@@ -9,6 +9,9 @@ const nextConfig: NextConfig = {
       // Optionally allow your specific Supabase project domain via env at runtime
       // Wikimedia for external images
       { protocol: "https", hostname: "upload.wikimedia.org" },
+      // Unsplash images
+      { protocol: "https", hostname: "images.unsplash.com" },
+      { protocol: "https", hostname: "plus.unsplash.com" },
     ],
   },
 };

@@ -62,22 +62,34 @@ export default function NewArtworkPage() {
           <label className="block text-sm mb-1">Description</label>
           <textarea className="w-full border rounded px-3 py-2" rows={4} {...register("description")} />
         </div>
-        <div className="grid grid-cols-2 gap-4 items-end">
-          <div>
-            <label className="block text-sm mb-1">Image URL</label>
-            <input className="w-full border rounded px-3 py-2" {...register("imageUrl")} />
+        <div className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm mb-1">Image URL</label>
+              <input className="w-full border rounded px-3 py-2" {...register("imageUrl")} />
+              {errors.imageUrl && <p className="text-sm text-red-600">{errors.imageUrl.message}</p>}
+            </div>
+            <div>
+              <label className="block text-sm mb-1">Image Public ID</label>
+              <input className="w-full border rounded px-3 py-2" {...register("imagePublicId")} />
+              {errors.imagePublicId && <p className="text-sm text-red-600">{errors.imagePublicId.message}</p>}
+            </div>
           </div>
-          <div>
-            <label className="block text-sm mb-1">Image Public ID</label>
-            <input className="w-full border rounded px-3 py-2" {...register("imagePublicId")} />
-          </div>
-          <div className="col-span-2 flex gap-3">
-            <SupabaseUpload
-              onUploaded={({ publicId, url }) => {
-                setValue("imagePublicId", publicId);
-                setValue("imageUrl", url);
-              }}
-            />
+          
+          <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+            <p className="text-sm font-medium text-gray-700 mb-3">Upload Image</p>
+            <div className="flex flex-wrap gap-3">
+              <SupabaseUpload
+                label="Upload to Supabase"
+                onUploaded={({ publicId, url }) => {
+                  setValue("imagePublicId", publicId);
+                  setValue("imageUrl", url);
+                }}
+              />
+            </div>
+            <p className="text-xs text-gray-500 mt-2">
+              If Supabase fails, the image will automatically be saved locally.
+            </p>
           </div>
         </div>
         <div className="flex items-center gap-3">

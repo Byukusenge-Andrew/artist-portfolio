@@ -8,9 +8,12 @@ import { ShareButton } from "@/components/ShareButton";
 import { Tag, Calendar, Palette, Sparkles } from "lucide-react";
 import Link from "next/link";
 
-export default async function ArtworkDetailPage({ params }: { params: { slug: string } }) {
+export default async function ArtworkDetailPage({ params }: { params: { slug: string } | Promise<{ slug: string }> }) {
+  // `params` can be a promise in some Next.js setups — await it before using.
+  const { slug } = (await params) as { slug: string };
+
   const artwork = await prisma.artwork.findUnique({
-    where: { slug: params.slug },
+    where: { slug },
     include: { printOptions: true },
   });
 
