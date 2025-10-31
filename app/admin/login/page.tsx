@@ -21,8 +21,9 @@ export default function AdminLoginPage() {
         throw new Error(j.error || "Invalid password");
       }
       window.location.href = "/";
-    } catch (err: any) {
-      setError(err.message || "Login failed");
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : "Login failed";
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }

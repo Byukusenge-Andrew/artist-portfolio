@@ -35,7 +35,7 @@ async function handleSign(req: Request) {
   }
 
   // Gather params coming from the widget (GET query or POST JSON)
-  let params: Record<string, any> = {};
+  let params: Record<string, unknown> = {};
   try {
     if (req.method === "POST") {
       const body = await req.json().catch(() => ({}));

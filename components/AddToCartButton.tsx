@@ -2,7 +2,7 @@
 import { useState } from "react";
 
 type Props = {
-  payload: any;
+  payload: Record<string, unknown>;
   label?: string;
 };
 
@@ -23,7 +23,7 @@ export function AddToCartButton({ payload, label = "Buy" }: Props) {
       } else {
         alert("Checkout error");
       }
-    } catch (e) {
+    } catch {
       alert("Checkout failed");
     } finally {
       setLoading(false);

@@ -13,7 +13,7 @@ export async function POST(req: Request) {
   const key = process.env.STRIPE_SECRET_KEY;
   if (!secret || !key) return NextResponse.json({ ok: true });
 
-  const stripe = new Stripe(key, { apiVersion: "2024-12-18.acacia" });
+  const stripe = new Stripe(key, { apiVersion: "2025-07-30.basil" });
   const rawBody = await req.text();
   const sig = req.headers.get("stripe-signature");
   if (!sig) return NextResponse.json({ error: "no sig" }, { status: 400 });
@@ -21,7 +21,7 @@ export async function POST(req: Request) {
   let event: Stripe.Event;
   try {
     event = stripe.webhooks.constructEvent(rawBody, sig, secret);
-  } catch (err) {
+  } catch {
     return NextResponse.json({ error: "invalid sig" }, { status: 400 });
   }
 
