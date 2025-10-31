@@ -2,9 +2,14 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import ArtworkGallery from "@/components/ArtworkGallery";
 
-export default async function GalleryDetailPage({ params }: { params: { slug: string } }) {
+export default async function GalleryDetailPage({ 
+  params 
+}: { 
+  params: Promise<{ slug: string }> 
+}) {
+  const { slug } = await params;
   const gallery = await prisma.gallery.findUnique({
-    where: { slug: params.slug },
+    where: { slug },
     include: {
       artworks: { include: { artwork: true } },
     },

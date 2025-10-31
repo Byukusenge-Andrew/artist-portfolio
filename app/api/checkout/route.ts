@@ -32,7 +32,15 @@ export async function POST(req: Request) {
 
   // Build order draft and Stripe line items
   const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = [];
-  const orderItemsData: Parameters<typeof prisma.orderItem.createMany>[0]["data"] = [];
+  const orderItemsData: Array<{
+    quantity: number;
+    productType: "ORIGINAL" | "PRINT" | "COMMISSION";
+    artworkId?: string;
+    printOptionId?: string;
+    titleSnapshot: string;
+    imageUrlSnapshot: string;
+    unitPriceCents: number;
+  }> = [];
 
   for (const item of items) {
     if (item.productType === "COMMISSION") {
@@ -101,6 +109,7 @@ export async function POST(req: Request) {
 
   const order = await prisma.order.create({
     data: {
+      email: "", // Will be filled in by Stripe webhook after payment
       currency,
       items: { createMany: { data: orderItemsData } },
     },
