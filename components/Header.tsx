@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { cookies } from "next/headers";
-import { Images, Plus, LogOut, Shield, Heart } from "lucide-react";
+import { Images, Plus, LogOut, Shield,} from "lucide-react";
 import SearchBox from "./SearchBox";
 import Logo from "./Logo";
 import FavoritesButton from "./FavoritesButton";
