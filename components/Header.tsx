@@ -10,7 +10,7 @@ export default async function Header() {
   const isAdmin = cookieStore.get("admin_session")?.value === "1";
 
   return (
-    <header className="sticky top-0 z-50 border-b border-teal-100/50 bg-white/80 backdrop-blur-xl supports-[backdrop-filter]:bg-white/70 shadow-sm">
+    <header className="sticky top-0 z-50 px-8 border-b border-teal-100/50 bg-white/80 backdrop-blur-xl supports-[backdrop-filter]:bg-white/70 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center gap-6 justify-between">
         <div className="flex items-center gap-6 min-w-0 flex-1">
           <Link href="/" className="group flex items-center gap-3 hover:scale-105 transition-transform duration-300">

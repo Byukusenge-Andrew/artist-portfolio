@@ -28,11 +28,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col  min-h-screen`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen`}
       >
         <FavoritesProvider>
           <Header />
-          <main className="flex-1">{children}</main>
+          <main className="flex-1 mx-4 sm:mx-6 lg:mx-8">{children}</main>
           <Footer />
         </FavoritesProvider>
       </body>

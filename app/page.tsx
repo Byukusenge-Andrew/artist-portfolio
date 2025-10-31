@@ -25,9 +25,9 @@ export default async function Home() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6">
+    <div className="max-w-7xl mx-auto">
       {/* Hero Section */}
-      <section className="relative overflow-hidden rounded-3xl my-10 animate-fade-in">
+      <section className="relative overflow-hidden rounded-3xl my-10 animate-fade-in ">
         <div className="absolute inset-0 bg-gradient-to-br from-teal-500 via-emerald-500 to-cyan-600 opacity-90"></div>
         <div className="absolute inset-0">
           <div className="absolute top-10 left-10 w-72 h-72 bg-white/10 rounded-full blur-3xl animate-pulse"></div>
