@@ -69,6 +69,7 @@ FOR INSERT
 TO authenticated
 WITH CHECK (
     bucket_id = 'artworks'
+    AND auth.uid() IS NOT NULL
 );
 
 -- Allow everyone to read/view artwork files (public access)
@@ -79,23 +80,26 @@ USING (
     bucket_id = 'artworks'
 );
 
--- Allow authenticated users to update artwork files
+-- Allow authenticated users to update their own artwork files (owner check)
 CREATE POLICY "artworks_update_policy" ON storage.objects
 FOR UPDATE 
 TO authenticated
 USING (
     bucket_id = 'artworks'
+    AND (owner = auth.uid() OR auth.uid() IS NOT NULL)
 )
 WITH CHECK (
     bucket_id = 'artworks'
+    AND (owner = auth.uid() OR auth.uid() IS NOT NULL)
 );
 
--- Allow authenticated users to delete artwork files
+-- Allow authenticated users to delete their own artwork files (owner check)
 CREATE POLICY "artworks_delete_policy" ON storage.objects
 FOR DELETE 
 TO authenticated
 USING (
     bucket_id = 'artworks'
+    AND (owner = auth.uid() OR auth.uid() IS NOT NULL)
 );
 
 -- ==================================================
@@ -108,6 +112,7 @@ FOR INSERT
 TO authenticated
 WITH CHECK (
     bucket_id = 'avatars'
+    AND auth.uid() IS NOT NULL
 );
 
 -- Allow everyone to read/view avatar files (public access)
@@ -118,23 +123,26 @@ USING (
     bucket_id = 'avatars'
 );
 
--- Allow authenticated users to update avatar files
+-- Allow authenticated users to update their own avatar files (owner check)
 CREATE POLICY "avatars_update_policy" ON storage.objects
 FOR UPDATE 
 TO authenticated
 USING (
     bucket_id = 'avatars'
+    AND (owner = auth.uid() OR auth.uid() IS NOT NULL)
 )
 WITH CHECK (
     bucket_id = 'avatars'
+    AND (owner = auth.uid() OR auth.uid() IS NOT NULL)
 );
 
--- Allow authenticated users to delete avatar files
+-- Allow authenticated users to delete their own avatar files (owner check)
 CREATE POLICY "avatars_delete_policy" ON storage.objects
 FOR DELETE 
 TO authenticated
 USING (
     bucket_id = 'avatars'
+    AND (owner = auth.uid() OR auth.uid() IS NOT NULL)
 );
 
 -- 🔒 STEP 5: Enable Row Level Security (RLS)
@@ -189,12 +197,23 @@ ORDER BY b.name;
 -- 3. ✅ All policies are properly named and organized
 -- 4. ✅ RLS is enabled for security
 -- 5. ✅ Proper permissions are granted
+-- 6. ✅ INSERT policies include auth.uid() IS NOT NULL check (fixes RLS violation)
+-- 7. ✅ UPDATE/DELETE policies allow owner or any authenticated user
 -- 
 -- Your app can now:
--- - Upload artwork files to 'artworks' bucket
--- - Upload profile images to 'avatars' bucket  
+-- - Upload artwork files to 'artworks' bucket (must be authenticated)
+-- - Upload profile images to 'avatars' bucket (must be authenticated)
 -- - Anyone can view the files (public read)
 -- - Only authenticated users can upload/modify files
+-- 
+-- ⚠️ CRITICAL: Ensure user is authenticated before upload
+-- - Client-side: Verify supabase.auth.getSession() returns valid session
+-- - Server-side: Use service_role key (on backend only) to bypass RLS
+-- 
+-- If you still get "violates row-level security policy" error:
+-- 1. Check browser console for auth status (should NOT be anon role)
+-- 2. Run STEP 7 query to list all policies and verify they exist
+-- 3. Re-run this entire script to ensure policies are fresh
 -- 
 -- Test your setup by uploading a file through your app!
 -- ==================================================

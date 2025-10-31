@@ -1,6 +1,6 @@
 "use client";
 import { useRef, useState } from "react";
-import { supabase, supabaseConfigured } from "@/lib/supabaseClient";
+import { supabaseConfigured } from "@/lib/supabaseClient";
 
 type Props = {
   onUploaded: (args: { publicId: string; url: string; width?: number; height?: number }) => void;
@@ -39,30 +39,35 @@ export function SupabaseUpload({ onUploaded, label = "Upload image", bucket = "a
     setUploadStatus("Uploading to Supabase...");
     
     try {
-      const fileExt = file.name.split(".").pop();
-      const fileName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${fileExt}`;
-      const filePath = `${fileName}`;
+      const form = new FormData();
+      form.append("file", file);
+      form.append("bucket", bucket);
 
-      // Try Supabase upload with timeout
-      const uploadPromise = supabase.storage.from(bucket).upload(filePath, file, {
-        cacheControl: "3600",
-        upsert: false,
+      // Upload via server endpoint (uses service_role key, bypasses RLS)
+      const uploadPromise = fetch("/api/uploads/supabase", {
+        method: "POST",
+        body: form,
       });
 
-      const timeoutPromise = new Promise<never>((_, reject) => 
+      const timeoutPromise = new Promise<never>((_, reject) =>
         setTimeout(() => reject(new Error("Upload timeout")), 30000) // 30 second timeout
       );
 
-      const uploadResult = await Promise.race([uploadPromise, timeoutPromise]);
-      const { error: uploadError } = uploadResult;
-      
-      if (uploadError) throw uploadError;
+      const res = await Promise.race([uploadPromise, timeoutPromise]) as Response;
 
-      const { data: publicUrlData } = supabase.storage.from(bucket).getPublicUrl(filePath);
-      const url = publicUrlData.publicUrl;
-      
+      if (!res.ok) {
+        const errorData = (await res.json()) as { error: string };
+        throw new Error(errorData.error || "Upload failed");
+      }
+
+      const data = (await res.json()) as { success: boolean; publicId: string; url: string };
+
+      if (!data.success) {
+        throw new Error("Upload failed on server");
+      }
+
       setUploadStatus("Upload successful!");
-      onUploaded({ publicId: filePath, url });
+      onUploaded({ publicId: data.publicId, url: data.url });
       
     } catch (error) {
       console.error("Supabase upload error:", error);

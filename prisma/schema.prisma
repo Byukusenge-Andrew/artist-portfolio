@@ -8,6 +8,9 @@ generator client {
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
+
+  sslcert  = env("SSL_CERT_PATH")
+  sslaccept = "strict"
 }
  
 // Portfolio data models
