@@ -2,8 +2,8 @@ import Link from "next/link";
 import { cookies } from "next/headers";
 import { Images, Plus, LogOut, Shield,} from "lucide-react";
 import SearchBox from "./SearchBox";
-import Logo from "./Logo";
 import FavoritesButton from "./FavoritesButton";
+import Image from "next/image";
 
 export default async function Header() {
   const cookieStore = await cookies();
@@ -14,9 +14,9 @@ export default async function Header() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center gap-6 justify-between">
         <div className="flex items-center gap-6 min-w-0 flex-1">
           <Link href="/" className="group flex items-center gap-3 hover:scale-105 transition-transform duration-300">
-            <Logo className="w-8 h-8 group-hover:rotate-12 transition-transform duration-300" />
+            <Image src="/icon.png" width={40} height={40} alt="Artistry"/>
             <span className="font-bold text-lg tracking-tight bg-gradient-to-r from-teal-600 via-emerald-600 to-teal-700 bg-clip-text text-transparent group-hover:from-teal-700 group-hover:via-emerald-700 group-hover:to-teal-800 transition-all duration-300">
-              ArtistryHub
+              Artelier
             </span>
           </Link>
 

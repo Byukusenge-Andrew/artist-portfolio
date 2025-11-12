@@ -9,11 +9,12 @@ datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
 
-  sslcert  = env("SSL_CERT_PATH")
-  sslaccept = "strict"
+ // sslcert  = env("SSL_CERT_PATH")
+
 }
  
 // Portfolio data models
+
 
 enum OrderStatus {
   PENDING
@@ -40,9 +41,9 @@ model Artwork {
   id                  String        @id @default(cuid())
   title               String
   slug                String        @unique
-  description         String?
+  description         String?       @db.Text
   imagePublicId       String
-  imageUrl            String
+  imageUrl            String        @db.LongText
   width               Int?
   height              Int?
   tags                Json?

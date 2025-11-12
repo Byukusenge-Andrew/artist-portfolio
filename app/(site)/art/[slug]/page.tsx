@@ -34,7 +34,13 @@ export default async function ArtworkDetailPage({
   
   if (tags.length > 0) {
     // Try to find artworks with matching tags
-    const allArtworks = await prisma.artwork.findMany({
+    const allArtworks: Array<{
+      id: string;
+      slug: string;
+      title: string;
+      imageUrl: string;
+      tags: unknown;
+    }> = await prisma.artwork.findMany({
       where: { id: { not: artwork.id } },
       select: {
         id: true,

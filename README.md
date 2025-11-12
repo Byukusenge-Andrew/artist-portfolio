@@ -1,4 +1,4 @@
-# 🎨 ArtistryHub - Artist Portfolio & Marketplace
+# 🎨 Artelier - Artist Portfolio & Marketplace
 
 A modern, full-featured art portfolio and e-commerce platform built with Next.js 15, featuring artwork galleries, favorites system, print sales, and admin management.
 
@@ -11,6 +11,7 @@ A modern, full-featured art portfolio and e-commerce platform built with Next.js
 ## ✨ Features
 
 ### 🖼️ Gallery & Artwork Management
+
 - **Dynamic Galleries**: Browse curated collections with smooth animations
 - **Advanced Search & Filtering**: Filter by tags, search by title, sort by date/title
 - **Image Lightbox**: Click-to-zoom with controls (zoom in/out, download, ESC to close)
@@ -18,6 +19,7 @@ A modern, full-featured art portfolio and e-commerce platform built with Next.js
 - **Loading States**: Elegant skeleton loaders for better UX
 
 ### ⭐ Favorites System
+
 - **Persistent Favorites**: LocalStorage-based favorites that persist across sessions
 - **Favorites Counter**: Real-time badge showing favorite count in header
 - **Sorting Options**: Sort by newest/oldest, alphabetically (A-Z/Z-A)
@@ -25,6 +27,7 @@ A modern, full-featured art portfolio and e-commerce platform built with Next.js
 - **Dedicated Page**: View and manage all favorited artworks
 
 ### 🛒 E-Commerce Features
+
 - **Original Artwork Sales**: Sell unique, one-of-a-kind pieces
 - **Print Options**: Multiple print sizes and formats
 - **Stripe Integration**: Secure payment processing
@@ -32,12 +35,14 @@ A modern, full-featured art portfolio and e-commerce platform built with Next.js
 - **Order Management**: Success and cancellation pages
 
 ### 🔐 Admin Features
+
 - **Admin Authentication**: Secure login/logout with cookie-based sessions
 - **Artwork Upload**: Multiple upload methods (Supabase, Cloudinary, Local)
 - **Gallery Management**: Create and organize gallery collections
 - **Artist Profiles**: Manage artist information and avatars
 
 ### 🎯 User Experience
+
 - **Share Functionality**: Share artworks on Twitter, Facebook, LinkedIn, or copy link
 - **Responsive Design**: Mobile-first, fully responsive across all devices
 - **Smooth Animations**: Fade-in, slide-in, scale-in effects throughout
@@ -45,6 +50,7 @@ A modern, full-featured art portfolio and e-commerce platform built with Next.js
 - **Custom Logo**: Beautiful palette & paintbrush SVG logo
 
 ### 🎨 Design Features
+
 - **Gradient Accents**: Teal-to-emerald gradients throughout
 - **Custom Scrollbar**: Styled scrollbar matching theme colors
 - **Interactive Cards**: Hover effects, overlays, and smooth transitions
@@ -54,6 +60,7 @@ A modern, full-featured art portfolio and e-commerce platform built with Next.js
 ## 🚀 Tech Stack
 
 ### Frontend
+
 - **Framework**: Next.js 15.4.6 (App Router)
 - **UI Library**: React 19.1.0
 - **Styling**: Tailwind CSS 4.x
@@ -62,6 +69,7 @@ A modern, full-featured art portfolio and e-commerce platform built with Next.js
 - **Type Safety**: TypeScript
 
 ### Backend
+
 - **Database**: MySQL with Prisma ORM
 - **File Storage**: Supabase Storage
 - **Image Processing**: Cloudinary, Next-Cloudinary
@@ -69,6 +77,7 @@ A modern, full-featured art portfolio and e-commerce platform built with Next.js
 - **API Routes**: Next.js API Routes
 
 ### State Management
+
 - **Global State**: React Context API (FavoritesContext)
 - **Local Storage**: Browser localStorage for persistence
 - **Zustand**: For complex state (optional)
@@ -76,7 +85,8 @@ A modern, full-featured art portfolio and e-commerce platform built with Next.js
 ## 📦 Installation
 
 ### Prerequisites
-- Node.js 18+ 
+
+- Node.js 18+
 - MySQL database
 - Supabase account (for file uploads)
 - Stripe account (for payments)
@@ -85,12 +95,14 @@ A modern, full-featured art portfolio and e-commerce platform built with Next.js
 ### Setup
 
 1. **Clone the repository**
+
 ```bash
 git clone <your-repo-url>
 cd artist-portfolio
 ```
 
-2. **Install dependencies**
+2.**Install dependencies**
+
 ```bash
 npm install
 # or
@@ -99,7 +111,7 @@ yarn install
 pnpm install
 ```
 
-3. **Configure environment variables**
+3.**Configure environment variables**
 
 Create a `.env` file in the root directory:
 
@@ -129,7 +141,8 @@ ADMIN_PASSWORD="your-secure-admin-password"
 NEXT_PUBLIC_BASE_URL="http://localhost:3000"
 ```
 
-4. **Set up the database**
+4.**Set up the database**
+
 ```bash
 # Generate Prisma Client
 npx prisma generate
@@ -141,7 +154,8 @@ npx prisma migrate dev
 npx prisma db seed
 ```
 
-5. **Run the development server**
+5.**Run the development server**
+
 ```bash
 npm run dev
 # or
@@ -150,12 +164,12 @@ yarn dev
 pnpm dev
 ```
 
-6. **Open your browser**
+6.**Open your browser**
 Navigate to [http://localhost:3000](http://localhost:3000)
 
 ## 📁 Project Structure
 
-```
+```bash
 artist-portfolio/
 ├── app/
 │   ├── (admin)/              # Admin-only routes
@@ -207,6 +221,7 @@ artist-portfolio/
 ## 🗄️ Database Schema
 
 ### Models
+
 - **Artwork**: Main artwork entity with images, pricing, tags
 - **Gallery**: Collection grouping for artworks
 - **Artist**: Artist profiles with avatars
@@ -217,6 +232,7 @@ artist-portfolio/
 ## 🎯 Usage
 
 ### For Visitors
+
 1. Browse galleries and artworks
 2. Click hearts to add favorites
 3. View artwork details with zoom
@@ -224,6 +240,7 @@ artist-portfolio/
 5. Purchase originals or prints
 
 ### For Admins
+
 1. Sign up/Login at `/admin/login`
 2. Upload artworks at `/artworks/new`
 3. Set pricing for originals and prints
@@ -233,7 +250,9 @@ artist-portfolio/
 ## 🎨 Customization
 
 ### Colors
+
 Edit `app/globals.css` to change the color scheme:
+
 ```css
 /* Primary gradient: teal to emerald */
 from-teal-600 to-emerald-600
@@ -243,10 +262,13 @@ from-[your-color] to-[your-color]
 ```
 
 ### Logo
+
 Edit `components/Logo.tsx` to customize the logo design.
 
 ### Animations
+
 All animations are defined in `app/globals.css`:
+
 - `animate-fade-in-up`
 - `animate-slide-in-left`
 - `animate-scale-in`
@@ -254,12 +276,14 @@ All animations are defined in `app/globals.css`:
 ## 🚢 Deployment
 
 ### Vercel (Recommended)
+
 1. Push code to GitHub
 2. Import project in Vercel
 3. Add environment variables
 4. Deploy
 
 ### Other Platforms
+
 - Build: `npm run build`
 - Start: `npm start`
 - Ensure MySQL database is accessible

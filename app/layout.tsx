@@ -16,7 +16,10 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "ArtistryHub - Discover Exceptional Artwork",
+  icons: {
+    icon: "/icon.png",
+  },
+  title: "Artelier - Discover Exceptional Artwork",
   description: "Explore and collect exceptional artwork from talented artists around the world. Join our community of creators and art enthusiasts.",
 };
 
@@ -27,6 +30,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head >
+   <link rel="icon"  href="/icon.png" sizes="any"/>
+        </head>
+
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen`}
       >

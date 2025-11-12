@@ -38,7 +38,7 @@ export default async function Home() {
           <div className="text-white space-y-6 animate-slide-in-left">
             <div className="inline-flex items-center gap-2 rounded-full bg-white/20 backdrop-blur-sm px-4 py-2 text-sm font-medium border border-white/30">
               <Sparkles className="size-4" />
-              <span>Welcome to ArtistryHub</span>
+              <span>Welcome to Artelier</span>
             </div>
             
             <h1 className="text-5xl md:text-6xl font-bold tracking-tight leading-tight">
