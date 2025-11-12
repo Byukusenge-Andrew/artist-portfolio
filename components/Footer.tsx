@@ -48,14 +48,14 @@ export default function Footer() {
             <div className="flex flex-col gap-3">
               <a 
                 className="group inline-flex items-center gap-3 rounded-lg px-4 py-3 bg-white hover:bg-gradient-to-br hover:from-teal-50 hover:to-emerald-50 border border-gray-200 hover:border-teal-300 transition-all duration-300 hover:shadow-md text-sm font-medium text-gray-700 hover:text-teal-800" 
-                href="mailto:hello@Artelier.com"
+                href="mailto:andrebyukusenge9@gmail.com"
               >
                 <Mail className="size-5 group-hover:scale-110 transition-transform" />
                 <span>hello@Artelier.com</span>
               </a>
               <a 
                 className="group inline-flex items-center gap-3 rounded-lg px-4 py-3 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 transition-all duration-300 hover:shadow-lg text-sm font-medium text-white" 
-                href="https://instagram.com" 
+                href="https://www.instagram.com/by_jam_23/" 
                 target="_blank" 
                 rel="noopener noreferrer"
               >
