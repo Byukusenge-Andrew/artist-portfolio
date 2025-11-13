@@ -1,6 +1,4 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
+// schema.prisma
 generator client {
   provider = "prisma-client-js"
 }
@@ -8,13 +6,7 @@ generator client {
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
-
- // sslcert  = env("SSL_CERT_PATH")
-
 }
- 
-// Portfolio data models
-
 
 enum OrderStatus {
   PENDING
@@ -38,118 +30,123 @@ enum ProductType {
 }
 
 model Artwork {
-  id                  String        @id @default(cuid())
-  title               String
-  slug                String        @unique
-  description         String?       @db.Text
-  imagePublicId       String
-  imageUrl            String        @db.LongText
-  width               Int?
-  height              Int?
-  tags                Json?
-  createdAt           DateTime      @default(now())
-  updatedAt           DateTime      @updatedAt
+  id                   String         @id @default(cuid())
+  title                String
+  slug                 String         @unique
+  description          String?        @db.Text
+  imagePublicId        String
+  imageUrl             String         @db.LongText
+  width                Int?
+  height               Int?
+  tags                 Json?
+  createdAt            DateTime       @default(now())
+  updatedAt            DateTime       @updatedAt
+  deletedAt            DateTime?
 
-  // Original piece info
-  isOriginalAvailable Boolean       @default(true)
-  originalPriceCents  Int?
+  isOriginalAvailable  Boolean        @default(true)
+  originalPriceCents   Int?
+  printEnabled         Boolean        @default(false)
+  printOptions         PrintOption[]  @relation("ArtworkPrintOptions")
+  galleries            ArtworkGallery[] @relation("ArtworkGalleries")
+  orderItems           OrderItem[]
 
-  // Prints
-  printEnabled        Boolean       @default(false)
-  printOptions        PrintOption[]
-
-  // Galleries (many-to-many)
-  galleries           ArtworkGallery[]
-
-  // Order items referencing snapshot of artwork
-  orderItems          OrderItem[]
+  @@index([slug])
+  @@index([deletedAt])  // ← Block-level index
 }
 
 model PrintOption {
-  id         String   @id @default(cuid())
-  artworkId  String
-  name       String   // e.g., "A4", "A3", "12x16 in"
-  priceCents Int
+  id           String     @id @default(cuid())
+  artworkId    String
+  name         String
+  priceCents   Int
 
-  artwork    Artwork  @relation(fields: [artworkId], references: [id], onDelete: Cascade)
-  orderItems OrderItem[]
+  artwork      Artwork    @relation("ArtworkPrintOptions", fields: [artworkId], references: [id], onDelete: Cascade)
+  orderItems   OrderItem[]
+
+  @@unique([artworkId, name])
 }
 
 model Gallery {
-  id          String           @id @default(cuid())
-  name        String
-  slug        String           @unique
-  description String?
-  createdAt   DateTime         @default(now())
-  updatedAt   DateTime         @updatedAt
+  id           String         @id @default(cuid())
+  name         String
+  slug         String         @unique
+  description  String?
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
 
-  artworks    ArtworkGallery[]
+  artworks     ArtworkGallery[]
+
+  @@index([slug])
 }
 
 model ArtworkGallery {
-  artworkId String
-  galleryId String
+  artworkId    String
+  galleryId    String
 
-  artwork   Artwork @relation(fields: [artworkId], references: [id], onDelete: Cascade)
-  gallery   Gallery @relation(fields: [galleryId], references: [id], onDelete: Cascade)
+  artwork      Artwork        @relation("ArtworkGalleries", fields: [artworkId], references: [id], onDelete: Cascade)
+  gallery      Gallery        @relation(fields: [galleryId], references: [id], onDelete: Cascade)
 
   @@id([artworkId, galleryId])
+  @@index([galleryId])
 }
 
 model Order {
-  id          String       @id @default(cuid())
-  email       String
+  id           String       @id @default(cuid())
+  email        String
   customerName String?
-  status      OrderStatus  @default(PENDING)
-  currency    String       @default("usd")
-  totalCents  Int          @default(0)
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  status       OrderStatus  @default(PENDING)
+  currency     String       @default("RWF")
+  totalCents   Int          @default(0)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
 
-  items       OrderItem[]
+  items        OrderItem[]
+
+  @@index([email, createdAt])
 }
 
 model OrderItem {
-  id            String      @id @default(cuid())
-  orderId       String
-  productType   ProductType
-  quantity      Int         @default(1)
+  id                 String       @id @default(cuid())
+  orderId            String
+  productType        ProductType
+  quantity           Int          @default(1)
+  artworkId          String?
+  printOptionId      String?
+  titleSnapshot      String
+  imageUrlSnapshot   String
+  unitPriceCents     Int
 
-  // Artwork association (for ORIGINAL or PRINT)
-  artworkId     String?
-  printOptionId String?
+  order              Order        @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  artwork            Artwork?     @relation(fields: [artworkId], references: [id])
+  printOption        PrintOption? @relation(fields: [printOptionId], references: [id])
 
-  // Snapshots to preserve state at order time
-  titleSnapshot String
-  imageUrlSnapshot String
-  unitPriceCents Int
-
-  order         Order       @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  artwork       Artwork?    @relation(fields: [artworkId], references: [id])
-  printOption   PrintOption? @relation(fields: [printOptionId], references: [id])
+  @@index([orderId])
 }
 
 model CommissionRequest {
-  id           String           @id @default(cuid())
-  name         String
-  email        String
-  details      String
+  id                    String           @id @default(cuid())
+  name                  String
+  email                 String
+  details               String
   referenceImagePublicId String?
-  referenceImageUrl      String?
-  status       CommissionStatus  @default(NEW)
-  createdAt    DateTime          @default(now())
-  updatedAt    DateTime          @updatedAt
+  referenceImageUrl     String?
+  status                CommissionStatus @default(NEW)
+  createdAt             DateTime         @default(now())
+  updatedAt             DateTime         @updatedAt
+
+  @@index([email, createdAt])
 }
 
-// Artist/Admin profile for signup
 model Artist {
-  id              String   @id @default(cuid())
-  name            String
-  email           String?  @unique
-  phone           String?
-  bio             String?
-  avatarPublicId  String?
-  avatarUrl       String?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id            String   @id @default(cuid())
+  name          String
+  email         String?  @unique
+  phone         String?
+  bio           String?
+  avatarPublicId String?
+  avatarUrl     String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([email])
 }

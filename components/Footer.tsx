@@ -1,6 +1,7 @@
 import { Instagram, Mail, Heart, ExternalLink } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
-import Logo from "./Logo";
+
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
@@ -13,7 +14,7 @@ export default function Footer() {
           {/* Brand section */}
           <div className="space-y-4">
             <div className="flex items-center gap-3">
-              <Logo className="w-10 h-10" />
+           <Image src="/icon.png" alt="logo" height={50} width={50}/>
               <span className="font-bold text-xl bg-gradient-to-r from-teal-600 via-emerald-600 to-teal-700 bg-clip-text text-transparent">
                 Artelier
               </span>
@@ -51,7 +52,7 @@ export default function Footer() {
                 href="mailto:andrebyukusenge9@gmail.com"
               >
                 <Mail className="size-5 group-hover:scale-110 transition-transform" />
-                <span>hello@Artelier.com</span>
+                <span>andrebyukusenge9@gmail.com</span>
               </a>
               <a 
                 className="group inline-flex items-center gap-3 rounded-lg px-4 py-3 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 transition-all duration-300 hover:shadow-lg text-sm font-medium text-white" 

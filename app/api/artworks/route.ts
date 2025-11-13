@@ -62,6 +62,12 @@ export async function POST(req: Request) {
     },
     include: { printOptions: true },
   });
+  // const deleted = await prisma.artwork.deleteMany({
+  //   where: {
+  //     id: { not: created.id },
+  //     slug: created.slug,
+  //   },
+  // });
 
   return NextResponse.json(created, { status: 201 });
 }

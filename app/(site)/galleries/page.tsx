@@ -1,22 +1,22 @@
+// app/(site)/galleries/page.tsx
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import ArtworkGallery from "@/components/ArtworkGallery";
 import { Palette } from "lucide-react";
+import { cookies } from "next/headers";
+import GalleryDeleteButton from "@/components/GalleryDeleteButton";
 
 export default async function GalleriesPage() {
+  const cookieStore = await cookies();
+  const isAdmin = cookieStore.get("admin_session")?.value === "1";
+
   const galleries = await prisma.gallery.findMany({
     orderBy: { name: "asc" },
   });
 
   const artworks = await prisma.artwork.findMany({
     orderBy: { createdAt: "desc" },
-    select: {
-      id: true,
-      slug: true,
-      title: true,
-      imageUrl: true,
-      tags: true,
-    },
+    select: { id: true, slug: true, title: true, imageUrl: true, tags: true },
   });
 
   const artworksList = artworks.map((artwork) => ({
@@ -24,7 +24,11 @@ export default async function GalleriesPage() {
     slug: artwork.slug,
     title: artwork.title,
     imageUrl: artwork.imageUrl,
-    tags: artwork.tags ? (Array.isArray(artwork.tags) ? artwork.tags as string[] : []) : [],
+    tags: artwork.tags
+      ? Array.isArray(artwork.tags)
+        ? artwork.tags.filter((t): t is string => typeof t === "string")
+        : []
+      : [],
   }));
 
   return (
@@ -44,7 +48,7 @@ export default async function GalleriesPage() {
         </p>
       </div>
 
-      {/* Gallery Collections */}
+      {/* Collections */}
       {galleries.length > 0 && (
         <div className="mb-12 animate-slide-in-left">
           <h2 className="text-2xl font-semibold mb-6 flex items-center gap-2">
@@ -53,21 +57,35 @@ export default async function GalleriesPage() {
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {galleries.map((g) => (
-              <Link
+              <div
                 key={g.id}
-                href={`/galleries/${g.slug}`}
-                className="group block p-6 border border-gray-200 rounded-xl hover:border-teal-300 bg-white hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
+                className="group relative p-6 border border-gray-200 rounded-xl hover:border-teal-300 bg-white hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
               >
-                <div className="flex items-start justify-between mb-2">
-                  <h3 className="text-lg font-semibold text-gray-900 group-hover:text-teal-700 transition-colors">
-                    {g.name}
-                  </h3>
-                  <span className="text-2xl group-hover:scale-110 transition-transform">🎨</span>
-                </div>
-                {g.description && (
-                  <p className="text-sm text-gray-600 line-clamp-2">{g.description}</p>
+                <Link
+                  href={`/galleries/${g.slug}`}
+                  className="block flex-1"
+                >
+                  <div className="flex items-start justify-between mb-2">
+                    <h3 className="text-lg font-semibold text-gray-900 group-hover:text-teal-700 transition-colors">
+                      {g.name}
+                    </h3>
+                    <span className="text-2xl group-hover:scale-110 transition-transform">Art</span>
+                  </div>
+                  {g.description && (
+                    <p className="text-sm text-gray-600 line-clamp-2">{g.description}</p>
+                  )}
+                </Link>
+
+                {/* Admin Delete */}
+                {isAdmin && (
+                  <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <GalleryDeleteButton
+                      galleryId={g.id}
+                      galleryName={g.name}
+                    />
+                  </div>
                 )}
-              </Link>
+              </div>
             ))}
           </div>
         </div>
@@ -84,5 +102,3 @@ export default async function GalleriesPage() {
     </div>
   );
 }
-
-
