@@ -5,8 +5,7 @@ generator client {
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
-  connection_limit = 10  // Reduce if you hit limits (Aiven free tier may have low max connections)
-  pool_timeout     = 30
+ 
 }
 
 model Artwork {
