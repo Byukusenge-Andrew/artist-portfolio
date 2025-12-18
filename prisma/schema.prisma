@@ -1,4 +1,3 @@
-// schema.prisma
 generator client {
   provider = "prisma-client-js"
 }
@@ -6,6 +5,124 @@ generator client {
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
+}
+
+model Artwork {
+  id                  String           @id @default(cuid())
+  title               String
+  slug                String           @unique
+  description         String?          @db.Text
+  imagePublicId       String
+  imageUrl            String           @db.LongText
+  width               Int?
+  height              Int?
+  tags                Json?
+  createdAt           DateTime         @default(now())
+  updatedAt           DateTime         @updatedAt
+  isOriginalAvailable Boolean          @default(true)
+  originalPriceCents  Int?
+  printEnabled        Boolean          @default(false)
+  deletedAt           DateTime?
+  galleries           ArtworkGallery[] @relation("ArtworkGalleries")
+  orderItems          OrderItem[]
+  printOptions        PrintOption[]    @relation("ArtworkPrintOptions")
+
+  @@index([slug])
+  @@index([deletedAt])
+}
+
+model PrintOption {
+  id         String      @id @default(cuid())
+  artworkId  String
+  name       String
+  priceCents Int
+  orderItems OrderItem[]
+  artwork    Artwork     @relation("ArtworkPrintOptions", fields: [artworkId], references: [id], onDelete: Cascade)
+
+  @@unique([artworkId, name])
+}
+
+model Gallery {
+  id          String           @id @default(cuid())
+  name        String
+  slug        String           @unique
+  description String?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  artworks    ArtworkGallery[]
+
+  @@index([slug])
+}
+
+model ArtworkGallery {
+  artworkId String
+  galleryId String
+  artwork   Artwork @relation("ArtworkGalleries", fields: [artworkId], references: [id], onDelete: Cascade)
+  gallery   Gallery @relation(fields: [galleryId], references: [id], onDelete: Cascade)
+
+  @@id([artworkId, galleryId])
+  @@index([galleryId])
+}
+
+model Order {
+  id           String      @id @default(cuid())
+  email        String
+  customerName String?
+  status       OrderStatus @default(PENDING)
+  currency     String      @default("RWF")
+  totalCents   Int         @default(0)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  items        OrderItem[]
+
+  @@index([email, createdAt])
+}
+
+model OrderItem {
+  id               String       @id @default(cuid())
+  orderId          String
+  productType      ProductType
+  quantity         Int          @default(1)
+  artworkId        String?
+  printOptionId    String?
+  titleSnapshot    String
+  imageUrlSnapshot String
+  unitPriceCents   Int
+  artwork          Artwork?     @relation(fields: [artworkId], references: [id])
+  order            Order        @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  printOption      PrintOption? @relation(fields: [printOptionId], references: [id])
+
+  @@index([orderId])
+  @@index([artworkId], map: "OrderItem_artworkId_fkey")
+  @@index([printOptionId], map: "OrderItem_printOptionId_fkey")
+}
+
+model CommissionRequest {
+  id                     String           @id @default(cuid())
+  name                   String
+  email                  String
+  details                String
+  referenceImagePublicId String?
+  referenceImageUrl      String?
+  status                 CommissionStatus @default(NEW)
+  createdAt              DateTime         @default(now())
+  updatedAt              DateTime         @updatedAt
+
+  @@index([email, createdAt])
+}
+
+model Artist {
+  id             String   @id @default(cuid())
+  name           String
+  email          String?  @unique
+  phone          String?
+  bio            String?
+  avatarPublicId String?
+  avatarUrl      String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([email])
 }
 
 enum OrderStatus {
@@ -27,126 +144,4 @@ enum ProductType {
   ORIGINAL
   PRINT
   COMMISSION
-}
-
-model Artwork {
-  id                   String         @id @default(cuid())
-  title                String
-  slug                 String         @unique
-  description          String?        @db.Text
-  imagePublicId        String
-  imageUrl             String         @db.LongText
-  width                Int?
-  height               Int?
-  tags                 Json?
-  createdAt            DateTime       @default(now())
-  updatedAt            DateTime       @updatedAt
-  deletedAt            DateTime?
-
-  isOriginalAvailable  Boolean        @default(true)
-  originalPriceCents   Int?
-  printEnabled         Boolean        @default(false)
-  printOptions         PrintOption[]  @relation("ArtworkPrintOptions")
-  galleries            ArtworkGallery[] @relation("ArtworkGalleries")
-  orderItems           OrderItem[]
-
-  @@index([slug])
-  @@index([deletedAt])  // ← Block-level index
-}
-
-model PrintOption {
-  id           String     @id @default(cuid())
-  artworkId    String
-  name         String
-  priceCents   Int
-
-  artwork      Artwork    @relation("ArtworkPrintOptions", fields: [artworkId], references: [id], onDelete: Cascade)
-  orderItems   OrderItem[]
-
-  @@unique([artworkId, name])
-}
-
-model Gallery {
-  id           String         @id @default(cuid())
-  name         String
-  slug         String         @unique
-  description  String?
-  createdAt    DateTime       @default(now())
-  updatedAt    DateTime       @updatedAt
-
-  artworks     ArtworkGallery[]
-
-  @@index([slug])
-}
-
-model ArtworkGallery {
-  artworkId    String
-  galleryId    String
-
-  artwork      Artwork        @relation("ArtworkGalleries", fields: [artworkId], references: [id], onDelete: Cascade)
-  gallery      Gallery        @relation(fields: [galleryId], references: [id], onDelete: Cascade)
-
-  @@id([artworkId, galleryId])
-  @@index([galleryId])
-}
-
-model Order {
-  id           String       @id @default(cuid())
-  email        String
-  customerName String?
-  status       OrderStatus  @default(PENDING)
-  currency     String       @default("RWF")
-  totalCents   Int          @default(0)
-  createdAt    DateTime     @default(now())
-  updatedAt    DateTime     @updatedAt
-
-  items        OrderItem[]
-
-  @@index([email, createdAt])
-}
-
-model OrderItem {
-  id                 String       @id @default(cuid())
-  orderId            String
-  productType        ProductType
-  quantity           Int          @default(1)
-  artworkId          String?
-  printOptionId      String?
-  titleSnapshot      String
-  imageUrlSnapshot   String
-  unitPriceCents     Int
-
-  order              Order        @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  artwork            Artwork?     @relation(fields: [artworkId], references: [id])
-  printOption        PrintOption? @relation(fields: [printOptionId], references: [id])
-
-  @@index([orderId])
-}
-
-model CommissionRequest {
-  id                    String           @id @default(cuid())
-  name                  String
-  email                 String
-  details               String
-  referenceImagePublicId String?
-  referenceImageUrl     String?
-  status                CommissionStatus @default(NEW)
-  createdAt             DateTime         @default(now())
-  updatedAt             DateTime         @updatedAt
-
-  @@index([email, createdAt])
-}
-
-model Artist {
-  id            String   @id @default(cuid())
-  name          String
-  email         String?  @unique
-  phone         String?
-  bio           String?
-  avatarPublicId String?
-  avatarUrl     String?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-
-  @@index([email])
 }
