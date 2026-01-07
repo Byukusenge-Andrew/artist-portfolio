@@ -69,6 +69,8 @@ model Order {
   id           String      @id @default(cuid())
   email        String
   customerName String?
+  userId       String?
+  user         User?       @relation("UserOrders", fields: [userId], references: [id], onDelete: SetNull)
   status       OrderStatus @default(PENDING)
   currency     String      @default("RWF")
   totalCents   Int         @default(0)
@@ -77,6 +79,7 @@ model Order {
   items        OrderItem[]
 
   @@index([email, createdAt])
+  @@index([userId])
 }
 
 model OrderItem {
@@ -126,11 +129,33 @@ model Artist {
   @@index([email])
 }
 
+model User {
+  id             String   @id @default(cuid())
+  email          String   @unique
+  password       String
+  name           String?
+  role           UserRole @default(USER)
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  favorites      String   @db.LongText @default("[]")
+  wishlist       String   @db.LongText @default("[]")
+  orders         Order[]  @relation("UserOrders")
+
+  @@index([email])
+  @@index([role])
+}
+
 enum OrderStatus {
   PENDING
   PAID
   FULFILLED
   CANCELED
+}
+
+enum UserRole {
+  USER
+  ADMIN
 }
 
 enum CommissionStatus {

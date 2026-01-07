@@ -4,6 +4,7 @@ import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { FavoritesProvider } from "@/contexts/FavoritesContext";
+import { AuthProvider } from "@/contexts/AuthContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -37,11 +38,13 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen`}
       >
-        <FavoritesProvider>
-          <Header />
-          <main className="flex-1 mx-4 sm:mx-6 lg:mx-8">{children}</main>
-          <Footer />
-        </FavoritesProvider>
+        <AuthProvider>
+          <FavoritesProvider>
+            <Header />
+            <main className="flex-1 mx-4 sm:mx-6 lg:mx-8">{children}</main>
+            <Footer />
+          </FavoritesProvider>
+        </AuthProvider>
       </body>
     </html>
   );

@@ -1,35 +1,68 @@
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
-export function middleware(req: NextRequest) {
-  const adminCookie = req.cookies.get("admin_session")?.value;
-  const isLoggedIn = adminCookie === "1";
+export function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+  const userSession = request.cookies.get("user_session")?.value;
+  const adminSession = request.cookies.get("admin_session")?.value; // Legacy support
 
-  // Protect all routes under /artworks (admin tools) except public viewing pages
-  if (req.nextUrl.pathname.startsWith("/artworks")) {
-    if (!isLoggedIn && !req.nextUrl.pathname.startsWith("/art/")) {
-      const loginUrl = new URL("/admin/login", req.url);
-      return NextResponse.redirect(loginUrl);
+  // Decode user session if available
+  let user: { role?: string } | null = null;
+  if (userSession) {
+    try {
+      user = JSON.parse(Buffer.from(userSession, "base64").toString());
+    } catch (e) {
+      // Invalid session
     }
   }
 
-  // Protect any /admin/* routes, but allow public pages like /admin/login and /admin/signup
-  const isAdminRoute = req.nextUrl.pathname.startsWith("/admin");
-  const isPublicAdminPage =
-    req.nextUrl.pathname === "/admin/login" ||
-    req.nextUrl.pathname === "/admin/signup";
-  if (isAdminRoute && !isPublicAdminPage) {
-    if (!isLoggedIn) {
-      const loginUrl = new URL("/admin/login", req.url);
-      return NextResponse.redirect(loginUrl);
+  const isAuthenticated = !!userSession;
+  const isAdmin = user?.role === "ADMIN" || !!adminSession; // Support both new and legacy admin
+
+  // Public routes - allow access
+  if (pathname === "/" || pathname.startsWith("/art/") || pathname.startsWith("/galleries")) {
+    return NextResponse.next();
+  }
+
+  // Auth routes - redirect if already authenticated
+  if ((pathname === "/auth/login" || pathname === "/auth/register") && isAuthenticated) {
+    return NextResponse.redirect(new URL("/user/dashboard", request.url));
+  }
+
+  // Admin routes - require admin role
+  if (pathname.startsWith("/admin")) {
+    const isPublicAdminPage = pathname === "/admin/login" || pathname === "/admin/signup";
+    if (!isPublicAdminPage && !isAdmin) {
+      return NextResponse.redirect(new URL("/auth/login", request.url));
     }
+    return NextResponse.next();
+  }
+
+  // User routes - require authentication
+  if (pathname.startsWith("/user")) {
+    if (!isAuthenticated) {
+      return NextResponse.redirect(new URL("/auth/login", request.url));
+    }
+    return NextResponse.next();
+  }
+
+  // Protected checkout route
+  if (pathname === "/order/success" || pathname === "/order/cancel") {
+    if (!isAuthenticated) {
+      return NextResponse.redirect(new URL("/auth/login", request.url));
+    }
+    return NextResponse.next();
   }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/artworks/:path*"],
+  matcher: [
+    "/admin/:path*",
+    "/user/:path*",
+    "/auth/:path*",
+    "/order/:path*",
+  ],
 };
 
 

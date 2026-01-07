@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { cookies } from "next/headers";
-import { Images, Plus, LogOut, Shield,} from "lucide-react";
+import { Images, Plus, LogOut, Shield, Settings} from "lucide-react";
 import SearchBox from "./SearchBox";
 import FavoritesButton from "./FavoritesButton";
 import Image from "next/image";
@@ -34,9 +34,53 @@ export default async function Header() {
             <Images className="size-4 group-hover:scale-110 transition-transform" />
             <span className="hidden sm:inline font-medium">Galleries</span>
           </Link>
+          <Link
+            href="/artist"
+            className="group inline-flex items-center gap-2 rounded-lg px-4 py-2 text-gray-700 hover:text-teal-800 hover:bg-gradient-to-br hover:from-teal-50 hover:to-emerald-50 transition-all duration-300 hover:shadow-sm"
+            aria-label="View artist profile"
+          >
+            <span className="hidden sm:inline font-medium">Artist</span>
+          </Link>
+          <Link
+            href="/commissions"
+            className="group inline-flex items-center gap-2 rounded-lg px-4 py-2 text-gray-700 hover:text-teal-800 hover:bg-gradient-to-br hover:from-teal-50 hover:to-emerald-50 transition-all duration-300 hover:shadow-sm"
+            aria-label="Request a commission"
+          >
+            <span className="hidden sm:inline font-medium">Commission</span>
+          </Link>
           <FavoritesButton />
           {isAdmin ? (
             <>
+              <div className="flex items-center gap-1">
+                <Link
+                  href="/admin/galleries"
+                  className="group inline-flex items-center gap-1 rounded-lg px-2 py-2 text-gray-700 hover:text-teal-800 hover:bg-teal-50 transition-all duration-300 text-xs sm:text-sm"
+                  title="Manage galleries"
+                >
+                  <span className="font-medium">Galleries</span>
+                </Link>
+                <Link
+                  href="/admin/artists"
+                  className="group inline-flex items-center gap-1 rounded-lg px-2 py-2 text-gray-700 hover:text-teal-800 hover:bg-teal-50 transition-all duration-300 text-xs sm:text-sm"
+                  title="Manage artists"
+                >
+                  <span className="font-medium">Artists</span>
+                </Link>
+                <Link
+                  href="/admin/orders"
+                  className="group inline-flex items-center gap-1 rounded-lg px-2 py-2 text-gray-700 hover:text-teal-800 hover:bg-teal-50 transition-all duration-300 text-xs sm:text-sm"
+                  title="View orders"
+                >
+                  <span className="font-medium">Orders</span>
+                </Link>
+                <Link
+                  href="/admin/commissions"
+                  className="group inline-flex items-center gap-1 rounded-lg px-2 py-2 text-gray-700 hover:text-teal-800 hover:bg-teal-50 transition-all duration-300 text-xs sm:text-sm"
+                  title="Commission requests"
+                >
+                  <span className="font-medium">Commissions</span>
+                </Link>
+              </div>
               <Link
                 href="/artworks/new"
                 className="group inline-flex items-center gap-2 rounded-lg px-4 py-2 text-white bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105"

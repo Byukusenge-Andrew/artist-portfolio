@@ -1,5 +1,5 @@
 import Stripe from "stripe";
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 
@@ -15,7 +15,25 @@ const cartSchema = z.object({
   ),
 });
 
-export async function POST(req: Request) {
+function getCurrentUser(req: NextRequest): { id: string; email: string } | null {
+  const userSession = req.cookies.get("user_session")?.value;
+  if (!userSession) return null;
+
+  try {
+    const user = JSON.parse(Buffer.from(userSession, "base64").toString());
+    return { id: user.id, email: user.email };
+  } catch (e) {
+    return null;
+  }
+}
+
+export async function POST(req: NextRequest) {
+  // Require authentication
+  const user = getCurrentUser(req);
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized - please log in" }, { status: 401 });
+  }
+
   if (!process.env.STRIPE_SECRET_KEY) {
     return NextResponse.json({ error: "Stripe not configured" }, { status: 500 });
   }
@@ -109,7 +127,8 @@ export async function POST(req: Request) {
 
   const order = await prisma.order.create({
     data: {
-      email: "", // Will be filled in by Stripe webhook after payment
+      email: user.email,
+      userId: user.id,
       currency,
       items: { createMany: { data: orderItemsData } },
     },
