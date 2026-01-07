@@ -2,6 +2,7 @@
 import { prisma } from "@/lib/prisma";
 import { Mail, Phone, Palette } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 
 export default async function ArtistPage() {
   const artists = await prisma.artist.findMany({
@@ -27,9 +28,10 @@ export default async function ArtistPage() {
           <div className="sticky top-8">
             <div className="relative aspect-square rounded-2xl overflow-hidden bg-gradient-to-br from-teal-100 to-emerald-100 flex items-center justify-center shadow-lg">
               {artist.avatarUrl ? (
-                <img
+                <Image
                   src={artist.avatarUrl}
                   alt={artist.name}
+                  fill
                   className="w-full h-full object-cover"
                 />
               ) : (
@@ -89,9 +91,9 @@ export default async function ArtistPage() {
         <h2 className="text-2xl font-bold mb-8">Recent Works</h2>
         <p className="text-gray-600">
           Explore all artworks in our{" "}
-          <a href="/galleries" className="text-teal-600 hover:text-teal-700 font-semibold">
+          <Link href="/galleries" className="text-teal-600 hover:text-teal-700 font-semibold">
             galleries
-          </a>
+          </Link>
           .
         </p>
       </div>
