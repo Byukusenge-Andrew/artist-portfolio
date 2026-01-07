@@ -23,7 +23,7 @@ export async function POST(req: Request) {
     const { email, password } = validation.data;
 
     // Find user
-    const user = await prisma.user.findUnique({
+    const user = await (prisma as any).user.findUnique({
       where: { email },
     });
 

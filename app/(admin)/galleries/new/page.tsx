@@ -109,7 +109,7 @@ export default function NewGalleryPage() {
       </form>
 
       <p className="text-sm text-gray-600 mt-6">
-        After creating the gallery, you'll be able to add artworks to it.
+        After creating the gallery, you&apos;ll be able to add artworks to it.
       </p>
     </div>
   );

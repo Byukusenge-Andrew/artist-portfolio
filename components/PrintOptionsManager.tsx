@@ -109,6 +109,7 @@ export default function PrintOptionsManager({ artworkId }: { artworkId: string }
                 </p>
               </div>
               <button
+              title="delete"
                 onClick={() => handleDeleteOption(option.id)}
                 className="p-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-all"
               >

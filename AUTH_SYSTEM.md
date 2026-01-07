@@ -3,8 +3,14 @@
 ## Overview
 
 The application now features a comprehensive authentication system with role-based access control supporting two user types:
-- **Regular Users** - Browse, purchase, and save favorites
-- **Admin Users** - Manage artworks, galleries, orders, and site content
+
+- **Regular Users**
+
+- Browse,purchase, and save favorites
+
+- **Admin Users**
+
+- Manage artworks,galleries, orders, and site content
 
 ## File Structure
 
@@ -36,7 +42,9 @@ The application now features a comprehensive authentication system with role-bas
 ## User Roles
 
 ### USER Role
+
 Access to:
+
 - Public galleries and artworks
 - User dashboard and profile
 - Order history and management
@@ -44,7 +52,9 @@ Access to:
 - Shopping checkout
 
 ### ADMIN Role
+
 Access to:
+
 - All user features
 - Admin dashboard with analytics
 - Artwork management (/admin/artworks/new)
@@ -86,9 +96,11 @@ User sessions are stored in an **httpOnly cookie** named `user_session`:
 ## API Endpoints
 
 ### `/api/auth/register` - POST
+
 Register a new user account.
 
 **Request:**
+
 ```json
 {
   "email": "user@example.com",
@@ -99,12 +111,14 @@ Register a new user account.
 ```
 
 **Validation:**
+
 - Email must be unique
 - Password must be 8+ characters
 - Passwords must match
 - Name is required
 
 **Response:**
+
 ```json
 {
   "id": "user_id",
@@ -115,9 +129,11 @@ Register a new user account.
 ```
 
 ### `/api/auth/login` - POST
+
 Authenticate a user.
 
 **Request:**
+
 ```json
 {
   "email": "user@example.com",
@@ -126,11 +142,13 @@ Authenticate a user.
 ```
 
 **Validation:**
+
 - User must exist
 - User must be active (isActive = true)
 - Password must match
 
 **Response:**
+
 ```json
 {
   "id": "user_id",
@@ -141,17 +159,21 @@ Authenticate a user.
 ```
 
 ### `/api/auth/logout` - POST
+
 Sign out and clear session.
 
 **Response:**
+
 ```json
 { "success": true }
 ```
 
 ### `/api/auth/session` - GET
+
 Get current user session information.
 
 **Response (if authenticated):**
+
 ```json
 {
   "user": {
@@ -165,6 +187,7 @@ Get current user session information.
 ```
 
 **Response (if not authenticated):**
+
 ```json
 {
   "user": null
@@ -226,6 +249,7 @@ async function MyServerComponent() {
 Routes are protected via middleware (`middleware.ts`):
 
 ### Public Routes
+
 - `/` - Home page
 - `/art/*` - Public artwork pages
 - `/galleries` - Public gallery listing
@@ -233,11 +257,13 @@ Routes are protected via middleware (`middleware.ts`):
 - `/auth/register` - Registration page
 
 ### Protected Routes
+
 - `/user/*` - Requires USER role (redirects to `/auth/login`)
 - `/admin/*` - Requires ADMIN role (redirects to `/auth/login`)
 - `/order/success`, `/order/cancel` - Requires authentication
 
 ### Automatic Redirects
+
 - Logged-in users accessing `/auth/login` or `/auth/register` → redirect to `/user/dashboard`
 - Non-admins accessing `/admin/*` → redirect to `/auth/login`
 - Non-authenticated users accessing protected routes → redirect to `/auth/login`
@@ -299,6 +325,7 @@ enum UserRole {
 ## Testing Authentication
 
 ### Register a Test User
+
 ```bash
 curl -X POST http://localhost:3000/api/auth/register \
   -H "Content-Type: application/json" \
@@ -311,6 +338,7 @@ curl -X POST http://localhost:3000/api/auth/register \
 ```
 
 ### Login
+
 ```bash
 curl -X POST http://localhost:3000/api/auth/login \
   -H "Content-Type: application/json" \
@@ -322,12 +350,14 @@ curl -X POST http://localhost:3000/api/auth/login \
 ```
 
 ### Check Session
+
 ```bash
 curl http://localhost:3000/api/auth/session \
   -b cookies.txt
 ```
 
 ### Logout
+
 ```bash
 curl -X POST http://localhost:3000/api/auth/logout \
   -b cookies.txt
@@ -336,21 +366,25 @@ curl -X POST http://localhost:3000/api/auth/logout \
 ## Troubleshooting
 
 ### Session Not Persisting
+
 - Verify cookies are enabled in browser
 - Check that `user_session` cookie is being set
 - Ensure middleware.ts is properly configured
 
 ### Admin Routes Not Accessible
+
 - Verify user has ADMIN role in database
 - Check that user_session cookie contains role
 - Clear browser cookies and re-login
 
 ### Login Redirects to Same Page
+
 - Browser may have cached redirect
 - Clear browser cookies and cache
 - Try in incognito/private window
 
 ### Password Reset Needed
+
 - Currently not supported
 - Create new account with different email
 - Or manually update password in database via Prisma Studio

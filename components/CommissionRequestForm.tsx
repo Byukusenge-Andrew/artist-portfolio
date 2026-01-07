@@ -58,7 +58,7 @@ export default function CommissionRequestForm() {
         <div>
           <h3 className="font-semibold text-green-900">Request Submitted!</h3>
           <p className="text-sm text-green-700 mt-1">
-            We've received your commission request. We'll review it and get back to you soon at the email provided.
+            We&apos;ve received your commission request. We&apos;ll review it and get back to you soon at the email provided.
           </p>
         </div>
       </div>
@@ -68,7 +68,7 @@ export default function CommissionRequestForm() {
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-8 shadow-sm">
       <h2 className="text-2xl font-bold mb-2">Commission Request</h2>
-      <p className="text-gray-600 mb-6">Tell us about your vision and we'll get in touch to discuss pricing and timeline.</p>
+      <p className="text-gray-600 mb-6">Tell us about your vision and we&apos;ll get in touch to discuss pricing and timeline.</p>
 
       {error && (
         <div className="mb-6 rounded-lg bg-red-50 border border-red-200 p-4 flex gap-3">

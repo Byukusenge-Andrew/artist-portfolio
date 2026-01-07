@@ -33,14 +33,14 @@ export default async function AdminDashboard() {
   await getCurrentUser();
 
   const stats: { totalUsers: number; totalOrders: number; totalRevenue: number; totalArtworks: number } = { totalUsers: 0, totalOrders: 0, totalRevenue: 0, totalArtworks: 0 };
-  const recentOrders: any[] = [];
+  let recentOrders: any[] = [];
 
   try {
-    const users = await prisma.user.count();
-    const orders = await prisma.order.findMany({
+    const users = await (prisma as any).user.count();
+    const orders = await (prisma as any).order.findMany({
       take: 5,
       orderBy: { createdAt: "desc" },
-      include: { artwork: true, user: true },
+      include: { items: true, user: true },
     });
 
     const orderStats = await prisma.order.aggregate({
@@ -187,9 +187,9 @@ export default async function AdminDashboard() {
                     <tr key={order.id} className="border-b border-gray-200 hover:bg-gray-50 transition-colors">
                       <td className="px-6 py-4 text-sm font-mono text-gray-900">{order.id.slice(0, 8)}...</td>
                       <td className="px-6 py-4 text-sm text-gray-900">{order.user?.name || "Unknown"}</td>
-                      <td className="px-6 py-4 text-sm text-gray-600">{order.artwork?.title || "Deleted"}</td>
+                      <td className="px-6 py-4 text-sm text-gray-600">{order.items?.[0]?.titleSnapshot || "Deleted"}</td>
                       <td className="px-6 py-4 text-sm font-semibold text-gray-900">
-                        {formatPrice(order.totalPrice)}
+                        {formatPrice((order.totalCents || 0) / 100)}
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-600">{formatDate(order.createdAt)}</td>
                       <td className="px-6 py-4">

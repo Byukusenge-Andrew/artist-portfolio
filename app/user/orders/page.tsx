@@ -25,7 +25,7 @@ export default async function OrdersPage() {
 
   let orders: any[] = [];
   try {
-    const orderRecords = await prisma.order.findMany({
+    const orderRecords = await (prisma as any).order.findMany({
       where: { userId: user.id },
       orderBy: { createdAt: "desc" },
       include: { items: true },
@@ -76,12 +76,12 @@ export default async function OrdersPage() {
           </div>
         ) : (
           <div className="space-y-4">
-            {orders.map((order: any) => (
+            {(orders as any[]).map((order: any) => (
               <div key={order.id} className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-md transition-shadow">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                   <div className="flex-1">
                     <h3 className="font-semibold text-gray-900 mb-1">
-                      {order.artwork?.title || "Order"}
+                      {order.items?.[0]?.titleSnapshot || "Order"}
                     </h3>
                     <p className="text-sm text-gray-600 mb-2">Order ID: {order.id}</p>
                     <p className="text-sm text-gray-600">Ordered on {formatDate(order.createdAt)}</p>
@@ -90,7 +90,7 @@ export default async function OrdersPage() {
                   <div className="flex items-center gap-8">
                     <div className="text-right">
                       <p className="text-sm text-gray-600 mb-1">Amount</p>
-                      <p className="text-xl font-bold text-gray-900">{formatPrice(order.totalPrice)}</p>
+                      <p className="text-xl font-bold text-gray-900">{formatPrice((order.totalCents || 0) / 100)}</p>
                     </div>
                     <div className="text-right">
                       <p className="text-sm text-gray-600 mb-1">Status</p>

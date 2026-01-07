@@ -18,7 +18,7 @@ export async function POST(req: Request) {
     const validation = registerSchema.safeParse(body);
     if (!validation.success) {
       return NextResponse.json(
-        { error: validation.error.errors[0].message },
+        { error: validation.error.flatten().fieldErrors },
         { status: 400 }
       );
     }
@@ -34,7 +34,7 @@ export async function POST(req: Request) {
     }
 
     // Check if user exists
-    const existingUser = await prisma.user.findUnique({
+    const existingUser = await (prisma as any).user.findUnique({
       where: { email },
     });
 
@@ -46,7 +46,7 @@ export async function POST(req: Request) {
     }
 
     // Create user
-    const user = await prisma.user.create({
+    const user = await (prisma as any).user.create({
       data: {
         email,
         password: hashPassword(password),

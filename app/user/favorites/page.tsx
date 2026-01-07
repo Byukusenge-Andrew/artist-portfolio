@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import { ArrowLeft, Heart } from "lucide-react";
 import { prisma } from "@/lib/prisma";
+import Image from "next/image";
 
 async function getCurrentUser() {
   const cookieStore = await cookies();
@@ -25,13 +26,13 @@ export default async function FavoritesPage() {
 
   let favorites: any[] = [];
   try {
-    const userRecord = await prisma.user.findUnique({
+    const userRecord = await (prisma as any).user.findUnique({
       where: { id: user.id },
     });
 
     if (userRecord?.favorites) {
       const favoriteIds = JSON.parse(userRecord.favorites as string);
-      favorites = await prisma.artwork.findMany({
+      favorites = await (prisma as any).artwork.findMany({
         where: { id: { in: favoriteIds } },
       });
     }
@@ -68,7 +69,7 @@ export default async function FavoritesPage() {
             {(favorites as any[]).map((artwork: any) => (
               <div key={artwork.id} className="bg-white rounded-lg overflow-hidden border border-gray-200 hover:shadow-lg transition-shadow">
                 <div className="aspect-square bg-gray-200 relative overflow-hidden">
-                  <img
+                  <Image
                     src={artwork.imageUrl}
                     alt={artwork.title}
                     className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"

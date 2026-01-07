@@ -1,6 +1,7 @@
 // app/(site)/artist/page.tsx
 import { prisma } from "@/lib/prisma";
 import { Mail, Phone, Palette } from "lucide-react";
+import Link from "next/link";
 
 export default async function ArtistPage() {
   const artists = await prisma.artist.findMany({

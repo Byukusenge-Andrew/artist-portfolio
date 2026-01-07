@@ -20,11 +20,17 @@ export async function POST(req: Request) {
 
   try {
     const body = await req.json();
-    const validated = gallerySchema.parse(body);
+    const validated = gallerySchema.safeParse(body);
+    if (!validated.success) {
+      return NextResponse.json(
+        { error: validated.error.flatten().fieldErrors },
+        { status: 400 }
+      );
+    }
 
     // Check if slug already exists
     const existing = await prisma.gallery.findUnique({
-      where: { slug: validated.slug },
+      where: { slug: validated.data.slug },
     });
 
     if (existing) {
@@ -36,9 +42,9 @@ export async function POST(req: Request) {
 
     const gallery = await prisma.gallery.create({
       data: {
-        name: validated.name,
-        slug: validated.slug,
-        description: validated.description || null,
+        name: validated.data.name,
+        slug: validated.data.slug,
+        description: validated.data.description || null,
       },
     });
 
@@ -48,12 +54,6 @@ export async function POST(req: Request) {
     return NextResponse.json(gallery, { status: 201 });
   } catch (error) {
     console.error("Failed to create gallery:", error);
-    if (error instanceof z.ZodError) {
-      return NextResponse.json(
-        { error: "Invalid request data", details: error.errors },
-        { status: 400 }
-      );
-    }
     return NextResponse.json(
       { error: "Failed to create gallery" },
       { status: 500 }

@@ -74,7 +74,7 @@ export default function ArtistsAdminPage() {
     }
   }
 
-  const editingArtist = selectedId && artists.find(a => a.id === selectedId);
+  const editingArtist: Artist | null = selectedId ? artists.find(a => a.id === selectedId) ?? null : null;
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
@@ -139,7 +139,7 @@ export default function ArtistsAdminPage() {
           {isEditing && (
             <div className="lg:col-span-2 bg-white rounded-lg border border-gray-200 p-6 sticky top-8 h-fit">
               <h2 className="text-xl font-bold mb-6">
-                {selectedId ? `Edit ${editingArtist?.name}` : "New Artist"}
+                {selectedId ? `Edit ${editingArtist?.name || "Artist"}` : "New Artist"}
               </h2>
 
               <div className="space-y-4">
@@ -211,6 +211,7 @@ export default function ArtistsAdminPage() {
               <div className="flex items-start justify-between mb-6">
                 <h2 className="text-xl font-bold">{editingArtist.name}</h2>
                 <button
+                title="Edit"
                   onClick={() => {
                     setFormData({
                       name: editingArtist.name,
