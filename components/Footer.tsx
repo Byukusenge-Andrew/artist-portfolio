@@ -28,7 +28,7 @@ export default function Footer() {
           <div className="space-y-4">
             <h3 className="font-semibold text-gray-900 text-sm uppercase tracking-wider">Quick Links</h3>
             <nav className="flex flex-col gap-2">
-              <Link href="/galleries" className="text-sm text-gray-600 hover:text-teal-700 transition-colors inline-flex items-center gap-2 group">
+              <Link href="/site/galleries" className="text-sm text-gray-600 hover:text-teal-700 transition-colors inline-flex items-center gap-2 group">
                 <span className="group-hover:translate-x-1 transition-transform">→</span>
                 Galleries
               </Link>

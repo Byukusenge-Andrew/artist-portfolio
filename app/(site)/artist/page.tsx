@@ -91,7 +91,7 @@ export default async function ArtistPage() {
         <h2 className="text-2xl font-bold mb-8">Recent Works</h2>
         <p className="text-gray-600">
           Explore all artworks in our{" "}
-          <Link href="/galleries" className="text-teal-600 hover:text-teal-700 font-semibold">
+          <Link href="/site/galleries" className="text-teal-600 hover:text-teal-700 font-semibold">
             galleries
           </Link>
           .

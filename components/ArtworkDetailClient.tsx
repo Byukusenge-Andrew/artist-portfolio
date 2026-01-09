@@ -169,7 +169,7 @@ export default function ArtworkDetailClient({ artwork, relatedArtworks, isAdmin 
             {!artwork.isOriginalAvailable && !artwork.printEnabled && (
               <div className="p-6 bg-gray-50 rounded-xl text-center">
                 <p className="text-gray-600">This artwork is currently not available for purchase.</p>
-                <Link href="/galleries" className="inline-block mt-4 text-teal-600 hover:text-teal-700 font-medium">
+                <Link href="/site/galleries" className="inline-block mt-4 text-teal-600 hover:text-teal-700 font-medium">
                   Browse more artworks
                 </Link>
               </div>

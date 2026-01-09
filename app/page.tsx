@@ -56,7 +56,7 @@ export default async function Home() {
             
             <div className="flex flex-col sm:flex-row gap-4 pt-4">
               <Link 
-                href="/galleries" 
+                href="/site/galleries" 
                 className="group inline-flex items-center justify-center gap-2 rounded-xl bg-white px-8 py-4 text-teal-700 font-semibold hover:bg-gray-50 transition-all duration-300 shadow-xl hover:shadow-2xl hover:scale-105"
               >
                 <Palette className="size-5 group-hover:rotate-12 transition-transform" />
@@ -131,7 +131,7 @@ export default async function Home() {
             <p className="text-gray-600 mt-1">Discover fresh pieces from our talented artists</p>
           </div>
           <Link 
-            href="/galleries" 
+            href="/site/galleries" 
             className="inline-flex items-center gap-2 text-teal-700 hover:text-teal-800 font-medium group transition-colors"
           >
             <span>View All</span>
@@ -187,7 +187,7 @@ export default async function Home() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link 
-              href="/galleries" 
+              href="/site/galleries" 
               className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-teal-600 to-emerald-600 px-8 py-4 text-white font-semibold hover:from-teal-700 hover:to-emerald-700 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
             >
               <Palette className="size-5" />

@@ -27,7 +27,7 @@ export default async function Header() {
         </div>
         <nav className="flex items-center gap-2 text-sm">
           <Link
-            href="/galleries"
+            href="/site/galleries"
             className="group inline-flex items-center gap-2 rounded-lg px-4 py-2 text-gray-700 hover:text-teal-800 hover:bg-gradient-to-br hover:from-teal-50 hover:to-emerald-50 transition-all duration-300 hover:shadow-sm"
             aria-label="View galleries"
           >
@@ -35,14 +35,14 @@ export default async function Header() {
             <span className="hidden sm:inline font-medium">Galleries</span>
           </Link>
           <Link
-            href="/artist"
+            href="/site/artist"
             className="group inline-flex items-center gap-2 rounded-lg px-4 py-2 text-gray-700 hover:text-teal-800 hover:bg-gradient-to-br hover:from-teal-50 hover:to-emerald-50 transition-all duration-300 hover:shadow-sm"
             aria-label="View artist profile"
           >
             <span className="hidden sm:inline font-medium">Artist</span>
           </Link>
           <Link
-            href="/commissions"
+            href="/site/commissions"
             className="group inline-flex items-center gap-2 rounded-lg px-4 py-2 text-gray-700 hover:text-teal-800 hover:bg-gradient-to-br hover:from-teal-50 hover:to-emerald-50 transition-all duration-300 hover:shadow-sm"
             aria-label="Request a commission"
           >

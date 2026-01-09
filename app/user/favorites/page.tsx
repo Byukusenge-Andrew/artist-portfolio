@@ -60,7 +60,7 @@ export default async function FavoritesPage() {
             <Heart className="h-16 w-16 text-gray-300 mx-auto mb-4" />
             <h2 className="text-xl font-semibold text-gray-900 mb-2">No Saved Favorites</h2>
             <p className="text-gray-600 mb-6">Start saving your favorite artworks to view them here</p>
-            <Link href="/galleries" className="inline-block bg-teal-600 text-white px-6 py-2 rounded-lg hover:bg-teal-700">
+            <Link href="/site/galleries" className="inline-block bg-teal-600 text-white px-6 py-2 rounded-lg hover:bg-teal-700">
               Explore Galleries
             </Link>
           </div>
