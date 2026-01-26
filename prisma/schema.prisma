@@ -130,17 +130,19 @@ model Artist {
 }
 
 model User {
-  id             String   @id @default(cuid())
-  email          String   @unique
-  password       String
-  name           String?
-  role           UserRole @default(USER)
-  isActive       Boolean  @default(true)
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-  favorites      String   @db.LongText @default("[]")
-  wishlist       String   @db.LongText @default("[]")
-  orders         Order[]  @relation("UserOrders")
+  id               String    @id @default(cuid())
+  email            String    @unique
+  password         String
+  name             String?
+  role             UserRole  @default(USER)
+  isActive         Boolean   @default(true)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  favorites        String?   @db.LongText
+  wishlist         String?   @db.LongText
+  resetToken       String?
+  resetTokenExpiry DateTime?
+  orders           Order[]   @relation("UserOrders")
 
   @@index([email])
   @@index([role])

@@ -19,7 +19,7 @@ export function middleware(request: NextRequest) {
   const isAdmin = user?.role === "ADMIN" || !!adminSession; // Support both new and legacy admin
 
   // Public routes - allow access
-  if (pathname === "/" || pathname.startsWith("/art/") || pathname.startsWith("/galleries")) {
+  if (pathname === "/" || pathname.startsWith("/art/") || pathname.startsWith("/galleries") || pathname.startsWith("/site/")) {
     return NextResponse.next();
   }
 
@@ -32,7 +32,10 @@ export function middleware(request: NextRequest) {
   if (pathname.startsWith("/admin")) {
     const isPublicAdminPage = pathname === "/admin/login" || pathname === "/admin/signup";
     if (!isPublicAdminPage && !isAdmin) {
-      return NextResponse.redirect(new URL("/auth/login", request.url));
+      // Preserve redirect URL
+      const loginUrl = new URL("/auth/login", request.url);
+      loginUrl.searchParams.set("redirect", pathname);
+      return NextResponse.redirect(loginUrl);
     }
     return NextResponse.next();
   }
@@ -40,7 +43,10 @@ export function middleware(request: NextRequest) {
   // User routes - require authentication
   if (pathname.startsWith("/user")) {
     if (!isAuthenticated) {
-      return NextResponse.redirect(new URL("/auth/login", request.url));
+      // Preserve redirect URL
+      const loginUrl = new URL("/auth/login", request.url);
+      loginUrl.searchParams.set("redirect", pathname);
+      return NextResponse.redirect(loginUrl);
     }
     return NextResponse.next();
   }
@@ -48,7 +54,9 @@ export function middleware(request: NextRequest) {
   // Protected checkout route
   if (pathname === "/order/success" || pathname === "/order/cancel") {
     if (!isAuthenticated) {
-      return NextResponse.redirect(new URL("/auth/login", request.url));
+      const loginUrl = new URL("/auth/login", request.url);
+      loginUrl.searchParams.set("redirect", pathname);
+      return NextResponse.redirect(loginUrl);
     }
     return NextResponse.next();
   }

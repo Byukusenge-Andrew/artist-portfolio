@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { hashPassword, verifyPassword, serializeUserSession } from "@/lib/auth";
+import { hashPassword, serializeUserSession, validatePassword } from "@/lib/auth";
 import { z } from "zod";
 
 const registerSchema = z.object({
@@ -33,8 +33,17 @@ export async function POST(req: Request) {
       );
     }
 
+    // Validate password strength
+    const passwordValidation = validatePassword(password);
+    if (!passwordValidation.valid) {
+      return NextResponse.json(
+        { error: passwordValidation.errors.join(". ") },
+        { status: 400 }
+      );
+    }
+
     // Check if user exists
-    const existingUser = await (prisma as any).user.findUnique({
+    const existingUser = await prisma.user.findUnique({
       where: { email },
     });
 
@@ -45,11 +54,14 @@ export async function POST(req: Request) {
       );
     }
 
+    // Hash password (now async with bcrypt)
+    const hashedPassword = await hashPassword(password);
+
     // Create user
-    const user = await (prisma as any).user.create({
+    const user = await prisma.user.create({
       data: {
         email,
-        password: hashPassword(password),
+        password: hashedPassword,
         name,
         role: "USER",
       },
@@ -60,10 +72,18 @@ export async function POST(req: Request) {
       userId: user.id,
       email: user.email,
       role: user.role,
+      name: user.name || undefined,
     });
 
+    // Get redirect URL from query params
+    const url = new URL(req.url);
+    const redirectUrl = url.searchParams.get("redirect") || "/user/dashboard";
+
     const res = NextResponse.json(
-      { message: "Account created successfully" },
+      {
+        message: "Account created successfully",
+        redirectUrl,
+      },
       { status: 201 }
     );
 

@@ -4,11 +4,13 @@ import { createContext, useContext, useState, useEffect, ReactNode } from "react
 
 type FavoritesContextType = {
   favorites: string[];
-  addFavorite: (artworkId: string) => void;
-  removeFavorite: (artworkId: string) => void;
+  addFavorite: (artworkId: string) => Promise<void>;
+  removeFavorite: (artworkId: string) => Promise<void>;
   isFavorite: (artworkId: string) => boolean;
-  toggleFavorite: (artworkId: string) => void;
+  toggleFavorite: (artworkId: string) => Promise<void>;
   clearAllFavorites: () => void;
+  isAuthenticated: boolean;
+  isLoading: boolean;
 };
 
 const FavoritesContext = createContext<FavoritesContextType | undefined>(undefined);
@@ -16,57 +18,146 @@ const FavoritesContext = createContext<FavoritesContextType | undefined>(undefin
 export function FavoritesProvider({ children }: { children: ReactNode }) {
   const [favorites, setFavorites] = useState<string[]>([]);
   const [mounted, setMounted] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Load favorites from localStorage on mount
+  // Check authentication and load favorites on mount
   useEffect(() => {
     setMounted(true);
-    const stored = localStorage.getItem("artwork-favorites");
-    if (stored) {
-      try {
-        setFavorites(JSON.parse(stored));
-      } catch {
-        setFavorites([]);
-      }
-    }
+    checkAuthAndLoadFavorites();
   }, []);
 
-  // Save favorites to localStorage whenever they change
-  useEffect(() => {
-    if (mounted) {
-      localStorage.setItem("artwork-favorites", JSON.stringify(favorites));
-    }
-  }, [favorites, mounted]);
+  async function checkAuthAndLoadFavorites() {
+    try {
+      // Check if user is authenticated
+      const sessionRes = await fetch("/api/auth/session");
+      const authenticated = sessionRes.ok;
+      setIsAuthenticated(authenticated);
 
-  const addFavorite = (artworkId: string) => {
+      if (authenticated) {
+        // Fetch favorites from server
+        const favRes = await fetch("/api/favorites");
+        if (favRes.ok) {
+          const data = await favRes.json();
+          setFavorites(data.favorites || []);
+        }
+      } else {
+        // For non-authenticated users, load from localStorage (read-only)
+        const stored = localStorage.getItem("artwork-favorites");
+        if (stored) {
+          try {
+            setFavorites(JSON.parse(stored));
+          } catch {
+            setFavorites([]);
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Error loading favorites:", error);
+      // Fallback to localStorage
+      const stored = localStorage.getItem("artwork-favorites");
+      if (stored) {
+        try {
+          setFavorites(JSON.parse(stored));
+        } catch {
+          setFavorites([]);
+        }
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  const addFavorite = async (artworkId: string) => {
+    if (!isAuthenticated) {
+      // Redirect to login
+      window.location.href = "/auth/login?redirect=" + encodeURIComponent(window.location.pathname);
+      return;
+    }
+
+    // Optimistic update
     setFavorites((prev) => {
       if (prev.includes(artworkId)) return prev;
       return [...prev, artworkId];
     });
+
+    try {
+      const res = await fetch("/api/favorites", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ artworkId }),
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to add favorite");
+      }
+
+      const data = await res.json();
+      setFavorites(data.favorites);
+    } catch (error) {
+      console.error("Error adding favorite:", error);
+      // Revert optimistic update
+      setFavorites((prev) => prev.filter((id) => id !== artworkId));
+    }
   };
 
-  const removeFavorite = (artworkId: string) => {
+  const removeFavorite = async (artworkId: string) => {
+    if (!isAuthenticated) {
+      return;
+    }
+
+    // Optimistic update
     setFavorites((prev) => prev.filter((id) => id !== artworkId));
+
+    try {
+      const res = await fetch(`/api/favorites?artworkId=${artworkId}`, {
+        method: "DELETE",
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to remove favorite");
+      }
+
+      const data = await res.json();
+      setFavorites(data.favorites);
+    } catch (error) {
+      console.error("Error removing favorite:", error);
+      // Revert optimistic update
+      setFavorites((prev) => [...prev, artworkId]);
+    }
   };
 
   const isFavorite = (artworkId: string) => {
     return favorites.includes(artworkId);
   };
 
-  const toggleFavorite = (artworkId: string) => {
+  const toggleFavorite = async (artworkId: string) => {
     if (isFavorite(artworkId)) {
-      removeFavorite(artworkId);
+      await removeFavorite(artworkId);
     } else {
-      addFavorite(artworkId);
+      await addFavorite(artworkId);
     }
   };
 
   const clearAllFavorites = () => {
     setFavorites([]);
+    if (mounted && !isAuthenticated) {
+      localStorage.removeItem("artwork-favorites");
+    }
   };
 
   return (
     <FavoritesContext.Provider
-      value={{ favorites, addFavorite, removeFavorite, isFavorite, toggleFavorite, clearAllFavorites }}
+      value={{
+        favorites,
+        addFavorite,
+        removeFavorite,
+        isFavorite,
+        toggleFavorite,
+        clearAllFavorites,
+        isAuthenticated,
+        isLoading,
+      }}
     >
       {children}
     </FavoritesContext.Provider>

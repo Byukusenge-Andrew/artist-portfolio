@@ -6,6 +6,7 @@ import { z } from "zod";
 const loginSchema = z.object({
   email: z.string().email("Invalid email"),
   password: z.string(),
+  rememberMe: z.boolean().optional(),
 });
 
 export async function POST(req: Request) {
@@ -20,10 +21,10 @@ export async function POST(req: Request) {
       );
     }
 
-    const { email, password } = validation.data;
+    const { email, password, rememberMe } = validation.data;
 
     // Find user
-    const user = await (prisma as any).user.findUnique({
+    const user = await prisma.user.findUnique({
       where: { email },
     });
 
@@ -42,8 +43,9 @@ export async function POST(req: Request) {
       );
     }
 
-    // Verify password
-    if (!verifyPassword(password, user.password)) {
+    // Verify password (now async with bcrypt)
+    const isValidPassword = await verifyPassword(password, user.password);
+    if (!isValidPassword) {
       return NextResponse.json(
         { error: "Invalid email or password" },
         { status: 401 }
@@ -55,18 +57,32 @@ export async function POST(req: Request) {
       userId: user.id,
       email: user.email,
       role: user.role,
+      name: user.name || undefined,
     });
 
+    // Get redirect URL from query params
+    const url = new URL(req.url);
+    const redirectUrl = url.searchParams.get("redirect") || "/user/dashboard";
+
     const res = NextResponse.json(
-      { message: "Login successful", user: { id: user.id, email: user.email, name: user.name, role: user.role } },
+      {
+        message: "Login successful",
+        user: { id: user.id, email: user.email, name: user.name, role: user.role },
+        redirectUrl,
+      },
       { status: 200 }
     );
+
+    // Set cookie with appropriate expiration
+    const maxAge = rememberMe
+      ? 60 * 60 * 24 * 30  // 30 days if "Remember Me"
+      : 60 * 60 * 24 * 7;  // 7 days otherwise
 
     res.cookies.set("user_session", session, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
-      maxAge: 60 * 60 * 24 * 7, // 7 days
+      maxAge,
       path: "/",
     });
 
