@@ -17,7 +17,7 @@ export function ArtworkCard({ id, slug, title, imageUrl }: Props) {
   return (
     <Link
       key={id}
-      href={`/art/${slug}`}
+      href={`/site/${slug}`}
       className="group block rounded-xl overflow-hidden border border-gray-200/60 bg-white shadow-sm hover:shadow-2xl hover:border-teal-200 transition-all duration-500 hover:-translate-y-2"
       aria-label={`View artwork ${title}`}
     >

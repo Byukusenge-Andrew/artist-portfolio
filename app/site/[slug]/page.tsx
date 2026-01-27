@@ -1,4 +1,4 @@
-// app/art/[slug]/page.tsx
+// app/site/[slug]/page.tsx
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { cookies } from "next/headers";

@@ -9,11 +9,12 @@ const updateSchema = z.object({
 
 export async function GET(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   try {
     const commission = await prisma.commissionRequest.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!commission) {
@@ -35,8 +36,9 @@ export async function GET(
 
 export async function PATCH(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   const cookieStore = await cookies();
   const isAdmin = cookieStore.get("admin_session")?.value === "1";
 
@@ -49,7 +51,7 @@ export async function PATCH(
     const validated = updateSchema.parse(body);
 
     const commission = await prisma.commissionRequest.update({
-      where: { id: params.id },
+      where: { id },
       data: { status: validated.status },
     });
 
@@ -71,8 +73,9 @@ export async function PATCH(
 
 export async function DELETE(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   const cookieStore = await cookies();
   const isAdmin = cookieStore.get("admin_session")?.value === "1";
 
@@ -82,7 +85,7 @@ export async function DELETE(
 
   try {
     await prisma.commissionRequest.delete({
-      where: { id: params.id },
+      where: { id },
     });
 
     return NextResponse.json({ success: true });

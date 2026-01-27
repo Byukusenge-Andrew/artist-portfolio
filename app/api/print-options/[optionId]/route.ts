@@ -10,8 +10,9 @@ const updateSchema = z.object({
 
 export async function PATCH(
   req: Request,
-  { params }: { params: { optionId: string } }
+  { params }: { params: Promise<{ optionId: string }> }
 ) {
+  const { optionId } = await params;
   const cookieStore = await cookies();
   const isAdmin = cookieStore.get("admin_session")?.value === "1";
 
@@ -24,7 +25,7 @@ export async function PATCH(
     const validated = updateSchema.parse(body);
 
     const option = await prisma.printOption.update({
-      where: { id: params.optionId },
+      where: { id: optionId },
       data: {
         ...(validated.name && { name: validated.name }),
         ...(validated.priceCents && { priceCents: validated.priceCents }),
@@ -49,8 +50,9 @@ export async function PATCH(
 
 export async function DELETE(
   req: Request,
-  { params }: { params: { optionId: string } }
+  { params }: { params: Promise<{ optionId: string }> }
 ) {
+  const { optionId } = await params;
   const cookieStore = await cookies();
   const isAdmin = cookieStore.get("admin_session")?.value === "1";
 
@@ -60,7 +62,7 @@ export async function DELETE(
 
   try {
     await prisma.printOption.delete({
-      where: { id: params.optionId },
+      where: { id: optionId },
     });
 
     return NextResponse.json({ success: true });

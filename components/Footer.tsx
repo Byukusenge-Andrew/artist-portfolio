@@ -17,11 +17,11 @@ export default async function Footer() {
 
   return (
     <footer className="mt-auto border-t border-teal-100/50 bg-gradient-to-br from-white via-teal-50/30 to-emerald-50/30">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
         {/* Main footer content */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
           {/* Brand section */}
-          <div className="space-y-4">
+          <div className="space-y-3">
             <div className="flex items-center gap-3">
               <Image src="/icon.png" alt="Artelier" height={50} width={50} />
               <span className="font-bold text-xl bg-gradient-to-r from-teal-600 via-emerald-600 to-teal-700 bg-clip-text text-transparent">
@@ -168,7 +168,7 @@ export default async function Footer() {
         </div>
 
         {/* Bottom bar */}
-        <div className="pt-8 border-t border-gray-200/60 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-600">
+        <div className="pt-6 border-t border-gray-200/60 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-600">
           <div className="flex items-center gap-2">
             <span>© {currentYear} Artelier</span>
             <span className="hidden sm:inline">•</span>

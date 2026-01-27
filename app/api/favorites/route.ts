@@ -114,7 +114,7 @@ export async function POST(req: NextRequest) {
             favoriteIds.push(artworkId);
 
             await prisma.user.update({
-                where: { id: user.id },
+                where: { id: user.userId || user.id },
                 data: { favorites: JSON.stringify(favoriteIds) },
             });
         }
@@ -150,7 +150,7 @@ export async function DELETE(req: NextRequest) {
 
         // Get current favorites
         const userRecord = await prisma.user.findUnique({
-            where: { id: user.id },
+            where: { id: user.userId || user.id },
             select: { favorites: true },
         });
 
@@ -165,7 +165,7 @@ export async function DELETE(req: NextRequest) {
         favoriteIds = favoriteIds.filter((id) => id !== artworkId);
 
         await prisma.user.update({
-            where: { id: user.id },
+            where: { id: user.userId || user.id },
             data: { favorites: JSON.stringify(favoriteIds) },
         });
 

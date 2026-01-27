@@ -28,7 +28,7 @@ export default async function FavoritesPage() {
   let favorites: any[] = [];
   try {
     const userRecord = await prisma.user.findUnique({
-      where: { id: user.id },
+      where: { id: user.userId || user.id },
       select: { favorites: true },
     });
 

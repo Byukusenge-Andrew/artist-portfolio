@@ -6,16 +6,15 @@ import { revalidatePath } from "next/cache";
 
 export async function DELETE(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const cookieStore = cookies();
-  const isAdmin = (await cookieStore).get("admin_session")?.value === "1";
+  const { id } = await params;
+  const cookieStore = await cookies();
+  const isAdmin = cookieStore.get("admin_session")?.value === "1";
 
   if (!isAdmin) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-
-  const { id } = params;
 
   try {
     // Optional: Check if exists

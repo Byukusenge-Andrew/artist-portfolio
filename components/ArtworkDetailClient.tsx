@@ -131,11 +131,15 @@ export default function ArtworkDetailClient({ artwork, relatedArtworks, isAdmin 
                     <p className="text-sm text-gray-600">One of a kind piece</p>
                   </div>
                   <div className="text-3xl font-bold text-teal-700">
-                    RWF {(artwork.originalPriceCents / 100).toFixed(2)}
+                    RWF {artwork.originalPriceCents}
                   </div>
                 </div>
                 <AddToCartButton
-                  payload={{ productType: "ORIGINAL", artworkId: artwork.id, quantity: 1 }}
+                  productType="ORIGINAL"
+                  artworkId={artwork.id}
+                  title={artwork.title}
+                  imageUrl={artwork.imageUrl}
+                  price={artwork.originalPriceCents}
                   label="Add Original to Cart"
                 />
               </div>
@@ -157,8 +161,13 @@ export default function ArtworkDetailClient({ artwork, relatedArtworks, isAdmin 
                         </div>
                       </div>
                       <AddToCartButton
-                        payload={{ productType: "PRINT", printOptionId: opt.id, quantity: 1 }}
+                        productType="PRINT"
+                        printOptionId={opt.id}
+                        title={`${artwork.title} - ${opt.name}`}
+                        imageUrl={artwork.imageUrl}
+                        price={opt.priceCents}
                         label="Add to Cart"
+                        className="text-sm px-4 py-2"
                       />
                     </div>
                   ))}

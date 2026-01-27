@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { Images, Plus, LogOut, Shield, User, Heart, Bell, Menu } from "lucide-react";
 import SearchBox from "./SearchBox";
 import FavoritesButton from "./FavoritesButton";
+import CartButton from "./CartButton";
 import Image from "next/image";
 import { parseUserSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -65,6 +66,7 @@ export default async function Header() {
           </Link>
 
           <FavoritesButton />
+          <CartButton />
 
           {/* Admin Section */}
           {isAdmin && (
