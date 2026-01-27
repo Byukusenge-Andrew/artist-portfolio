@@ -10,13 +10,15 @@ const updateSchema = z.object({
   bio: z.string().optional(),
 });
 
+// GET /api/artists/[id] - Get single artist
 export async function GET(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const artist = await prisma.artist.findUnique({
-      where: { id: params.id },
+      where: { id: id },
     });
 
     if (!artist) {
@@ -35,7 +37,7 @@ export async function GET(
 
 export async function PATCH(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const cookieStore = await cookies();
   const isAdmin = cookieStore.get("admin_session")?.value === "1";
@@ -45,11 +47,12 @@ export async function PATCH(
   }
 
   try {
+    const { id } = await params;
     const body = await req.json();
     const validated = updateSchema.parse(body);
 
     const artist = await prisma.artist.update({
-      where: { id: params.id },
+      where: { id: id },
       data: {
         ...(validated.name && { name: validated.name }),
         ...(validated.email !== undefined && { email: validated.email || null }),
@@ -76,7 +79,7 @@ export async function PATCH(
 
 export async function DELETE(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const cookieStore = await cookies();
   const isAdmin = cookieStore.get("admin_session")?.value === "1";
@@ -86,8 +89,9 @@ export async function DELETE(
   }
 
   try {
+    const { id } = await params;
     await prisma.artist.delete({
-      where: { id: params.id },
+      where: { id: id },
     });
 
     return NextResponse.json({ success: true });

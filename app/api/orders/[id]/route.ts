@@ -9,11 +9,12 @@ const updateSchema = z.object({
 
 export async function GET(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const order = await prisma.order.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: { items: true },
     });
 
@@ -33,7 +34,7 @@ export async function GET(
 
 export async function PATCH(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const cookieStore = await cookies();
   const isAdmin = cookieStore.get("admin_session")?.value === "1";
@@ -43,11 +44,12 @@ export async function PATCH(
   }
 
   try {
+    const { id } = await params;
     const body = await req.json();
     const validated = updateSchema.parse(body);
 
     const order = await prisma.order.update({
-      where: { id: params.id },
+      where: { id },
       data: { status: validated.status },
       include: { items: true },
     });

@@ -13,11 +13,12 @@ const updateSchema = z.object({
 
 export async function GET(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const gallery = await prisma.gallery.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         artworks: {
           include: { artwork: true },
@@ -41,7 +42,7 @@ export async function GET(
 
 export async function PATCH(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const cookieStore = await cookies();
   const isAdmin = cookieStore.get("admin_session")?.value === "1";
@@ -51,13 +52,14 @@ export async function PATCH(
   }
 
   try {
+    const { id } = await params;
     const body = await req.json();
     const validated = updateSchema.parse(body);
 
     // Update gallery metadata
     if (validated.name || validated.description !== undefined) {
       await prisma.gallery.update({
-        where: { id: params.id },
+        where: { id },
         data: {
           ...(validated.name && { name: validated.name }),
           ...(validated.description !== undefined && { description: validated.description || null }),
@@ -70,8 +72,8 @@ export async function PATCH(
       await Promise.all(
         validated.addArtworkIds.map(artworkId =>
           prisma.artworkGallery.create({
-            data: { galleryId: params.id, artworkId },
-          }).catch(() => {}) // Ignore duplicates
+            data: { galleryId: id, artworkId },
+          }).catch(() => { }) // Ignore duplicates
         )
       );
     }
@@ -80,14 +82,14 @@ export async function PATCH(
     if (validated.removeArtworkIds && validated.removeArtworkIds.length > 0) {
       await prisma.artworkGallery.deleteMany({
         where: {
-          galleryId: params.id,
+          galleryId: id,
           artworkId: { in: validated.removeArtworkIds },
         },
       });
     }
 
     const updated = await prisma.gallery.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: { artworks: { include: { artwork: true } } },
     });
 

@@ -11,12 +11,13 @@ const deleteArtworkSchema = z.object({
 
 export async function DELETE(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   // 1. Validate ID
-  const parsed = deleteArtworkSchema.safeParse({ id: params.id });
+  const { id: artworkId } = await params;
+  const parsed = deleteArtworkSchema.safeParse({ id: artworkId });
   if (!parsed.success) {
-  
+
     return NextResponse.json(
       { error: "Invalid artwork ID", details: parsed.error.flatten() },
       { status: 400 }
@@ -29,11 +30,12 @@ export async function DELETE(
     // 2. Find artwork first (optional: for better error message)
     const artwork = await prisma.artwork.findUnique({
       where: { id },
-      select: { id: true,
-    slug: true,
-    imagePublicId: true, 
-    },
-  });
+      select: {
+        id: true,
+        slug: true,
+        imagePublicId: true,
+      },
+    });
 
     if (!artwork) {
       return NextResponse.json(
@@ -63,4 +65,5 @@ export async function DELETE(
       { error: "Failed to delete artwork" },
       { status: 500 }
     );
-  }}
+  }
+}

@@ -10,13 +10,21 @@ const printOptionSchema = z.object({
 
 export async function GET(
   req: Request,
-  { params }: { params: { artworkId: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const options = await prisma.printOption.findMany({
-      where: { artworkId: params.artworkId },
+    const { id: artworkId } = await params;
+
+    const printOptions = await prisma.printOption.findMany({
+      where: { artworkId },
+      select: {
+        id: true,
+        artworkId: true,
+        name: true,
+        priceCents: true,
+      },
     });
-    return NextResponse.json(options);
+    return NextResponse.json(printOptions);
   } catch (error) {
     console.error("Failed to fetch print options:", error);
     return NextResponse.json(
@@ -28,7 +36,7 @@ export async function GET(
 
 export async function POST(
   req: Request,
-  { params }: { params: { artworkId: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const cookieStore = await cookies();
   const isAdmin = cookieStore.get("admin_session")?.value === "1";
@@ -38,12 +46,13 @@ export async function POST(
   }
 
   try {
+    const { id: artworkId } = await params;
     const body = await req.json();
     const validated = printOptionSchema.parse(body);
 
     // Check if artwork exists
     const artwork = await prisma.artwork.findUnique({
-      where: { id: params.artworkId },
+      where: { id: artworkId },
     });
 
     if (!artwork) {
@@ -57,7 +66,7 @@ export async function POST(
     const existing = await prisma.printOption.findUnique({
       where: {
         artworkId_name: {
-          artworkId: params.artworkId,
+          artworkId: artworkId,
           name: validated.name,
         },
       },
@@ -72,7 +81,7 @@ export async function POST(
 
     const option = await prisma.printOption.create({
       data: {
-        artworkId: params.artworkId,
+        artworkId: artworkId,
         name: validated.name,
         priceCents: validated.priceCents,
       },
