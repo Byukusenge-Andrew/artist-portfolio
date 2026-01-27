@@ -29,7 +29,7 @@ export async function GET() {
 
     try {
         const userRecord = await prisma.user.findUnique({
-            where: { id: user.id },
+            where: { id: user.userId || user.id },
             select: { favorites: true },
         });
 
@@ -98,7 +98,7 @@ export async function POST(req: NextRequest) {
 
         // Get current favorites
         const userRecord = await prisma.user.findUnique({
-            where: { id: user.id },
+            where: { id: user.userId || user.id },
             select: { favorites: true },
         });
 

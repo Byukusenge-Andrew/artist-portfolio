@@ -52,6 +52,14 @@ export async function POST(req: Request) {
       );
     }
 
+    // Check if admin is approved
+    if (user.role === "ADMIN" && !user.isApproved) {
+      return NextResponse.json(
+        { error: "Your admin account is pending approval. Please wait for an existing admin to approve your account." },
+        { status: 403 }
+      );
+    }
+
     // Create session
     const session = serializeUserSession({
       userId: user.id,

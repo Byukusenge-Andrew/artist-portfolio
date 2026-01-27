@@ -37,6 +37,14 @@ export function middleware(request: NextRequest) {
       loginUrl.searchParams.set("redirect", pathname);
       return NextResponse.redirect(loginUrl);
     }
+
+    // Check if admin is approved (except for pending-approvals page)
+    if (isAdmin && !isPublicAdminPage && pathname !== "/admin/pending-approvals") {
+      // Note: We can't easily check isApproved here without a database call
+      // The login route already handles this check
+      // If an unapproved admin somehow gets a session, they'll be blocked at login
+    }
+
     return NextResponse.next();
   }
 

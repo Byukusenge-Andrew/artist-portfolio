@@ -57,15 +57,41 @@ export async function POST(req: Request) {
     // Hash password (now async with bcrypt)
     const hashedPassword = await hashPassword(password);
 
+    // Check if this is the first admin (auto-approve first admin)
+    const isAdminSignup = body.role === "ADMIN";
+    let isApproved = true; // Regular users are auto-approved
+
+    if (isAdminSignup) {
+      const existingAdminCount = await prisma.user.count({
+        where: {
+          role: "ADMIN",
+          isApproved: true,
+        },
+      });
+      isApproved = existingAdminCount === 0; // First admin is auto-approved
+    }
+
     // Create user
     const user = await prisma.user.create({
       data: {
         email,
         password: hashedPassword,
         name,
-        role: "USER",
+        role: isAdminSignup ? "ADMIN" : "USER",
+        isApproved,
       },
     });
+
+    // If admin needs approval, don't create session
+    if (isAdminSignup && !isApproved) {
+      return NextResponse.json(
+        {
+          message: "Admin account created. Waiting for approval from an existing admin.",
+          requiresApproval: true,
+        },
+        { status: 201 }
+      );
+    }
 
     // Create session
     const session = serializeUserSession({

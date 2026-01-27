@@ -4,13 +4,26 @@ import { cookies } from "next/headers";
 
 export async function POST(req: NextRequest) {
   try {
-    // ✅ Check if user has admin_session (your custom auth)
+    // Check if user has admin_session (legacy) or user_session with ADMIN role
     const cookieStore = await cookies();
     const adminSession = cookieStore.get("admin_session");
-    
-    if (!adminSession) {
+    const userSession = cookieStore.get("user_session")?.value;
+
+    // Check for admin access
+    let isAdmin = !!adminSession;
+
+    if (!isAdmin && userSession) {
+      try {
+        const user = JSON.parse(Buffer.from(userSession, "base64").toString());
+        isAdmin = user.role === "ADMIN";
+      } catch {
+        // Invalid session
+      }
+    }
+
+    if (!isAdmin) {
       return NextResponse.json(
-        { error: "Unauthorized. Please sign in first." },
+        { error: "Unauthorized. Admin access required." },
         { status: 401 }
       );
     }
