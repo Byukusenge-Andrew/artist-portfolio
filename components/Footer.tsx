@@ -17,9 +17,9 @@ export default async function Footer() {
 
   return (
     <footer className="mt-auto border-t border-teal-100/50 bg-gradient-to-br from-white via-teal-50/30 to-emerald-50/30">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 py-6 sm:py-8">
         {/* Main footer content */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 mb-6 sm:mb-8">
           {/* Brand section */}
           <div className="space-y-3">
             <div className="flex items-center gap-3">
@@ -31,28 +31,28 @@ export default async function Footer() {
             <p className="text-sm text-gray-600 leading-relaxed">
               Discover exceptional artwork from talented artists around the world. Explore, collect, and connect with creativity.
             </p>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 sm:gap-4">
               <a
                 href="https://www.instagram.com/by_jam_23/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-2 rounded-lg bg-gradient-to-r from-pink-500 to-purple-600 text-white hover:from-pink-600 hover:to-purple-700 transition-all duration-300 hover:scale-110"
+                className="p-2.5 sm:p-3 rounded-lg bg-gradient-to-r from-pink-500 to-purple-600 text-white hover:from-pink-600 hover:to-purple-700 transition-all duration-300 hover:scale-110"
                 aria-label="Instagram"
               >
-                <Instagram className="size-5" />
+                <Instagram className="size-5 sm:size-6" />
               </a>
               <a
                 href="mailto:andrebyukusenge9@gmail.com"
-                className="p-2 rounded-lg bg-teal-600 text-white hover:bg-teal-700 transition-all duration-300 hover:scale-110"
+                className="p-2.5 sm:p-3 rounded-lg bg-teal-600 text-white hover:bg-teal-700 transition-all duration-300 hover:scale-110"
                 aria-label="Email"
               >
-                <Mail className="size-5" />
+                <Mail className="size-5 sm:size-6" />
               </a>
             </div>
           </div>
 
           {/* Explore */}
-          <div className="space-y-4">
+          <div className="space-y-4 sm:col-span-1">
             <h3 className="font-semibold text-gray-900 text-sm uppercase tracking-wider">Explore</h3>
             <nav className="flex flex-col gap-2">
               <Link href="/site/galleries" className="text-sm text-gray-600 hover:text-teal-700 transition-colors inline-flex items-center gap-2 group">
@@ -77,7 +77,7 @@ export default async function Footer() {
           </div>
 
           {/* Account - Different for each user type */}
-          <div className="space-y-4">
+          <div className="hidden lg:block space-y-4">
             <h3 className="font-semibold text-gray-900 text-sm uppercase tracking-wider">
               {isAuthenticated ? "My Account" : "Get Started"}
             </h3>
@@ -121,7 +121,7 @@ export default async function Footer() {
           </div>
 
           {/* For Artists - Different for admins */}
-          <div className="space-y-4">
+          <div className="hidden lg:block space-y-4">
             <h3 className="font-semibold text-gray-900 text-sm uppercase tracking-wider">
               {isAdmin ? "Admin Tools" : "For Artists"}
             </h3>
@@ -168,7 +168,7 @@ export default async function Footer() {
         </div>
 
         {/* Bottom bar */}
-        <div className="pt-6 border-t border-gray-200/60 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-600">
+        <div className="pt-4 sm:pt-6 border-t border-gray-200/60 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4 text-sm text-gray-600">
           <div className="flex items-center gap-2">
             <span>© {currentYear} Artelier</span>
             <span className="hidden sm:inline">•</span>

@@ -33,18 +33,18 @@ export default function ShoppingCart({ isOpen, onClose }: ShoppingCartProps) {
 
             {/* Cart Sidebar */}
             <div
-                className="fixed top-0 right-0 h-screen w-full sm:w-[480px] bg-white shadow-2xl"
+                className="fixed top-0 right-0 h-screen w-full sm:w-[min(480px,90vw)] bg-white shadow-2xl"
                 style={{ zIndex: 9999 }}
             >
                 <div className="flex flex-col h-full">
                     {/* Header */}
-                    <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-white">
+                    <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200 bg-white">
                         <div className="flex items-center gap-3">
-                            <div className="p-2 bg-gradient-to-br from-teal-500 to-emerald-600 rounded-lg">
+                            <div className="p-1.5 sm:p-2 bg-gradient-to-br from-teal-500 to-emerald-600 rounded-lg">
                                 <ShoppingBag className="size-5 text-white" />
                             </div>
                             <div>
-                                <h2 className="text-xl font-bold text-gray-900">Shopping Cart</h2>
+                                <h2 className="text-lg sm:text-xl font-bold text-gray-900">Shopping Cart</h2>
                                 <p className="text-sm text-gray-500">
                                     {totalItems} {totalItems === 1 ? "item" : "items"}
                                 </p>
@@ -60,7 +60,7 @@ export default function ShoppingCart({ isOpen, onClose }: ShoppingCartProps) {
                     </div>
 
                     {/* Cart Items */}
-                    <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-white">
+                    <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-3 sm:space-y-4 bg-white">
                         {items.length === 0 ? (
                             <div className="flex flex-col items-center justify-center h-full text-center py-12">
                                 <div className="p-4 bg-gray-100 rounded-full mb-4">
@@ -84,10 +84,10 @@ export default function ShoppingCart({ isOpen, onClose }: ShoppingCartProps) {
                                 {items.map((item, index) => (
                                     <div
                                         key={index}
-                                        className="flex gap-4 p-4 bg-gray-50 rounded-xl border border-gray-200 hover:border-teal-200 transition-colors"
+                                        className="flex gap-3 sm:gap-4 p-3 sm:p-4 bg-gray-50 rounded-xl border border-gray-200 hover:border-teal-200 transition-colors"
                                     >
                                         {/* Image */}
-                                        <div className="relative w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-200">
+                                        <div className="relative w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-200">
                                             <Image
                                                 src={item.imageUrl}
                                                 alt={item.title}
@@ -98,7 +98,7 @@ export default function ShoppingCart({ isOpen, onClose }: ShoppingCartProps) {
 
                                         {/* Details */}
                                         <div className="flex-1 min-w-0">
-                                            <h3 className="font-semibold text-gray-900 truncate mb-1">
+                                            <h3 className="font-semibold text-sm sm:text-base text-gray-900 truncate mb-1">
                                                 {item.title}
                                             </h3>
                                             <p className="text-sm text-gray-600 mb-2">
@@ -108,22 +108,22 @@ export default function ShoppingCart({ isOpen, onClose }: ShoppingCartProps) {
                                             </p>
                                             <div className="flex items-center gap-3">
                                                 {/* Quantity Controls */}
-                                                <div className="flex items-center gap-2 bg-white rounded-lg border border-gray-300">
+                                                <div className="flex items-center gap-2 bg-white rounded-lg border border-gray-300 p-0.5">
                                                     <button
                                                         onClick={() => updateQuantity(index, item.quantity - 1)}
                                                         disabled={item.quantity <= 1}
-                                                        className="p-1.5 hover:bg-gray-100 rounded-l-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                                        className="p-2 sm:p-2.5 hover:bg-gray-100 rounded-l-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors touch-manipulation"
                                                     >
-                                                        <Minus className="size-3.5" />
+                                                        <Minus className="size-4" />
                                                     </button>
-                                                    <span className="text-sm font-medium w-8 text-center">
+                                                    <span className="text-sm font-medium min-w-[32px] text-center">
                                                         {item.quantity}
                                                     </span>
                                                     <button
                                                         onClick={() => updateQuantity(index, item.quantity + 1)}
-                                                        className="p-1.5 hover:bg-gray-100 rounded-r-lg transition-colors"
+                                                        className="p-2 sm:p-2.5 hover:bg-gray-100 rounded-r-lg transition-colors touch-manipulation"
                                                     >
-                                                        <Plus className="size-3.5" />
+                                                        <Plus className="size-4" />
                                                     </button>
                                                 </div>
                                                 <span className="text-sm font-bold text-teal-700">
@@ -135,7 +135,7 @@ export default function ShoppingCart({ isOpen, onClose }: ShoppingCartProps) {
                                         {/* Remove Button */}
                                         <button
                                             onClick={() => removeItem(index)}
-                                            className="p-2 hover:bg-red-50 rounded-lg transition-colors self-start"
+                                            className="p-2 sm:p-2.5 hover:bg-red-50 rounded-lg transition-colors self-start touch-manipulation"
                                             aria-label="Remove item"
                                         >
                                             <Trash2 className="size-4 text-red-600" />
@@ -148,7 +148,7 @@ export default function ShoppingCart({ isOpen, onClose }: ShoppingCartProps) {
 
                     {/* Footer */}
                     {items.length > 0 && (
-                        <div className="border-t border-gray-200 p-6 space-y-4 bg-gray-50">
+                        <div className="border-t border-gray-200 p-4 sm:p-6 space-y-3 sm:space-y-4 bg-gray-50">
                             {/* Total */}
                             <div className="flex items-center justify-between text-lg">
                                 <span className="font-semibold text-gray-900">Total</span>
