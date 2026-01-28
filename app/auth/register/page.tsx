@@ -1,11 +1,11 @@
 "use client";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { AlertCircle, CheckCircle, Eye, EyeOff } from "lucide-react";
 import PasswordStrengthIndicator from "@/components/PasswordStrengthIndicator";
 
-export default function RegisterPage() {
+function RegisterForm() {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -181,5 +181,17 @@ export default function RegisterPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-teal-50 to-emerald-50 flex items-center justify-center">
+        <div className="text-gray-600">Loading...</div>
+      </div>
+    }>
+      <RegisterForm />
+    </Suspense>
   );
 }
