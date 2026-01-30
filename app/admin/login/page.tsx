@@ -3,6 +3,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { AlertCircle } from "lucide-react";
+import AuthLayout from "@/components/auth/AuthLayout";
 
 export default function AdminLoginPage() {
   const [email, setEmail] = useState("");
@@ -23,16 +24,17 @@ export default function AdminLoginPage() {
         body: JSON.stringify({ email, password }),
       });
 
+      const data = await res.json();
+
       if (!res.ok) {
-        const data = await res.json();
         throw new Error(data.error || "Login failed");
       }
 
-      const user = await res.json();
-      if (user.role !== "ADMIN") {
+      if (data.user.role !== "ADMIN") {
         throw new Error("Admin access required");
       }
 
+      router.refresh();
       router.push("/admin/dashboard");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Login failed");
@@ -42,63 +44,60 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 flex items-center justify-center px-4 sm:px-6">
-      <div className="w-full max-w-md">
-        <div className="bg-white rounded-2xl border border-gray-200 shadow-2xl p-8 sm:p-10">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Admin Portal</h1>
-          <p className="text-gray-600 mb-8">Sign in to manage artworks and orders</p>
-
-          {error && (
-            <div className="mb-6 rounded-lg bg-red-50 border border-red-200 p-4 flex gap-3">
-              <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
-              <p className="text-sm text-red-700">{error}</p>
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="space-y-5">
-            <div>
-              <label className="block text-sm font-medium text-gray-900 mb-2">
-                Email Address
-              </label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="admin@artelier.com"
-                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-100 transition-all"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-900 mb-2">
-                Password
-              </label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-100 transition-all"
-                required
-              />
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-gradient-to-r from-gray-900 to-gray-800 text-white font-semibold py-3 rounded-lg hover:from-gray-800 hover:to-gray-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {loading ? "Signing in..." : "Sign In"}
-            </button>
-          </form>
-
-          <p className="text-center text-gray-600 mt-6 text-sm">
-            Not authorized? Contact the system administrator
-          </p>
+    <AuthLayout
+      title="Admin Portal"
+      subtitle="Sign in to manage artworks and orders"
+      showBackHome={true}
+    >
+      {error && (
+        <div className="mb-6 rounded-lg bg-red-50 border border-red-200 p-4 flex gap-3">
+          <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
+          <p className="text-sm text-red-700">{error}</p>
         </div>
-      </div>
-    </div>
+      )}
+
+      <form onSubmit={handleSubmit} className="space-y-5">
+        <div>
+          <label className="block text-sm font-medium text-gray-900 mb-2">
+            Email Address
+          </label>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="admin@artelier.com"
+            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-100 transition-all"
+            required
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-900 mb-2">
+            Password
+          </label>
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="••••••••"
+            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-100 transition-all"
+            required
+          />
+        </div>
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full bg-gradient-to-r from-gray-900 to-gray-800 text-white font-semibold py-3 rounded-lg hover:from-gray-800 hover:to-gray-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {loading ? "Signing in..." : "Sign In"}
+        </button>
+      </form>
+
+      <p className="text-center text-gray-600 mt-6 text-sm">
+        Not authorized? Contact the system administrator
+      </p>
+    </AuthLayout>
   );
 }
 

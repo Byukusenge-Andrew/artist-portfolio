@@ -2,9 +2,15 @@ import { NextResponse } from "next/server";
 import { writeFile, mkdir } from "node:fs/promises";
 import { randomBytes } from "node:crypto";
 import { extname, join } from "node:path";
+import { getCurrentUser } from "@/lib/authorization";
 
 export async function POST(req: Request) {
   try {
+    const user = await getCurrentUser(req);
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const contentType = req.headers.get("content-type") || "";
     if (!contentType.includes("multipart/form-data")) {
       return NextResponse.json({ error: "Expected multipart form data" }, { status: 400 });
@@ -32,16 +38,16 @@ export async function POST(req: Request) {
     const id = randomBytes(8).toString("hex");
     const ext = extname(file.name) || ".png";
     const dir = join(process.cwd(), "public", "uploads");
-    
+
     // Ensure directory exists
     await mkdir(dir, { recursive: true });
-    
+
     const filePath = join(dir, `${id}${ext}`);
     await writeFile(filePath, buffer);
 
     const publicPath = `/uploads/${id}${ext}`;
     return NextResponse.json({ publicId: `${id}${ext}`, url: publicPath });
-    
+
   } catch (error) {
     console.error("Local upload error:", error);
     const errorMessage = error instanceof Error ? error.message : "Upload failed";

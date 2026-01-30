@@ -4,15 +4,16 @@ import { prisma } from "@/lib/prisma";
 import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
 
+import { getCurrentUser } from "@/lib/authorization";
+
 export async function DELETE(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
-  const cookieStore = await cookies();
-  const isAdmin = cookieStore.get("admin_session")?.value === "1";
+  const user = await getCurrentUser(req as any);
 
-  if (!isAdmin) {
+  if (!user || user.role !== "ADMIN") {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

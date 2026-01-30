@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { verifyPassword, serializeUserSession } from "@/lib/auth";
+import { verifyPassword } from "@/lib/auth";
+import { signToken } from "@/lib/jwt";
+import { checkRateLimit } from "@/lib/rate-limit";
 import { z } from "zod";
 
 const loginSchema = z.object({
@@ -11,6 +13,18 @@ const loginSchema = z.object({
 
 export async function POST(req: Request) {
   try {
+    // Rate limiting - 5 attempts per 15 minutes
+    const rateLimitResult = await checkRateLimit(req, "login");
+    if (!rateLimitResult.allowed) {
+      return NextResponse.json(
+        { error: "Too many login attempts. Please try again later." },
+        {
+          status: 429,
+          headers: rateLimitResult.headers,
+        }
+      );
+    }
+
     const body = await req.json();
 
     const validation = loginSchema.safeParse(body);
@@ -60,8 +74,8 @@ export async function POST(req: Request) {
       );
     }
 
-    // Create session
-    const session = serializeUserSession({
+    // Create JWT session token
+    const sessionToken = await signToken({
       userId: user.id,
       email: user.email,
       role: user.role,
@@ -78,7 +92,10 @@ export async function POST(req: Request) {
         user: { id: user.id, email: user.email, name: user.name, role: user.role },
         redirectUrl,
       },
-      { status: 200 }
+      {
+        status: 200,
+        headers: rateLimitResult.headers,
+      }
     );
 
     // Set cookie with appropriate expiration
@@ -86,7 +103,7 @@ export async function POST(req: Request) {
       ? 60 * 60 * 24 * 30  // 30 days if "Remember Me"
       : 60 * 60 * 24 * 7;  // 7 days otherwise
 
-    res.cookies.set("user_session", session, {
+    res.cookies.set("user_session", sessionToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",

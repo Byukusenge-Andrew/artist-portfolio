@@ -3,6 +3,8 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import { User, LogOut, Heart, ShoppingBag } from "lucide-react";
 
+import { parseUserSession } from "@/lib/auth";
+
 async function getCurrentUser() {
   const cookieStore = await cookies();
   const userSession = cookieStore.get("user_session")?.value;
@@ -11,12 +13,11 @@ async function getCurrentUser() {
     redirect("/auth/login");
   }
 
-  try {
-    const user = JSON.parse(Buffer.from(userSession, "base64").toString());
-    return user;
-  } catch (e) {
+  const user = await parseUserSession(userSession);
+  if (!user) {
     redirect("/auth/login");
   }
+  return user;
 }
 
 export default async function UserDashboard() {

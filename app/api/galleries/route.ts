@@ -10,11 +10,12 @@ const gallerySchema = z.object({
   description: z.string().optional(),
 });
 
-export async function POST(req: Request) {
-  const cookieStore = await cookies();
-  const isAdmin = cookieStore.get("admin_session")?.value === "1";
+import { getCurrentUser } from "@/lib/authorization";
 
-  if (!isAdmin) {
+export async function POST(req: Request) {
+  const user = await getCurrentUser(req as any);
+
+  if (!user || user.role !== "ADMIN") {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

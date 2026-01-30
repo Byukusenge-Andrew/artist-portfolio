@@ -1,27 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { cookies } from "next/headers";
-
-// Helper to get current user from session
-async function getCurrentUser() {
-    const cookieStore = await cookies();
-    const userSession = cookieStore.get("user_session")?.value;
-
-    if (!userSession) {
-        return null;
-    }
-
-    try {
-        const user = JSON.parse(Buffer.from(userSession, "base64").toString());
-        return user;
-    } catch {
-        return null;
-    }
-}
+import { getCurrentUser } from "@/lib/authorization";
 
 // GET /api/favorites - Fetch user's favorites
-export async function GET() {
-    const user = await getCurrentUser();
+export async function GET(req: NextRequest) {
+    const user = await getCurrentUser(req);
 
     if (!user) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -29,7 +12,7 @@ export async function GET() {
 
     try {
         const userRecord = await prisma.user.findUnique({
-            where: { id: user.userId || user.id },
+            where: { id: user.userId },
             select: { favorites: true },
         });
 
@@ -71,7 +54,7 @@ export async function GET() {
 
 // POST /api/favorites - Add artwork to favorites
 export async function POST(req: NextRequest) {
-    const user = await getCurrentUser();
+    const user = await getCurrentUser(req);
 
     if (!user) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -98,7 +81,7 @@ export async function POST(req: NextRequest) {
 
         // Get current favorites
         const userRecord = await prisma.user.findUnique({
-            where: { id: user.userId || user.id },
+            where: { id: user.userId },
             select: { favorites: true },
         });
 
@@ -114,7 +97,7 @@ export async function POST(req: NextRequest) {
             favoriteIds.push(artworkId);
 
             await prisma.user.update({
-                where: { id: user.userId || user.id },
+                where: { id: user.userId },
                 data: { favorites: JSON.stringify(favoriteIds) },
             });
         }
@@ -131,7 +114,7 @@ export async function POST(req: NextRequest) {
 
 // DELETE /api/favorites - Remove artwork from favorites
 export async function DELETE(req: NextRequest) {
-    const user = await getCurrentUser();
+    const user = await getCurrentUser(req);
 
     if (!user) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -150,7 +133,7 @@ export async function DELETE(req: NextRequest) {
 
         // Get current favorites
         const userRecord = await prisma.user.findUnique({
-            where: { id: user.userId || user.id },
+            where: { id: user.userId },
             select: { favorites: true },
         });
 
@@ -165,7 +148,7 @@ export async function DELETE(req: NextRequest) {
         favoriteIds = favoriteIds.filter((id) => id !== artworkId);
 
         await prisma.user.update({
-            where: { id: user.userId || user.id },
+            where: { id: user.userId },
             data: { favorites: JSON.stringify(favoriteIds) },
         });
 

@@ -31,17 +31,25 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
     try {
       // Check if user is authenticated
       const sessionRes = await fetch("/api/auth/session");
-      const authenticated = sessionRes.ok;
-      setIsAuthenticated(authenticated);
 
-      if (authenticated) {
-        // Fetch favorites from server
-        const favRes = await fetch("/api/favorites");
-        if (favRes.ok) {
-          const data = await favRes.json();
-          setFavorites(data.favorites || []);
+      if (sessionRes.ok) {
+        const sessionData = await sessionRes.json();
+        const authenticated = !!sessionData.user;
+        setIsAuthenticated(authenticated);
+
+        if (authenticated) {
+          // Fetch favorites from server
+          const favRes = await fetch("/api/favorites");
+          if (favRes.ok) {
+            const data = await favRes.json();
+            setFavorites(data.favorites || []);
+          }
+        } else {
+          // Should not happen if sessionRes is ok, but clear just in case
+          setFavorites([]);
         }
       } else {
+        setIsAuthenticated(false);
         // For non-authenticated users, load from localStorage (read-only)
         const stored = localStorage.getItem("artwork-favorites");
         if (stored) {

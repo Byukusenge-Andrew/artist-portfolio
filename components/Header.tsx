@@ -11,7 +11,7 @@ import { prisma } from "@/lib/prisma";
 export default async function Header() {
   const cookieStore = await cookies();
   const userSession = cookieStore.get("user_session")?.value;
-  const user = parseUserSession(userSession);
+  const user = await parseUserSession(userSession);
 
   const isAdmin = user?.role === "ADMIN";
   const isAuthenticated = !!user;

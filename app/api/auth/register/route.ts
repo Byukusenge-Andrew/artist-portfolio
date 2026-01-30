@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { hashPassword, serializeUserSession, validatePassword } from "@/lib/auth";
+import { hashPassword, validatePassword } from "@/lib/auth";
+import { signToken } from "@/lib/jwt";
+import { checkRateLimit } from "@/lib/rate-limit";
 import { z } from "zod";
 
 const registerSchema = z.object({
@@ -12,6 +14,18 @@ const registerSchema = z.object({
 
 export async function POST(req: Request) {
   try {
+    // Rate limiting - 3 registrations per hour
+    const rateLimitResult = await checkRateLimit(req, "register");
+    if (!rateLimitResult.allowed) {
+      return NextResponse.json(
+        { error: "Too many registration attempts. Please try again later." },
+        {
+          status: 429,
+          headers: rateLimitResult.headers,
+        }
+      );
+    }
+
     const body = await req.json();
 
     // Validate schema
@@ -93,8 +107,8 @@ export async function POST(req: Request) {
       );
     }
 
-    // Create session
-    const session = serializeUserSession({
+    // Create JWT session token
+    const sessionToken = await signToken({
       userId: user.id,
       email: user.email,
       role: user.role,
@@ -110,10 +124,13 @@ export async function POST(req: Request) {
         message: "Account created successfully",
         redirectUrl,
       },
-      { status: 201 }
+      {
+        status: 201,
+        headers: rateLimitResult.headers,
+      }
     );
 
-    res.cookies.set("user_session", session, {
+    res.cookies.set("user_session", sessionToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",

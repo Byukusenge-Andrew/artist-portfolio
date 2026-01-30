@@ -1,27 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
-import { cookies } from "next/headers";
+import { getCurrentUser } from "@/lib/authorization";
 
 export async function POST(req: NextRequest) {
   try {
-    // Check if user has admin_session (legacy) or user_session with ADMIN role
-    const cookieStore = await cookies();
-    const adminSession = cookieStore.get("admin_session");
-    const userSession = cookieStore.get("user_session")?.value;
+    const user = await getCurrentUser(req);
 
-    // Check for admin access
-    let isAdmin = !!adminSession;
-
-    if (!isAdmin && userSession) {
-      try {
-        const user = JSON.parse(Buffer.from(userSession, "base64").toString());
-        isAdmin = user.role === "ADMIN";
-      } catch {
-        // Invalid session
-      }
-    }
-
-    if (!isAdmin) {
+    if (!user || user.role !== "ADMIN") {
       return NextResponse.json(
         { error: "Unauthorized. Admin access required." },
         { status: 401 }

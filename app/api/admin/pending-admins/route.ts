@@ -1,27 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { cookies } from "next/headers";
-
-// Helper to get current user from session
-async function getCurrentUser() {
-    const cookieStore = await cookies();
-    const userSession = cookieStore.get("user_session")?.value;
-
-    if (!userSession) {
-        return null;
-    }
-
-    try {
-        const user = JSON.parse(Buffer.from(userSession, "base64").toString());
-        return user;
-    } catch {
-        return null;
-    }
-}
+import { getCurrentUser } from "@/lib/authorization";
 
 // GET /api/admin/pending-admins - Get list of pending admin approvals
-export async function GET() {
-    const user = await getCurrentUser();
+export async function GET(req: NextRequest) {
+    const user = await getCurrentUser(req);
 
     if (!user || user.role !== "ADMIN") {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

@@ -4,6 +4,8 @@ import Link from "next/link";
 import { ArrowLeft, ShoppingBag } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 
+import { parseUserSession } from "@/lib/auth";
+
 async function getCurrentUser() {
   const cookieStore = await cookies();
   const userSession = cookieStore.get("user_session")?.value;
@@ -12,12 +14,11 @@ async function getCurrentUser() {
     redirect("/auth/login");
   }
 
-  try {
-    const user = JSON.parse(Buffer.from(userSession, "base64").toString());
-    return user;
-  } catch (e) {
+  const user = await parseUserSession(userSession);
+  if (!user) {
     redirect("/auth/login");
   }
+  return user;
 }
 
 export default async function OrdersPage() {
@@ -26,7 +27,7 @@ export default async function OrdersPage() {
   let orders: any[] = [];
   try {
     const orderRecords = await (prisma as any).order.findMany({
-      where: { userId: user.id },
+      where: { userId: user.userId },
       orderBy: { createdAt: "desc" },
       include: { items: true },
     });

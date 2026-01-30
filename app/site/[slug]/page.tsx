@@ -12,7 +12,12 @@ export default async function ArtworkDetailPage({
 }) {
   const { slug } = await params;
   const cookieStore = await cookies();
-  const isAdmin = cookieStore.get("admin_session")?.value === "1";
+  const userSession = cookieStore.get("user_session")?.value;
+
+  // Check strict admin role from JWT
+  const { parseUserSession } = await import("@/lib/auth");
+  const user = await parseUserSession(userSession);
+  const isAdmin = user?.role === "ADMIN";
 
   const artwork = await prisma.artwork.findUnique({
     where: { slug },
@@ -21,7 +26,7 @@ export default async function ArtworkDetailPage({
 
   if (!artwork) return notFound();
 
-  const tags: string[] = Array.isArray(artwork.tags) 
+  const tags: string[] = Array.isArray(artwork.tags)
     ? artwork.tags.filter((t): t is string => typeof t === "string")
     : [];
   // === Related Artworks Logic (same as before) ===
@@ -37,9 +42,9 @@ export default async function ArtworkDetailPage({
     relatedArtworks = allArtworks
       .filter((art) => {
         const artTags: string[] = Array.isArray(art.tags)
-        ? art.tags.filter((t): t is string => typeof t === "string")
-        : [];
-        return artTags.some((tag) => tags.includes(tag ));
+          ? art.tags.filter((t): t is string => typeof t === "string")
+          : [];
+        return artTags.some((tag) => tags.includes(tag));
       })
       .slice(0, 4)
       .map((art) => ({
@@ -71,8 +76,8 @@ export default async function ArtworkDetailPage({
       height: artwork.height,
       createdAt: artwork.createdAt.toISOString(),
       tags: Array.isArray(artwork.tags)
-      ? artwork.tags.filter((t): t is string => typeof t === "string")
-      : [],
+        ? artwork.tags.filter((t): t is string => typeof t === "string")
+        : [],
       isOriginalAvailable: artwork.isOriginalAvailable,
       originalPriceCents: artwork.originalPriceCents,
       printEnabled: artwork.printEnabled,

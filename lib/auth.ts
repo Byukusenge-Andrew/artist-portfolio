@@ -1,4 +1,5 @@
 import bcrypt from "bcryptjs";
+import { signToken, verifyToken, JWTPayload } from "./jwt";
 
 /**
  * Hash password using bcrypt (secure for passwords)
@@ -57,7 +58,7 @@ export function validatePassword(password: string): { valid: boolean; errors: st
     errors.push("Password must contain at least one lowercase letter");
   }
 
-  if (!/[A-Z]/.test(password)) {
+  if (/[A-Z]/.test(password)) {
     errors.push("Password must contain at least one uppercase letter");
   }
 
@@ -96,20 +97,46 @@ export interface UserSession {
 }
 
 /**
- * Parse user session from cookie
+ * Parse user session from JWT token
+ * @deprecated Use verifyToken from jwt.ts directly
  */
-export function parseUserSession(sessionCookie: string | undefined): UserSession | null {
-  if (!sessionCookie) return null;
+export async function parseUserSession(sessionToken: string | undefined): Promise<UserSession | null> {
+  if (!sessionToken) return null;
+
   try {
-    return JSON.parse(Buffer.from(sessionCookie, "base64").toString());
+    // Try JWT first (new format)
+    const payload = await verifyToken(sessionToken);
+    if (payload && payload.type === "access") {
+      return {
+        userId: payload.userId,
+        email: payload.email,
+        role: payload.role,
+        name: payload.name,
+      };
+    }
+  } catch {
+    // Ignore JWT errors, try legacy
+  }
+
+  try {
+    // Fall back to legacy base64 format for backward compatibility
+    // TODO: Remove this after all users have re-authenticated
+    const decoded = JSON.parse(Buffer.from(sessionToken, "base64").toString());
+    return decoded;
   } catch {
     return null;
   }
 }
 
 /**
- * Serialize user session to cookie value
+ * Serialize user session to JWT token
+ * @deprecated Use signToken from jwt.ts directly
  */
-export function serializeUserSession(session: UserSession): string {
-  return Buffer.from(JSON.stringify(session)).toString("base64");
+export async function serializeUserSession(session: UserSession): Promise<string> {
+  return signToken({
+    userId: session.userId,
+    email: session.email,
+    role: session.role,
+    name: session.name,
+  });
 }

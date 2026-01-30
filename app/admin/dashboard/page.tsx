@@ -4,29 +4,22 @@ import Link from "next/link";
 import { ArrowLeft, Users, Package, TrendingUp } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 
+import { parseUserSession } from "@/lib/auth";
+
 async function getCurrentUser() {
   const cookieStore = await cookies();
   const userSession = cookieStore.get("user_session")?.value;
-  const adminSession = cookieStore.get("admin_session")?.value;
 
-  if (!userSession && !adminSession) {
+  if (!userSession) {
     redirect("/admin/login");
   }
 
-  if (userSession) {
-    try {
-      const user = JSON.parse(Buffer.from(userSession, "base64").toString());
-      if (user.role !== "ADMIN") {
-        redirect("/auth/login");
-      }
-      return user;
-    } catch (e) {
-      redirect("/admin/login");
-    }
+  const user = await parseUserSession(userSession);
+  if (!user || user.role !== "ADMIN") {
+    redirect("/auth/login"); // Redirect to user login if session exists but not admin
   }
 
-  // Legacy admin session
-  return { id: "admin", email: "admin@artelier.com", name: "Administrator", role: "ADMIN" };
+  return user;
 }
 
 export default async function AdminDashboard() {
