@@ -8,7 +8,7 @@ import Link from "next/link";
 export default async function UserArtworksPage() {
     const cookieStore = await cookies();
     const userSession = cookieStore.get("user_session")?.value;
-    const user = parseUserSession(userSession);
+    const user = await parseUserSession(userSession);
 
     if (!user) {
         return (
