@@ -59,9 +59,9 @@ export default function AuthLayout({
                 {showBackHome && (
                     <Link
                         href="/"
-                        className="absolute top-6 left-6 lg:top-12 lg:left-12 flex items-center text-sm text-gray-500 hover:text-gray-900 transition-colors"
+                        className="absolute top-6 left-6 lg:top-6 lg:left-12 flex items-center text-sm text-gray-500 hover:text-gray-900 transition-colors"
                     >
-                        <ArrowLeft className="h-4 w-4 mr-2" />
+                        <ArrowLeft className="h-4 w-4 mr-2 " />
                         Back to Home
                     </Link>
                 )}
