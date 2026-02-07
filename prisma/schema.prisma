@@ -24,6 +24,8 @@ model Artwork {
   originalPriceCents  Int?
   printEnabled        Boolean          @default(false)
   deletedAt           DateTime?
+  uploadedBy          String?
+  uploader            User?            @relation("UserArtworks", fields: [uploadedBy], references: [id], onDelete: SetNull)
   galleries           ArtworkGallery[] @relation("ArtworkGalleries")
   orderItems          OrderItem[]
   printOptions        PrintOption[]    @relation("ArtworkPrintOptions")
@@ -139,6 +141,8 @@ model User {
   isApproved       Boolean   @default(true)
   approvedBy       String?
   approvedAt       DateTime?
+  avatarUrl        String?   // Artist profile picture
+  bio              String?   @db.Text // Artist bio/description
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
   favorites        String?   @db.LongText
@@ -146,6 +150,7 @@ model User {
   resetToken       String?
   resetTokenExpiry DateTime?
   orders           Order[]   @relation("UserOrders")
+  uploadedArtworks Artwork[] @relation("UserArtworks")
 
   @@index([email])
   @@index([role])
@@ -160,6 +165,7 @@ enum OrderStatus {
 
 enum UserRole {
   USER
+  ARTIST
   ADMIN
 }
 

@@ -21,7 +21,17 @@ export default async function ArtworkDetailPage({
 
   const artwork = await prisma.artwork.findUnique({
     where: { slug },
-    include: { printOptions: true },
+    include: {
+      printOptions: true,
+      uploader: {
+        select: {
+          id: true,
+          name: true,
+          avatarUrl: true,
+          bio: true,
+        },
+      },
+    },
   });
 
   if (!artwork) return notFound();
@@ -86,6 +96,12 @@ export default async function ArtworkDetailPage({
         name: opt.name,
         priceCents: opt.priceCents,
       })),
+      artist: artwork.uploader ? {
+        id: artwork.uploader.id,
+        name: artwork.uploader.name || "Unknown Artist",
+        avatarUrl: artwork.uploader.avatarUrl,
+        bio: artwork.uploader.bio,
+      } : null,
     },
     relatedArtworks,
     isAdmin,

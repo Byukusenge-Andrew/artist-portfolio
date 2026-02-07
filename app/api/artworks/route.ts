@@ -29,7 +29,19 @@ export async function GET() {
   return NextResponse.json(artworks);
 }
 
+import { getCurrentUser } from "@/lib/authorization";
+
 export async function POST(req: Request) {
+  const user = await getCurrentUser(req);
+
+  // Only artists can create artworks
+  if (!user || user.role !== "ARTIST") {
+    return NextResponse.json(
+      { error: "Artist role required to create artworks" },
+      { status: 403 }
+    );
+  }
+
   const json = await req.json();
   const parsed = createArtworkSchema.safeParse(json);
   if (!parsed.success) {
@@ -53,6 +65,7 @@ export async function POST(req: Request) {
       isOriginalAvailable: data.isOriginalAvailable,
       originalPriceCents: data.originalPriceCents,
       printEnabled: data.printEnabled,
+      uploadedBy: user.userId, // Track who uploaded it
       printOptions: {
         create: data.printOptions.map((opt) => ({
           name: opt.name,
@@ -62,12 +75,6 @@ export async function POST(req: Request) {
     },
     include: { printOptions: true },
   });
-  // const deleted = await prisma.artwork.deleteMany({
-  //   where: {
-  //     id: { not: created.id },
-  //     slug: created.slug,
-  //   },
-  // });
 
   return NextResponse.json(created, { status: 201 });
 }

@@ -71,11 +71,16 @@ export async function POST(req: Request) {
     // Hash password (now async with bcrypt)
     const hashedPassword = await hashPassword(password);
 
-    // Check if this is the first admin (auto-approve first admin)
-    const isAdminSignup = body.role === "ADMIN";
-    let isApproved = true; // Regular users are auto-approved
+    // Determine role and approval status
+    const requestedRole = body.role as "USER" | "ARTIST" | "ADMIN" | undefined;
+    let role: "USER" | "ARTIST" | "ADMIN" = "USER"; // Default to USER (buyer)
+    let isApproved = true; // Users and artists are auto-approved
 
-    if (isAdminSignup) {
+    if (requestedRole === "ARTIST") {
+      role = "ARTIST"; // Artists can self-register
+    } else if (requestedRole === "ADMIN") {
+      role = "ADMIN";
+      // Check if this is the first admin (auto-approve first admin)
       const existingAdminCount = await prisma.user.count({
         where: {
           role: "ADMIN",
@@ -91,13 +96,13 @@ export async function POST(req: Request) {
         email,
         password: hashedPassword,
         name,
-        role: isAdminSignup ? "ADMIN" : "USER",
+        role,
         isApproved,
       },
     });
 
     // If admin needs approval, don't create session
-    if (isAdminSignup && !isApproved) {
+    if (role === "ADMIN" && !isApproved) {
       return NextResponse.json(
         {
           message: "Admin account created. Waiting for approval from an existing admin.",
@@ -115,9 +120,18 @@ export async function POST(req: Request) {
       name: user.name || undefined,
     });
 
-    // Get redirect URL from query params
+    // Determine redirect URL based on role
     const url = new URL(req.url);
-    const redirectUrl = url.searchParams.get("redirect") || "/user/dashboard";
+    const redirectParam = url.searchParams.get("redirect");
+
+    let defaultRedirect = "/user/dashboard"; // Buyer default
+    if (role === "ARTIST") {
+      defaultRedirect = "/artist/dashboard";
+    } else if (role === "ADMIN") {
+      defaultRedirect = "/admin/dashboard";
+    }
+
+    const redirectUrl = redirectParam || defaultRedirect;
 
     const res = NextResponse.json(
       {

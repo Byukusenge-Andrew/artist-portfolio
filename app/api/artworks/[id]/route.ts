@@ -9,10 +9,22 @@ const deleteArtworkSchema = z.object({
   id: z.string().uuid(), // or z.coerce.number().int() if using numeric IDs
 });
 
+import { getCurrentUser } from "@/lib/authorization";
+
 export async function DELETE(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const user = await getCurrentUser(req);
+
+  // Only artists can delete artworks
+  if (!user || user.role !== "ARTIST") {
+    return NextResponse.json(
+      { error: "Artist role required to delete artworks" },
+      { status: 403 }
+    );
+  }
+
   // 1. Validate ID
   const { id: artworkId } = await params;
   const parsed = deleteArtworkSchema.safeParse({ id: artworkId });
@@ -27,13 +39,14 @@ export async function DELETE(
   const { id } = parsed.data;
 
   try {
-    // 2. Find artwork first (optional: for better error message)
+    // 2. Find artwork first
     const artwork = await prisma.artwork.findUnique({
       where: { id },
       select: {
         id: true,
         slug: true,
         imagePublicId: true,
+        uploadedBy: true,
       },
     });
 
@@ -44,7 +57,15 @@ export async function DELETE(
       );
     }
 
-    // 3. Delete the artwork (Prisma handles cascade if configured)
+    // 3. Verify ownership - only the artist who uploaded can delete
+    if (artwork.uploadedBy !== user.userId) {
+      return NextResponse.json(
+        { error: "You can only delete your own artworks" },
+        { status: 403 }
+      );
+    }
+
+    // 4. Delete the artwork (Prisma handles cascade if configured)
     await prisma.artwork.delete({
       where: { id },
     });
@@ -54,7 +75,7 @@ export async function DELETE(
     revalidatePath(`/art/${artwork.slug}`);
     revalidatePath("/");
 
-    // 4. Success response
+    // 5. Success response
     return NextResponse.json(
       { message: "Artwork deleted successfully", id },
       { status: 200 }

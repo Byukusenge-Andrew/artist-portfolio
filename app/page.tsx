@@ -10,6 +10,16 @@ export default async function Home() {
   const latest = await prisma.artwork.findMany({
     orderBy: { createdAt: "desc" },
     take: 12,
+    include: {
+      uploader: {
+        select: {
+          id: true,
+          name: true,
+          avatarUrl: true,
+          bio: true,
+        },
+      },
+    },
   });
 
   // Optional: artist list, if the model/migration is applied

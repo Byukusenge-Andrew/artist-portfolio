@@ -7,8 +7,13 @@ import { getCurrentUser } from "@/lib/authorization";
 export async function POST(req: Request) {
   try {
     const user = await getCurrentUser(req);
-    if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    // Allow both ADMIN and ARTIST roles to upload
+    if (!user || (user.role !== "ADMIN" && user.role !== "ARTIST")) {
+      return NextResponse.json(
+        { error: "Unauthorized. Admin or Artist access required." },
+        { status: 403 }
+      );
     }
 
     const contentType = req.headers.get("content-type") || "";

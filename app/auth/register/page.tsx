@@ -171,12 +171,20 @@ function RegisterForm() {
         </button>
       </form>
 
-      <p className="text-center text-gray-600 mt-6">
-        Already have an account?{" "}
-        <Link href="/auth/login" className="text-teal-600 hover:text-teal-700 font-semibold">
-          Sign in
-        </Link>
-      </p>
+      <div className="mt-6 space-y-3">
+        <p className="text-center text-gray-600 text-sm">
+          Already have an account?{" "}
+          <Link href="/auth/login" className="text-teal-600 hover:text-teal-700 font-semibold">
+            Sign in
+          </Link>
+        </p>
+        <p className="text-center text-gray-600 text-sm">
+          Want to sell art?{" "}
+          <Link href="/auth/artist-signup" className="text-purple-600 hover:text-purple-700 font-medium">
+            Sign up as an Artist
+          </Link>
+        </p>
+      </div>
     </AuthLayout>
   );
 }

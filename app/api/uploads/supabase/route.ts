@@ -6,10 +6,11 @@ export async function POST(req: NextRequest) {
   try {
     const user = await getCurrentUser(req);
 
-    if (!user || user.role !== "ADMIN") {
+    // Allow both ADMIN and ARTIST roles to upload
+    if (!user || (user.role !== "ADMIN" && user.role !== "ARTIST")) {
       return NextResponse.json(
-        { error: "Unauthorized. Admin access required." },
-        { status: 401 }
+        { error: "Unauthorized. Admin or Artist access required." },
+        { status: 403 }
       );
     }
 

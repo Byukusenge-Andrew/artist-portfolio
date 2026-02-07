@@ -18,11 +18,37 @@ export async function PATCH(
 ) {
   const { optionId } = await params;
   const user = await getCurrentUser(req as any);
-  if (!user || user.role !== "ADMIN") {
+
+  // Require authentication
+  if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   try {
+    // Get the print option with its artwork
+    const printOption = await prisma.printOption.findUnique({
+      where: { id: optionId },
+      include: { artwork: true },
+    });
+
+    if (!printOption) {
+      return NextResponse.json({ error: "Print option not found" }, { status: 404 });
+    }
+
+    // Artists can only update options for their own artworks
+    // Admins cannot update (read-only)
+    if (user.role === "ARTIST" && printOption.artwork.uploadedBy !== user.userId) {
+      return NextResponse.json(
+        { error: "You can only modify print options for your own artworks" },
+        { status: 403 }
+      );
+    } else if (user.role !== "ARTIST") {
+      return NextResponse.json(
+        { error: "Only artists can modify print options" },
+        { status: 403 }
+      );
+    }
+
     const body = await req.json();
     const validated = updateSchema.parse(body);
 
@@ -56,11 +82,37 @@ export async function DELETE(
 ) {
   const { optionId } = await params;
   const user = await getCurrentUser(req as any);
-  if (!user || user.role !== "ADMIN") {
+
+  // Require authentication
+  if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   try {
+    // Get the print option with its artwork
+    const printOption = await prisma.printOption.findUnique({
+      where: { id: optionId },
+      include: { artwork: true },
+    });
+
+    if (!printOption) {
+      return NextResponse.json({ error: "Print option not found" }, { status: 404 });
+    }
+
+    // Artists can only delete options for their own artworks
+    // Admins cannot delete (read-only)
+    if (user.role === "ARTIST" && printOption.artwork.uploadedBy !== user.userId) {
+      return NextResponse.json(
+        { error: "You can only delete print options for your own artworks" },
+        { status: 403 }
+      );
+    } else if (user.role !== "ARTIST") {
+      return NextResponse.json(
+        { error: "Only artists can delete print options" },
+        { status: 403 }
+      );
+    }
+
     await prisma.printOption.delete({
       where: { id: optionId },
     });

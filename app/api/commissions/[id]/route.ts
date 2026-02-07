@@ -7,6 +7,8 @@ const updateSchema = z.object({
   status: z.enum(["NEW", "IN_REVIEW", "INVOICE_SENT", "PAID", "REJECTED"]),
 });
 
+import { getCurrentUser } from "@/lib/authorization";
+
 export async function GET(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -24,6 +26,19 @@ export async function GET(
       );
     }
 
+    const user = await getCurrentUser(req);
+
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    // Check access permissions
+    // Users can only view their own commissions (matched by email)
+    // Admins can view all
+    if (user.role !== "ADMIN" && commission.email !== user.email) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
     return NextResponse.json(commission);
   } catch (error) {
     console.error("Failed to fetch commission:", error);
@@ -34,8 +49,6 @@ export async function GET(
   }
 }
 
-import { getCurrentUser } from "@/lib/authorization";
-
 export async function PATCH(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -43,6 +56,7 @@ export async function PATCH(
   const { id } = await params;
   const user = await getCurrentUser(req as any);
 
+  // Only admins can update commission status
   if (!user || user.role !== "ADMIN") {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
@@ -79,6 +93,7 @@ export async function DELETE(
   const { id } = await params;
   const user = await getCurrentUser(req as any);
 
+  // Only admins can delete commissions
   if (!user || user.role !== "ADMIN") {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }

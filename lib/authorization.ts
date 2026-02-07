@@ -67,7 +67,7 @@ export async function requireAdmin(request: NextRequest | Request) {
  */
 export async function requireOwnership(
     request: NextRequest | Request,
-    resourceType: "order" | "commissionRequest",
+    resourceType: "order" | "commissionRequest" | "artwork",
     resourceId: string
 ) {
     const user = await requireAuth(request);
@@ -91,6 +91,14 @@ export async function requireOwnership(
                 select: { email: true },
             });
             isOwner = commission?.email === user.email;
+            break;
+
+        case "artwork":
+            const artwork = await prisma.artwork.findUnique({
+                where: { id: resourceId },
+                select: { uploadedBy: true },
+            });
+            isOwner = artwork?.uploadedBy === user.userId;
             break;
     }
 

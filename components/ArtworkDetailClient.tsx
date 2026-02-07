@@ -29,6 +29,12 @@ type Artwork = {
     name: string;
     priceCents: number;
   }>;
+  artist?: {
+    id: string;
+    name: string;
+    avatarUrl?: string | null;
+    bio?: string | null;
+  } | null;
 };
 
 type Props = {
@@ -111,6 +117,34 @@ export default function ArtworkDetailClient({ artwork, relatedArtworks, isAdmin 
                     {tag}
                   </span>
                 ))}
+              </div>
+            )}
+
+            {/* Artist Profile */}
+            {artwork.artist && (
+              <div className="mb-6 p-5 bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl border border-purple-100">
+                <div className="flex items-center gap-4 mb-3">
+                  {artwork.artist.avatarUrl ? (
+                    <img
+                      src={artwork.artist.avatarUrl}
+                      alt={artwork.artist.name}
+                      className="w-16 h-16 rounded-full object-cover border-2 border-purple-200"
+                    />
+                  ) : (
+                    <div className="w-16 h-16 rounded-full bg-purple-200 flex items-center justify-center border-2 border-purple-300">
+                      <Palette className="size-8 text-purple-600" />
+                    </div>
+                  )}
+                  <div>
+                    <div className="text-sm text-purple-700 font-medium mb-1">Artist</div>
+                    <h3 className="text-lg font-bold text-gray-900">{artwork.artist.name}</h3>
+                  </div>
+                </div>
+                {artwork.artist.bio && (
+                  <p className="text-sm text-gray-700 leading-relaxed">
+                    {artwork.artist.bio}
+                  </p>
+                )}
               </div>
             )}
 
