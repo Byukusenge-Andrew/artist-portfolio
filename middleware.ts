@@ -35,26 +35,41 @@ export async function middleware(request: NextRequest) {
 
   // Auth routes - redirect if already authenticated
   if ((pathname === "/auth/login" || pathname === "/auth/register") && isAuthenticated) {
+    if (user?.role === "ADMIN") {
+      return NextResponse.redirect(new URL("/admin/dashboard", request.url));
+    } else if (user?.role === "ARTIST") {
+      return NextResponse.redirect(new URL("/artist/dashboard", request.url));
+    }
     return NextResponse.redirect(new URL("/user/dashboard", request.url));
   }
 
   // Admin routes - require admin role
   if (pathname.startsWith("/admin")) {
     const isPublicAdminPage = pathname === "/admin/login" || pathname === "/admin/signup";
-    if (!isPublicAdminPage && !isAdmin) {
-      // Preserve redirect URL
+    // Allow ARTIST to access specific admin pages (artworks, orders, etc.)
+    // We'll let the page-level checks handle detailed permissions, but we need to pass authenticated users
+    if (!isAuthenticated && !isPublicAdminPage) {
       const loginUrl = new URL("/auth/login", request.url);
       loginUrl.searchParams.set("redirect", pathname);
       return NextResponse.redirect(loginUrl);
     }
 
-    // Check if admin is approved (except for pending-approvals page)
-    if (isAdmin && !isPublicAdminPage && pathname !== "/admin/pending-approvals") {
-      // Note: We can't easily check isApproved here without a database call
-      // The login route already handles this check
-      // If an unapproved admin somehow gets a session, they'll be blocked at login
-    }
+    // Strict check for admin-only pages (like user management) could go here
+    // But for now, we rely on page-level checks since we share some admin routes with artists
 
+    return addSecurityHeaders(NextResponse.next());
+  }
+
+  // Artist routes - require artist role
+  if (pathname.startsWith("/artist")) {
+    if (!isAuthenticated) {
+      const loginUrl = new URL("/auth/login", request.url);
+      loginUrl.searchParams.set("redirect", pathname);
+      return NextResponse.redirect(loginUrl);
+    }
+    if (user?.role !== "ARTIST" && user?.role !== "ADMIN") {
+      return NextResponse.redirect(new URL("/user/dashboard", request.url));
+    }
     return addSecurityHeaders(NextResponse.next());
   }
 
@@ -115,6 +130,7 @@ function addSecurityHeaders(response: NextResponse): NextResponse {
 export const config = {
   matcher: [
     "/admin/:path*",
+    "/artist/:path*",
     "/user/:path*",
     "/auth/:path*",
     "/order/:path*",

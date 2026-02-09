@@ -149,11 +149,11 @@ export default async function Footer() {
               ) : (
                 /* Non-admin users */
                 <>
-                  <Link href="/admin/login" className="text-sm text-gray-600 hover:text-teal-700 transition-colors inline-flex items-center gap-2 group">
+                  <Link href="/auth/login" className="text-sm text-gray-600 hover:text-teal-700 transition-colors inline-flex items-center gap-2 group">
                     <span className="group-hover:translate-x-1 transition-transform">→</span>
                     Artist Login
                   </Link>
-                  <Link href="/admin/signup" className="text-sm text-gray-600 hover:text-teal-700 transition-colors inline-flex items-center gap-2 group">
+                  <Link href="/auth/artist-signup" className="text-sm text-gray-600 hover:text-teal-700 transition-colors inline-flex items-center gap-2 group">
                     <span className="group-hover:translate-x-1 transition-transform">→</span>
                     Join as Artist
                   </Link>

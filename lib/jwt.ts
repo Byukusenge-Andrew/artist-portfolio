@@ -7,7 +7,7 @@ import { env } from "./env";
 export interface JWTPayload extends JoseJWTPayload {
     userId: string;
     email: string;
-    role: "USER" | "ADMIN";
+    role: "USER" | "ADMIN" | "ARTIST";
     name?: string;
     type: "access" | "refresh";
 }
@@ -95,7 +95,7 @@ export async function refreshAccessToken(refreshToken: string): Promise<string |
     const cleanPayload = {
         userId: userPayload.userId as string,
         email: userPayload.email as string,
-        role: userPayload.role as "USER" | "ADMIN",
+        role: userPayload.role as "USER" | "ADMIN" | "ARTIST",
         name: userPayload.name as string | undefined,
     };
 

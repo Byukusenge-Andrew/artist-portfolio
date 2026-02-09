@@ -31,6 +31,7 @@ export async function POST(req: Request) {
     // Validate schema
     const validation = registerSchema.safeParse(body);
     if (!validation.success) {
+      console.error("Registration validation failed:", validation.error.flatten());
       return NextResponse.json(
         { error: validation.error.flatten().fieldErrors },
         { status: 400 }

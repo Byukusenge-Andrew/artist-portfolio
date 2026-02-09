@@ -15,8 +15,8 @@ async function getCurrentUser() {
   }
 
   const user = await parseUserSession(userSession);
-  if (!user || user.role !== "ADMIN") {
-    redirect("/auth/login"); // Redirect to user login if session exists but not admin
+  if (!user || (user.role !== "ADMIN" && user.role !== "ARTIST")) {
+    redirect("/auth/login"); // Redirect to user login if session exists but not admin/artist
   }
 
   return user;

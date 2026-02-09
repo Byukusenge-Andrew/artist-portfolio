@@ -82,9 +82,20 @@ export async function POST(req: Request) {
       name: user.name || undefined,
     });
 
-    // Get redirect URL from query params
+    // Get redirect URL from query params or determine by role
     const url = new URL(req.url);
-    const redirectUrl = url.searchParams.get("redirect") || "/user/dashboard";
+    let redirectUrl = url.searchParams.get("redirect");
+
+    // If no redirect specified, use role-based default
+    if (!redirectUrl) {
+      if (user.role === "ADMIN") {
+        redirectUrl = "/admin/dashboard";
+      } else if (user.role === "ARTIST") {
+        redirectUrl = "/artist/dashboard";
+      } else {
+        redirectUrl = "/user/dashboard";
+      }
+    }
 
     const res = NextResponse.json(
       {

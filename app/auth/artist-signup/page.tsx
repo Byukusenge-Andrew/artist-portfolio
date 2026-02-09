@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { AlertCircle, Palette } from "lucide-react";
 import AuthLayout from "@/components/auth/AuthLayout";
+import PasswordStrengthIndicator from "@/components/PasswordStrengthIndicator";
 
 export default function ArtistSignupPage() {
     const [formData, setFormData] = useState({
@@ -115,7 +116,8 @@ export default function ArtistSignupPage() {
                         required
                         minLength={8}
                     />
-                    <p className="text-xs text-gray-500 mt-1">Minimum 8 characters</p>
+                    <PasswordStrengthIndicator password={formData.password} />
+                    <p className="text-xs text-gray-500 mt-1">Must contain uppercase, lowercase, number, and be at least 8 characters</p>
                 </div>
 
                 <div>

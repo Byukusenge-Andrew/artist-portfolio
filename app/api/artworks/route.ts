@@ -34,10 +34,10 @@ import { getCurrentUser } from "@/lib/authorization";
 export async function POST(req: Request) {
   const user = await getCurrentUser(req);
 
-  // Only artists can create artworks
-  if (!user || user.role !== "ARTIST") {
+  // Only artists and admins can create artworks
+  if (!user || (user.role !== "ARTIST" && user.role !== "ADMIN")) {
     return NextResponse.json(
-      { error: "Artist role required to create artworks" },
+      { error: "Artist or Admin role required to create artworks" },
       { status: 403 }
     );
   }

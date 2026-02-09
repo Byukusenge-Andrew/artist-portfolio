@@ -73,7 +73,7 @@ export default async function Home() {
                 Explore Galleries
               </Link>
               <Link
-                href="/admin/signup"
+                href="/auth/artist-signup"
                 className="inline-flex items-center justify-center gap-2 rounded-xl border-2 border-white/30 backdrop-blur-sm bg-white/10 px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-base text-white font-semibold hover:bg-white/20 transition-all duration-300"
               >
                 <TrendingUp className="size-4 sm:size-5" />
@@ -161,7 +161,7 @@ export default async function Home() {
             <h3 className="text-xl font-semibold text-gray-900 mb-2">No artworks yet</h3>
             <p className="text-gray-600 mb-6">Be the first to upload amazing artwork!</p>
             <Link
-              href="/admin/signup"
+              href="/auth/artist-signup"
               className="inline-flex items-center gap-2 px-6 py-3 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-all"
             >
               <Sparkles className="size-5" />
@@ -204,7 +204,7 @@ export default async function Home() {
               Explore Galleries
             </Link>
             <Link
-              href="/admin/signup"
+              href="/auth/artist-signup"
               className="inline-flex items-center justify-center gap-2 rounded-xl border-2 border-gray-300 bg-white px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-base text-gray-900 font-semibold hover:border-teal-600 hover:text-teal-700 transition-all duration-300"
             >
               <TrendingUp className="size-4 sm:size-5" />

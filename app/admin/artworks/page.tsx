@@ -11,7 +11,7 @@ export default async function ManageArtworksPage() {
     const userSession = cookieStore.get("user_session")?.value;
     const user = await parseUserSession(userSession);
 
-    if (!user || user.role !== "ADMIN") {
+    if (!user || (user.role !== "ADMIN" && user.role !== "ARTIST")) {
         redirect("/auth/login");
     }
 

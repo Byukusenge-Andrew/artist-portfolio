@@ -5,7 +5,7 @@ export interface User {
   id: string;
   email: string;
   name: string;
-  role: "USER" | "ADMIN";
+  role: "USER" | "ADMIN" | "ARTIST";
   isActive: boolean;
 }
 
@@ -14,6 +14,7 @@ interface AuthContextType {
   loading: boolean;
   isAdmin: boolean;
   isUser: boolean;
+  isArtist: boolean;
   logout: () => Promise<void>;
 }
 
@@ -58,6 +59,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         loading,
         isAdmin: user?.role === "ADMIN",
         isUser: user?.role === "USER",
+        isArtist: user?.role === "ARTIST",
         logout,
       }}
     >

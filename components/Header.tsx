@@ -14,6 +14,7 @@ export default async function Header() {
   const user = await parseUserSession(userSession);
 
   const isAdmin = user?.role === "ADMIN";
+  const isArtist = user?.role === "ARTIST";
   const isAuthenticated = !!user;
 
   // Get pending admin count if user is admin
@@ -37,7 +38,7 @@ export default async function Header() {
         {/* Logo */}
         <Link href="/" className="group flex items-center gap-2 sm:gap-3 hover:scale-105 transition-transform duration-300 flex-shrink-0">
           <Image src="/icon.png" width={34} height={34} alt="Artelier" className="sm:w-10 sm:h-10" />
-          
+
         </Link>
 
         {/* Search - Desktop & Tablet */}
@@ -67,8 +68,8 @@ export default async function Header() {
           <FavoritesButton />
           <CartButton />
 
-          {/* Admin Section */}
-          {isAdmin && (
+          {/* Admin/Artist Section */}
+          {(isAdmin || isArtist) && (
             <>
               <div className="h-6 w-px bg-gray-300 mx-1 sm:mx-2 hidden sm:block" />
 
@@ -107,10 +108,10 @@ export default async function Header() {
           {/* User Menu */}
           {isAuthenticated ? (
             <>
-              {!isAdmin && <div className="h-6 w-px bg-gray-300 mx-1 sm:mx-2 hidden sm:block" />}
+              {!(isAdmin || isArtist) && <div className="h-6 w-px bg-gray-300 mx-1 sm:mx-2 hidden sm:block" />}
 
               <Link
-                href={isAdmin ? "/admin/dashboard" : "/user/dashboard"}
+                href={isAdmin ? "/admin/dashboard" : isArtist ? "/artist/dashboard" : "/user/dashboard"}
                 className="group inline-flex items-center gap-2 rounded-lg px-2 lg:px-3 py-2 text-gray-700 hover:text-teal-800 hover:bg-gradient-to-br hover:from-teal-50 hover:to-emerald-50 transition-all duration-300"
               >
                 <User className="size-4 group-hover:scale-110 transition-transform" />

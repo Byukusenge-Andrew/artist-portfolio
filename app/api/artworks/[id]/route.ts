@@ -17,10 +17,10 @@ export async function DELETE(
 ) {
   const user = await getCurrentUser(req);
 
-  // Only artists can delete artworks
-  if (!user || user.role !== "ARTIST") {
+  // Only artists and admins can delete artworks
+  if (!user || (user.role !== "ARTIST" && user.role !== "ADMIN")) {
     return NextResponse.json(
-      { error: "Artist role required to delete artworks" },
+      { error: "Artist or Admin role required to delete artworks" },
       { status: 403 }
     );
   }

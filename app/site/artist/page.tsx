@@ -11,7 +11,7 @@ export default async function ArtistsPage() {
     });
 
     return (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12 bg-[#f5f5f0]">
             {/* Hero Section */}
             <div className="text-center mb-16 animate-fade-in">
                 <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-teal-600 to-emerald-600 rounded-2xl mb-6 shadow-lg">

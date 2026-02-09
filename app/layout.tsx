@@ -37,13 +37,13 @@ export default function RootLayout({
       </head>
 
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen bg-[#f5f5f0]`}
       >
         <AuthProvider>
           <FavoritesProvider>
             <CartProvider>
               <Header />
-              <main className="flex-1 mx-4 sm:mx-6 lg:mx-8">{children}</main>
+              <main className="flex-1">{children}</main>
               <Footer />
             </CartProvider>
           </FavoritesProvider>

@@ -1,6 +1,6 @@
 "use client";
 
-import { checkPasswordStrength } from "@/lib/auth";
+import { checkPasswordStrength } from "@/lib/password-utils";
 import { useEffect, useState } from "react";
 
 type Props = {
@@ -49,8 +49,8 @@ export default function PasswordStrengthIndicator({ password }: Props) {
             </div>
             <p className="text-xs mt-1 capitalize text-gray-600">
                 Password strength: <span className={`font-medium ${strength === "weak" ? "text-red-600" :
-                        strength === "medium" ? "text-yellow-600" :
-                            "text-green-600"
+                    strength === "medium" ? "text-yellow-600" :
+                        "text-green-600"
                     }`}>{strength}</span>
             </p>
         </div>

@@ -134,11 +134,14 @@ NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY="your-stripe-publishable-key"
 STRIPE_SECRET_KEY="your-stripe-secret-key"
 STRIPE_WEBHOOK_SECRET="your-webhook-secret"
 
+# JWT Authentication
+JWT_SECRET="your-super-secret-jwt-key-min-32-chars"
+
 # Admin Authentication
 ADMIN_PASSWORD="your-secure-admin-password"
 
-# App URL (for sharing)
-NEXT_PUBLIC_BASE_URL="http://localhost:3000"
+# App URL (HTTPS for local development)
+NEXT_PUBLIC_SITE_URL="https://localhost:3000"
 ```
 
 4.**Set up the database**
@@ -154,18 +157,30 @@ npx prisma migrate dev
 npx prisma db seed
 ```
 
-5.**Run the development server**
+5.**Generate SSL certificates (for HTTPS development)**
+
+```bash
+npm run generate:certs
+```
+
+This creates self-signed SSL certificates for local HTTPS development. Your browser will show a security warning (this is normal for development certificates).
+
+6.**Run the development server**
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
+# Runs HTTPS server at https://localhost:3000
+
+# OR run HTTP-only (without SSL)
+npm run dev:http
+# Runs at http://localhost:3000
 ```
 
-6.**Open your browser**
-Navigate to [http://localhost:3000](http://localhost:3000)
+7.**Open your browser**
+Navigate to [https://localhost:3000](https://localhost:3000)
+
+> **Note**: You'll see a security warning because of the self-signed certificate. Click "Advanced" and "Proceed to localhost" to continue. This is normal for local development.
+
 
 ## 📁 Project Structure
 
@@ -279,8 +294,13 @@ All animations are defined in `app/globals.css`:
 
 1. Push code to GitHub
 2. Import project in Vercel
-3. Add environment variables
+3. Add environment variables (use HTTPS URLs)
 4. Deploy
+
+**SSL/HTTPS**: Vercel provides automatic SSL certificates for all deployments! 🎉
+- Vercel domains (`.vercel.app`) get SSL automatically
+- Custom domains get free Let's Encrypt certificates
+- See [SSL_SETUP_GUIDE.md](./SSL_SETUP_GUIDE.md) for detailed instructions
 
 ### Other Platforms
 
@@ -288,16 +308,20 @@ All animations are defined in `app/globals.css`:
 - Start: `npm start`
 - Ensure MySQL database is accessible
 - Set all environment variables
+- Configure SSL certificates (see [SSL_SETUP_GUIDE.md](./SSL_SETUP_GUIDE.md))
 
 ## 📝 Scripts
 
 ```bash
-npm run dev          # Start development server
-npm run build        # Build for production
-npm run start        # Start production server
-npm run lint         # Run ESLint
-npx prisma studio    # Open Prisma Studio (database GUI)
-npx prisma migrate   # Run database migrations
+npm run dev              # Start HTTPS development server
+npm run dev:http         # Start HTTP-only development server
+npm run build            # Build for production
+npm run start            # Start production server
+npm run lint             # Run ESLint
+npm run generate:certs   # Generate SSL certificates for HTTPS
+npm run setup:ssl        # Generate certificates and show setup info
+npx prisma studio        # Open Prisma Studio (database GUI)
+npx prisma migrate       # Run database migrations
 ```
 
 ## 🤝 Contributing
