@@ -15,8 +15,12 @@ export default async function ManageArtworksPage() {
         redirect("/auth/login");
     }
 
-    // Fetch all artworks with stats
+    // Filter for artists
+    const whereClause = user.role === "ARTIST" ? { uploadedBy: user.userId } : {};
+
+    // Fetch artworks with stats
     const artworks = await prisma.artwork.findMany({
+        where: whereClause,
         orderBy: { createdAt: "desc" },
         select: {
             id: true,
@@ -26,6 +30,7 @@ export default async function ManageArtworksPage() {
             originalPriceCents: true,
             isOriginalAvailable: true,
             createdAt: true,
+            uploadedBy: true,
         },
     });
 

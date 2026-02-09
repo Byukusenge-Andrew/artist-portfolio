@@ -88,11 +88,11 @@ export default async function Header() {
               )}
 
               <Link
-                href="/admin/dashboard"
+                href={isAdmin ? "/admin/dashboard" : "/artist/dashboard"}
                 className="hidden sm:inline-flex group items-center gap-2 rounded-lg px-2 lg:px-3 py-2 text-gray-700 hover:text-teal-800 hover:bg-teal-50 transition-all duration-300"
               >
                 <Shield className="size-4 group-hover:scale-110 transition-transform" />
-                <span className="hidden lg:inline font-medium">Admin</span>
+                <span className="hidden lg:inline font-medium">{isAdmin ? "Admin" : "Dashboard"}</span>
               </Link>
 
               <Link

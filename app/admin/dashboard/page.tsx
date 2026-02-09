@@ -15,36 +15,53 @@ async function getCurrentUser() {
   }
 
   const user = await parseUserSession(userSession);
-  if (!user || (user.role !== "ADMIN" && user.role !== "ARTIST")) {
-    redirect("/auth/login"); // Redirect to user login if session exists but not admin/artist
+  if (!user || user.role !== "ADMIN") {
+    redirect("/auth/login"); // Redirect to user login if session exists but not admin
   }
 
   return user;
 }
 
 export default async function AdminDashboard() {
-  await getCurrentUser();
+  const user = await getCurrentUser();
 
   const stats: { totalUsers: number; totalOrders: number; totalRevenue: number; totalArtworks: number } = { totalUsers: 0, totalOrders: 0, totalRevenue: 0, totalArtworks: 0 };
   let recentOrders: any[] = [];
 
   try {
+    // Filter logic based on role
+    const isArtist = user.role === "ARTIST";
+    const artworkWhere = isArtist ? { uploadedBy: user.userId } : {};
+
+    // For orders, artists see orders containing their artworks
+    const orderWhere = isArtist ? {
+      items: {
+        some: {
+          artwork: { uploadedBy: user.userId }
+        }
+      }
+    } : {};
+
     const users = await (prisma as any).user.count();
     const orders = await (prisma as any).order.findMany({
+      where: orderWhere,
       take: 5,
       orderBy: { createdAt: "desc" },
       include: { items: true, user: true },
     });
 
     const orderStats = await prisma.order.aggregate({
+      where: orderWhere,
       _sum: { totalCents: true },
       _count: true,
     });
 
-    const artworks = await prisma.artwork.count();
+    const artworks = await prisma.artwork.count({
+      where: artworkWhere
+    });
 
     Object.assign(stats, {
-      totalUsers: users,
+      totalUsers: isArtist ? 0 : users, // Hide user count for artists
       totalOrders: orderStats._count || 0,
       totalRevenue: (orderStats._sum?.totalCents || 0) / 100,
       totalArtworks: artworks,

@@ -1,9 +1,10 @@
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { Palette, Package, ShoppingCart, User, Upload } from "lucide-react";
+import { Palette, Package, ShoppingCart, User, Upload, TrendingUp } from "lucide-react";
 
 import { parseUserSession } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 
 async function getCurrentUser() {
     const cookieStore = await cookies();
@@ -29,6 +30,48 @@ async function getCurrentUser() {
 export default async function ArtistDashboard() {
     const user = await getCurrentUser();
 
+    // Fetch stats
+    const artworkWhere = { uploadedBy: user.userId };
+    const orderWhere = {
+        items: {
+            some: {
+                artwork: { uploadedBy: user.userId }
+            }
+        }
+    };
+
+    const orderStats = await prisma.order.aggregate({
+        where: orderWhere,
+        _sum: { totalCents: true },
+        _count: true,
+    });
+
+    const artworksCount = await prisma.artwork.count({
+        where: artworkWhere
+    });
+
+    const recentOrders = await prisma.order.findMany({
+        where: orderWhere,
+        take: 5,
+        orderBy: { createdAt: "desc" },
+        include: { items: true, user: true },
+    });
+
+    const formatPrice = (price: number) => {
+        return new Intl.NumberFormat("en-US", {
+            style: "currency",
+            currency: "USD",
+        }).format(price);
+    };
+
+    const formatDate = (date: Date) => {
+        return new Date(date).toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+        });
+    };
+
     return (
         <div className="min-h-screen bg-[#f5f5f0]">
             {/* Main Content */}
@@ -41,6 +84,29 @@ export default async function ArtistDashboard() {
                     <p className="text-gray-600">
                         Manage your artworks, track sales, and grow your portfolio
                     </p>
+                </div>
+
+                {/* Stats Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                    <div className="bg-white rounded-lg border border-gray-200 p-6">
+                        <TrendingUp className="h-8 w-8 text-green-600 mb-3" />
+                        <p className="text-sm text-gray-600 mb-1">Total Revenue</p>
+                        <p className="text-3xl font-bold text-gray-900">
+                            {formatPrice((orderStats._sum.totalCents || 0) / 100)}
+                        </p>
+                    </div>
+
+                    <div className="bg-white rounded-lg border border-gray-200 p-6">
+                        <Package className="h-8 w-8 text-emerald-600 mb-3" />
+                        <p className="text-sm text-gray-600 mb-1">Total Orders</p>
+                        <p className="text-3xl font-bold text-gray-900">{orderStats._count}</p>
+                    </div>
+
+                    <div className="bg-white rounded-lg border border-gray-200 p-6">
+                        <Palette className="h-8 w-8 text-purple-600 mb-3" />
+                        <p className="text-sm text-gray-600 mb-1">Total Artworks</p>
+                        <p className="text-3xl font-bold text-gray-900">{artworksCount}</p>
+                    </div>
                 </div>
 
                 {/* Quick Actions */}
@@ -83,19 +149,53 @@ export default async function ArtistDashboard() {
                             Track your artwork sales
                         </p>
                     </Link>
+                </div>
 
-                    <Link
-                        href="/admin/fulfillment"
-                        className="bg-white p-6 rounded-lg border border-gray-200 hover:border-purple-500 hover:shadow-lg transition-all group"
-                    >
-                        <Package className="h-8 w-8 text-purple-600 mb-3 group-hover:scale-110 transition-transform" />
-                        <h3 className="text-lg font-semibold text-gray-900 mb-1">
-                            Fulfillment
-                        </h3>
-                        <p className="text-gray-600 text-sm">
-                            Manage order delivery
-                        </p>
-                    </Link>
+                {/* Recent Orders */}
+                <div className="bg-white rounded-lg border border-gray-200 mb-12">
+                    <div className="px-6 py-4 border-b border-gray-200">
+                        <h2 className="text-xl font-semibold text-gray-900">Recent Orders</h2>
+                    </div>
+                    <div className="overflow-x-auto">
+                        <table className="w-full">
+                            <thead className="bg-gray-50 border-b border-gray-200">
+                                <tr>
+                                    <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Order ID</th>
+                                    <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Customer</th>
+                                    <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Items</th>
+                                    <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Amount</th>
+                                    <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Date</th>
+                                    <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {recentOrders.length === 0 ? (
+                                    <tr>
+                                        <td colSpan={6} className="px-6 py-8 text-center text-gray-600">
+                                            No orders yet
+                                        </td>
+                                    </tr>
+                                ) : (
+                                    recentOrders.map((order) => (
+                                        <tr key={order.id} className="border-b border-gray-200 hover:bg-gray-50 transition-colors">
+                                            <td className="px-6 py-4 text-sm font-mono text-gray-900">{order.id.slice(0, 8)}...</td>
+                                            <td className="px-6 py-4 text-sm text-gray-900">{order.user?.name || "Guest"}</td>
+                                            <td className="px-6 py-4 text-sm text-gray-600">{order.items.length} items</td>
+                                            <td className="px-6 py-4 text-sm font-semibold text-gray-900">
+                                                {formatPrice((order.totalCents || 0) / 100)}
+                                            </td>
+                                            <td className="px-6 py-4 text-sm text-gray-600">{formatDate(order.createdAt)}</td>
+                                            <td className="px-6 py-4">
+                                                <span className="inline-block px-3 py-1 rounded-full bg-green-100 text-green-800 text-xs font-medium">
+                                                    {order.status}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    ))
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
 
                 {/* Account Information */}

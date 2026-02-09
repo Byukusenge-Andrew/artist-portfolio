@@ -146,8 +146,24 @@ export default async function Footer() {
                     Pending Approvals
                   </Link>
                 </>
+              ) : isAuthenticated && user?.role === "ARTIST" ? (
+                /* Artist Users */
+                <>
+                  <Link href="/artist/dashboard" className="text-sm text-gray-600 hover:text-teal-700 transition-colors inline-flex items-center gap-2 group">
+                    <span className="group-hover:translate-x-1 transition-transform">→</span>
+                    Artist Dashboard
+                  </Link>
+                  <Link href="/admin/artworks/new" className="text-sm text-gray-600 hover:text-teal-700 transition-colors inline-flex items-center gap-2 group">
+                    <span className="group-hover:translate-x-1 transition-transform">→</span>
+                    Upload Artwork
+                  </Link>
+                  <Link href="/admin/artworks" className="text-sm text-gray-600 hover:text-teal-700 transition-colors inline-flex items-center gap-2 group">
+                    <span className="group-hover:translate-x-1 transition-transform">→</span>
+                    My Artworks
+                  </Link>
+                </>
               ) : (
-                /* Non-admin users */
+                /* Non-admin / Non-artist users */
                 <>
                   <Link href="/auth/login" className="text-sm text-gray-600 hover:text-teal-700 transition-colors inline-flex items-center gap-2 group">
                     <span className="group-hover:translate-x-1 transition-transform">→</span>
