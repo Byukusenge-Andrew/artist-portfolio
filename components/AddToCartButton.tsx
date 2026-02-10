@@ -47,8 +47,8 @@ export function AddToCartButton({
       onClick={handleClick}
       disabled={added}
       className={`inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-semibold transition-all duration-300 ${added
-          ? "bg-green-600 text-white"
-          : "bg-gradient-to-r from-teal-600 to-emerald-600 text-white hover:from-teal-700 hover:to-emerald-700 shadow-lg hover:shadow-xl hover:scale-105"
+        ? "bg-green-600 text-white"
+        : "bg-gradient-to-r from-teal-600 to-emerald-600 text-white hover:from-teal-700 hover:to-emerald-700 shadow-lg hover:shadow-xl hover:scale-105"
         } ${className}`}
     >
       {added ? (

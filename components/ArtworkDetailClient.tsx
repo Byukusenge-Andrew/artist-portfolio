@@ -165,7 +165,7 @@ export default function ArtworkDetailClient({ artwork, relatedArtworks, isAdmin 
                     <p className="text-sm text-gray-600">One of a kind piece</p>
                   </div>
                   <div className="text-3xl font-bold text-teal-700">
-                    RWF {artwork.originalPriceCents}
+                    {(artwork.originalPriceCents / 100).toLocaleString()} RWF
                   </div>
                 </div>
                 <AddToCartButton
@@ -191,7 +191,7 @@ export default function ArtworkDetailClient({ artwork, relatedArtworks, isAdmin 
                       <div>
                         <div className="font-medium text-gray-900">{opt.name}</div>
                         <div className="text-sm text-gray-600">
-                          RWF {(opt.priceCents / 100).toFixed(2)}
+                          {(opt.priceCents / 100).toLocaleString()} RWF
                         </div>
                       </div>
                       <AddToCartButton

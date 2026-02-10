@@ -13,7 +13,7 @@ const commissionSchema = z.object({
 
 type CommissionFormData = z.infer<typeof commissionSchema>;
 
-export default function CommissionRequestForm() {
+export default function CommissionRequestForm({ artistId }: { artistId?: string }) {
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -31,10 +31,11 @@ export default function CommissionRequestForm() {
     setIsLoading(true);
     setError("");
     try {
+      const payload = { ...data, artistId };
       const res = await fetch("/api/commissions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body: JSON.stringify(payload),
       });
 
       if (!res.ok) {

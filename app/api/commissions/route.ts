@@ -21,8 +21,11 @@ export async function GET(req: Request) {
     let whereClause = {};
 
     // Regular users can only see commissions with their email
-    // Admins can see all commissions
-    if (user.role !== "ADMIN") {
+    if (user.role === "ADMIN") {
+      whereClause = { artistId: null };
+    } else if (user.role === "ARTIST") {
+      whereClause = { artistId: user.userId };
+    } else {
       whereClause = { email: user.email };
     }
 
@@ -41,10 +44,14 @@ export async function GET(req: Request) {
   }
 }
 
+const postSchema = commissionSchema.extend({
+  artistId: z.string().optional(),
+});
+
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const validated = commissionSchema.safeParse(body);
+    const validated = postSchema.safeParse(body);
     if (!validated.success) {
       return NextResponse.json(
         { error: validated.error.flatten().fieldErrors },
@@ -58,6 +65,7 @@ export async function POST(req: Request) {
         email: validated.data.email,
         details: validated.data.details,
         status: "NEW",
+        artistId: validated.data.artistId || null,
       },
     });
 

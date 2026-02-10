@@ -101,12 +101,12 @@ export default async function OrderTrackingPage({
                 <div className="space-y-4">
                     <div className="flex gap-4">
                         <div className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center ${order.status === "PENDING" || order.status === "PAID" || order.status === "FULFILLED"
-                                ? "bg-green-100"
-                                : "bg-gray-100"
+                            ? "bg-green-100"
+                            : "bg-gray-100"
                             }`}>
                             <CheckCircle className={`size-5 ${order.status === "PENDING" || order.status === "PAID" || order.status === "FULFILLED"
-                                    ? "text-green-600"
-                                    : "text-gray-400"
+                                ? "text-green-600"
+                                : "text-gray-400"
                                 }`} />
                         </div>
                         <div className="flex-1 pb-8 border-l-2 border-gray-200 pl-6 -ml-5">
@@ -119,12 +119,12 @@ export default async function OrderTrackingPage({
 
                     <div className="flex gap-4">
                         <div className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center ${order.status === "PAID" || order.status === "FULFILLED"
-                                ? "bg-green-100"
-                                : "bg-gray-100"
+                            ? "bg-green-100"
+                            : "bg-gray-100"
                             }`}>
                             <CheckCircle className={`size-5 ${order.status === "PAID" || order.status === "FULFILLED"
-                                    ? "text-green-600"
-                                    : "text-gray-400"
+                                ? "text-green-600"
+                                : "text-gray-400"
                                 }`} />
                         </div>
                         <div className="flex-1 pb-8 border-l-2 border-gray-200 pl-6 -ml-5">
@@ -179,7 +179,7 @@ export default async function OrderTrackingPage({
                                 <div className="flex items-center justify-between">
                                     <span className="text-sm text-gray-600">Quantity: {item.quantity}</span>
                                     <span className="font-bold text-teal-700">
-                                        RWF {(item.unitPriceCents * item.quantity).toLocaleString()}
+                                        RWF {((item.unitPriceCents * item.quantity) / 100).toLocaleString()}
                                     </span>
                                 </div>
                             </div>
@@ -190,7 +190,7 @@ export default async function OrderTrackingPage({
                 <div className="border-t border-gray-200 pt-4">
                     <div className="flex items-center justify-between text-lg font-bold">
                         <span className="text-gray-900">Total</span>
-                        <span className="text-2xl text-teal-700">RWF {order.totalCents.toLocaleString()}</span>
+                        <span className="text-2xl text-teal-700">RWF {(order.totalCents / 100).toLocaleString()}</span>
                     </div>
                 </div>
             </div>

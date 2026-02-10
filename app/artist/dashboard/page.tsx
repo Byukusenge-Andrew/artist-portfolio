@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { Palette, Package, ShoppingCart, User, Upload, TrendingUp } from "lucide-react";
+import { Palette, Package, ShoppingCart, User, Upload, TrendingUp, MessageSquare } from "lucide-react";
 
 import { parseUserSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -11,12 +11,12 @@ async function getCurrentUser() {
     const userSession = cookieStore.get("user_session")?.value;
 
     if (!userSession) {
-        redirect("/auth/artist-login?redirect=/artist/dashboard");
+        redirect("/auth/login?redirect=/artist/dashboard");
     }
 
     const user = await parseUserSession(userSession);
     if (!user) {
-        redirect("/auth/artist-login?redirect=/artist/dashboard");
+        redirect("/auth/login?redirect=/artist/dashboard");
     }
 
     // Ensure only artists can access
@@ -55,6 +55,13 @@ export default async function ArtistDashboard() {
         take: 5,
         orderBy: { createdAt: "desc" },
         include: { items: true, user: true },
+    });
+
+    // Fetch direct commissions
+    const commissions = await prisma.commissionRequest.findMany({
+        where: { artistId: user.userId },
+        orderBy: { createdAt: "desc" },
+        take: 5,
     });
 
     const formatPrice = (price: number) => {
@@ -149,6 +156,72 @@ export default async function ArtistDashboard() {
                             Track your artwork sales
                         </p>
                     </Link>
+
+                    <Link
+                        href="#"
+                        className="bg-white p-6 rounded-lg border border-gray-200 hover:border-purple-500 hover:shadow-lg transition-all group"
+                    >
+                        <User className="h-8 w-8 text-purple-600 mb-3 group-hover:scale-110 transition-transform" />
+                        <h3 className="text-lg font-semibold text-gray-900 mb-1">
+                            Edit Profile
+                        </h3>
+                        <p className="text-gray-600 text-sm">
+                            Update your bio and details
+                        </p>
+                    </Link>
+                </div>
+
+                {/* Direct Commissions */}
+                <div className="bg-white rounded-lg border border-gray-200 mb-12">
+                    <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+                        <div className="flex items-center gap-2">
+                            <MessageSquare className="h-5 w-5 text-purple-600" />
+                            <h2 className="text-xl font-semibold text-gray-900">Direct Commissions</h2>
+                        </div>
+                        {/* Could link to a full commissions page if needed */}
+                        <span className="text-sm text-gray-500">Recent Requests</span>
+                    </div>
+                    <div className="overflow-x-auto">
+                        <table className="w-full">
+                            <thead className="bg-gray-50 border-b border-gray-200">
+                                <tr>
+                                    <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Requester</th>
+                                    <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Email</th>
+                                    <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Details</th>
+                                    <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Date</th>
+                                    <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {commissions.length === 0 ? (
+                                    <tr>
+                                        <td colSpan={5} className="px-6 py-8 text-center text-gray-600">
+                                            No commission requests yet
+                                        </td>
+                                    </tr>
+                                ) : (
+                                    commissions.map((c) => (
+                                        <tr key={c.id} className="border-b border-gray-200 hover:bg-gray-50 transition-colors">
+                                            <td className="px-6 py-4 text-sm font-medium text-gray-900">{c.name}</td>
+                                            <td className="px-6 py-4 text-sm text-gray-600">{c.email}</td>
+                                            <td className="px-6 py-4 text-sm text-gray-600 max-w-xs truncate" title={c.details}>
+                                                {c.details}
+                                            </td>
+                                            <td className="px-6 py-4 text-sm text-gray-600">{formatDate(c.createdAt)}</td>
+                                            <td className="px-6 py-4">
+                                                <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${c.status === 'NEW' ? 'bg-blue-100 text-blue-800' :
+                                                    c.status === 'PAID' ? 'bg-green-100 text-green-800' :
+                                                        'bg-gray-100 text-gray-800'
+                                                    }`}>
+                                                    {c.status}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    ))
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
 
                 {/* Recent Orders */}

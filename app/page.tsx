@@ -176,8 +176,8 @@ export default async function Home() {
         <section className="my-12 animate-fade-in-up">
           <h2 className="text-2xl font-bold mb-6">Trending Now</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {latest.slice(0, 2).map((a: { id: string; title: string; imageUrl: string }) => (
-              <FeedCard key={a.id} title={a.title} author="Featured Artist" imageUrl={a.imageUrl} />
+            {latest.slice(0, 2).map((a: { id: string; title: string; imageUrl: string; uploader?: { name: string | null } | null }) => (
+              <FeedCard key={a.id} title={a.title} author={a.uploader?.name || "Featured Artist"} imageUrl={a.imageUrl} />
             ))}
           </div>
         </section>

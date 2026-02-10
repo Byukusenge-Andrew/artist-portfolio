@@ -115,7 +115,7 @@ export default function OrderRequestPage() {
                                         <div className="flex items-center justify-between mt-2">
                                             <span className="text-xs text-gray-600">Qty: {item.quantity}</span>
                                             <span className="text-sm font-bold text-teal-700">
-                                                RWF {(item.price * item.quantity).toLocaleString()}
+                                                RWF {((item.price * item.quantity) / 100).toLocaleString()}
                                             </span>
                                         </div>
                                     </div>
@@ -126,7 +126,7 @@ export default function OrderRequestPage() {
                         <div className="border-t border-gray-200 pt-4">
                             <div className="flex items-center justify-between text-lg font-bold">
                                 <span className="text-gray-900">Total</span>
-                                <span className="text-2xl text-teal-700">RWF {totalPrice.toLocaleString()}</span>
+                                <span className="text-2xl text-teal-700">RWF {(totalPrice / 100).toLocaleString()}</span>
                             </div>
                         </div>
                     </div>

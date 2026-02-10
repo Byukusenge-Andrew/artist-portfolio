@@ -1,9 +1,26 @@
-// app/site/commissions/page.tsx
+import { prisma } from "@/lib/prisma"; // Make sure to import prisma if not already available globally or imported
 import CommissionRequestForm from "@/components/CommissionRequestForm";
 import { Palette, CheckCircle, MessageSquare, Sparkles } from "lucide-react";
 import Link from "next/link";
 
-export default function CommissionsPage() {
+interface Props {
+    searchParams: Promise<{
+        artistId?: string;
+    }>;
+}
+
+export default async function CommissionsPage({ searchParams }: Props) {
+    const { artistId } = await searchParams;
+
+    let artistName = "";
+    if (artistId) {
+        const artist = await prisma.user.findUnique({
+            where: { id: artistId },
+            select: { name: true }
+        });
+        if (artist) artistName = artist.name || "the Artist";
+    }
+
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12">
             {/* Hero Section */}
@@ -12,10 +29,12 @@ export default function CommissionsPage() {
                     <Palette className="size-8 text-white" />
                 </div>
                 <h1 className="text-5xl md:text-6xl font-bold tracking-tight mb-4">
-                    Commission Custom Art
+                    {artistName ? `Commission ${artistName}` : "Commission Custom Art"}
                 </h1>
                 <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-                    Bring your vision to life with a unique, personalized artwork created just for you
+                    {artistName
+                        ? `Request a unique, personalized artwork from ${artistName}`
+                        : "Bring your vision to life with a unique, personalized artwork created just for you"}
                 </p>
             </div>
 
@@ -115,8 +134,10 @@ export default function CommissionsPage() {
                 {/* Right Column - Form */}
                 <div className="animate-slide-in-right">
                     <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8">
-                        <h2 className="text-2xl font-bold mb-6">Request a Commission</h2>
-                        <CommissionRequestForm />
+                        <h2 className="text-2xl font-bold mb-6">
+                            {artistName ? `Request for ${artistName}` : "Request a Commission"}
+                        </h2>
+                        <CommissionRequestForm artistId={artistId} />
                     </div>
                 </div>
             </div>

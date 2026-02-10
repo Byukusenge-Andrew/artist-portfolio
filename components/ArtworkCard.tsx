@@ -10,15 +10,17 @@ type Props = {
   slug: string;
   title: string;
   imageUrl: string;
+  price?: number | null;
+  artistName?: string;
 };
 
-export function ArtworkCard({ id, slug, title, imageUrl }: Props) {
+export function ArtworkCard({ id, slug, title, imageUrl, price, artistName }: Props) {
   const { isFavorite, toggleFavorite } = useFavorites();
   return (
     <Link
       key={id}
       href={`/site/${slug}`}
-      className="group block rounded-xl overflow-hidden border border-gray-200/60 bg-white shadow-sm hover:shadow-2xl hover:border-teal-200 transition-all duration-500 hover:-translate-y-2"
+      className="group rounded-xl overflow-hidden border border-gray-200/60 bg-white shadow-sm hover:shadow-2xl hover:border-teal-200 transition-all duration-500 hover:-translate-y-2 h-full flex flex-col"
       aria-label={`View artwork ${title}`}
     >
       <div className="relative aspect-square bg-gradient-to-br from-gray-100 to-gray-50 overflow-hidden">
@@ -31,10 +33,10 @@ export function ArtworkCard({ id, slug, title, imageUrl }: Props) {
         />
 
         {/* Gradient overlay with title */}
-        <div className="absolute inset-0 flex items-end opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+        <div className="absolute inset-0 flex items-end opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
           <div className="w-full p-4 bg-gradient-to-t from-black/70 via-black/40 to-transparent backdrop-blur-[2px]">
-            <div className="flex items-center justify-between gap-3">
-              <div className="text-sm font-semibold text-white drop-shadow-lg truncate">{title}</div>
+            <div className="flex items-center justify-between gap-3 pointer-events-auto">
+              <div className="text-sm font-semibold text-white drop-shadow-lg truncate flex-1">{title}</div>
               <button
                 type="button"
                 onClick={(e) => {
@@ -44,36 +46,40 @@ export function ArtworkCard({ id, slug, title, imageUrl }: Props) {
                 className="group/heart inline-flex items-center justify-center rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-sm p-2 transition-all duration-300 hover:scale-110"
                 aria-label={isFavorite(id) ? `Remove ${title} from favorites` : `Add ${title} to favorites`}
               >
-                <Heart 
-                  className={`size-4 transition-all duration-300 ${
-                    isFavorite(id) 
-                      ? "fill-red-500 text-red-500" 
-                      : "text-white group-hover/heart:fill-red-400 group-hover/heart:text-red-400"
-                  }`} 
+                <Heart
+                  className={`size-4 transition-all duration-300 ${isFavorite(id)
+                    ? "fill-red-500 text-red-500"
+                    : "text-white group-hover/heart:fill-red-400 group-hover/heart:text-red-400"
+                    }`}
                 />
               </button>
             </div>
           </div>
         </div>
-
-        {/* Top-right quick action badge */}
-        <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-          <div className="rounded-full bg-teal-500/90 backdrop-blur-sm px-3 py-1 text-xs font-medium text-white shadow-lg">
-            View Details
-          </div>
-        </div>
       </div>
-      
-      <div className="p-4">
-        <h3 className="text-sm font-semibold text-gray-900 truncate group-hover:text-teal-700 transition-colors duration-300">
+
+      <div className="p-4 flex flex-col flex-1 gap-2">
+        <h3 className="text-base font-semibold text-gray-900 truncate group-hover:text-teal-700 transition-colors duration-300">
           {title}
         </h3>
-        <p className="text-xs text-gray-500 mt-1">Click to explore</p>
+
+        <div className="flex items-center justify-between mt-auto">
+          {artistName && (
+            <p className="text-xs text-gray-500 truncate max-w-[60%]">
+              by {artistName}
+            </p>
+          )}
+
+          {price !== undefined && price !== null && (
+            <p className="text-sm font-bold text-teal-700">
+              {(price / 100).toLocaleString()} RWF
+            </p>
+          )}
+        </div>
       </div>
     </Link>
   );
 }
-
 
 
 

@@ -119,7 +119,7 @@ export default async function AdminDashboard() {
           <div className="bg-white rounded-lg border border-gray-200 p-6">
             <TrendingUp className="h-8 w-8 text-green-600 mb-3" />
             <p className="text-sm text-gray-600 mb-1">Total Revenue</p>
-            <p className="text-3xl font-bold text-gray-900">{formatPrice(stats.totalRevenue)}</p>
+            <p className="text-3xl font-bold text-gray-900">{stats.totalRevenue}</p>
           </div>
 
           <div className="bg-white rounded-lg border border-gray-200 p-6">
@@ -165,6 +165,15 @@ export default async function AdminDashboard() {
             <h3 className="text-lg font-semibold text-gray-900 mb-2">View Orders</h3>
             <p className="text-gray-600 text-sm mb-4">Review all customer orders</p>
             <span className="text-teal-600 font-medium text-sm">Go to Orders →</span>
+          </Link>
+
+          <Link
+            href="/admin/commissions"
+            className="bg-white rounded-lg border border-gray-200 p-6 hover:border-teal-500 hover:shadow-lg transition-all"
+          >
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Commission Requests</h3>
+            <p className="text-gray-600 text-sm mb-4">Review and manage art commissions</p>
+            <span className="text-teal-600 font-medium text-sm">Go to Commissions →</span>
           </Link>
         </div>
 

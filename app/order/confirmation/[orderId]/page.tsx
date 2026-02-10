@@ -101,7 +101,7 @@ export default async function OrderConfirmationPage({
                                 <div className="flex items-center justify-between">
                                     <span className="text-sm text-gray-600">Quantity: {item.quantity}</span>
                                     <span className="font-bold text-teal-700">
-                                        RWF {(item.unitPriceCents * item.quantity).toLocaleString()}
+                                        RWF {((item.unitPriceCents * item.quantity) / 100).toLocaleString()}
                                     </span>
                                 </div>
                             </div>
@@ -112,7 +112,7 @@ export default async function OrderConfirmationPage({
                 <div className="border-t border-gray-200 pt-4">
                     <div className="flex items-center justify-between text-lg font-bold">
                         <span className="text-gray-900">Total</span>
-                        <span className="text-2xl text-teal-700">RWF {order.totalCents.toLocaleString()}</span>
+                        <span className="text-2xl text-teal-700">RWF {(order.totalCents / 100).toLocaleString()}</span>
                     </div>
                 </div>
             </div>
