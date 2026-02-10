@@ -4,6 +4,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { User, Mail, Palette, ArrowLeft } from "lucide-react";
 import { ArtworkCard } from "@/components/ArtworkCard";
+import LikeButton from "@/components/LikeButton";
+import CommentSection from "@/components/CommentSection";
+import { cookies } from "next/headers";
 
 export const revalidate = 60;
 
@@ -32,6 +35,16 @@ export default async function ArtistProfilePage({ params }: Props) {
     if (!artist) {
         notFound();
     }
+
+    const cookieStore = await cookies();
+    const userSession = cookieStore.get("user_session")?.value;
+    const { parseUserSession } = await import("@/lib/auth");
+    const currentUser = await parseUserSession(userSession);
+
+    const likeCount = await prisma.like.count({ where: { artistId: artist.id } });
+    const isLiked = currentUser?.userId
+        ? !!(await prisma.like.findFirst({ where: { artistId: artist.id, userId: currentUser.userId } }))
+        : false;
 
     return (
         <div className="min-h-screen bg-[#f5f5f0]">
@@ -79,6 +92,13 @@ export default async function ArtistProfilePage({ params }: Props) {
                                 <div className="flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-full border border-gray-100">
                                     <Palette className="w-4 h-4 text-teal-600" />
                                     <span>{artist.uploadedArtworks.length} Artworks</span>
+                                </div>
+                                <div className="flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-full border border-gray-100">
+                                    <LikeButton
+                                        artistId={artist.id}
+                                        initialLikes={likeCount}
+                                        initialIsLiked={isLiked}
+                                    />
                                 </div>
                                 {/* Email is kept private usually, but if public profile implies contact: */}
                                 <div className="flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-full border border-gray-100">
@@ -128,6 +148,11 @@ export default async function ArtistProfilePage({ params }: Props) {
                         ))}
                     </div>
                 )}
+            </div>
+
+            {/* Comments Section */}
+            <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
+                <CommentSection artistId={artist.id} currentUserId={currentUser?.userId} />
             </div>
         </div>
     );

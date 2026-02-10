@@ -7,7 +7,24 @@ import { Sparkles, TrendingUp, Palette, Users } from "lucide-react";
 import Image from "next/image";
 
 export default async function Home() {
-  const latest = await prisma.artwork.findMany({
+  type ArtworkWithStats = {
+    id: string;
+    title: string;
+    slug: string;
+    imageUrl: string;
+    uploader: {
+      id: string;
+      name: string | null;
+      avatarUrl: string | null;
+      bio: string | null;
+    } | null;
+    _count: {
+      likes: number;
+      comments: number;
+    };
+  };
+
+  const latest = (await prisma.artwork.findMany({
     orderBy: { createdAt: "desc" },
     take: 12,
     include: {
@@ -19,8 +36,14 @@ export default async function Home() {
           bio: true,
         },
       },
-    },
-  });
+      _count: {
+        select: {
+          likes: true,
+          comments: true,
+        },
+      },
+    } as any,
+  })) as unknown as ArtworkWithStats[];
 
   // Optional: artist list, if the model/migration is applied
   let artists: Array<{ name: string; avatarUrl: string | null }> = [];
@@ -176,8 +199,15 @@ export default async function Home() {
         <section className="my-12 animate-fade-in-up">
           <h2 className="text-2xl font-bold mb-6">Trending Now</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {latest.slice(0, 2).map((a: { id: string; title: string; imageUrl: string; uploader?: { name: string | null } | null }) => (
-              <FeedCard key={a.id} title={a.title} author={a.uploader?.name || "Featured Artist"} imageUrl={a.imageUrl} />
+            {latest.slice(0, 2).map((a) => (
+              <FeedCard
+                key={a.id}
+                title={a.title}
+                author={a.uploader?.name || "Featured Artist"}
+                imageUrl={a.imageUrl}
+                likesCount={a._count.likes}
+                commentsCount={a._count.comments}
+              />
             ))}
           </div>
         </section>

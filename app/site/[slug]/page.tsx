@@ -36,6 +36,11 @@ export default async function ArtworkDetailPage({
 
   if (!artwork) return notFound();
 
+  const likeCount = await prisma.like.count({ where: { artworkId: artwork.id } });
+  const initialIsLiked = user?.userId
+    ? !!(await prisma.like.findFirst({ where: { artworkId: artwork.id, userId: user.userId } }))
+    : false;
+
   const tags: string[] = Array.isArray(artwork.tags)
     ? artwork.tags.filter((t): t is string => typeof t === "string")
     : [];
@@ -106,6 +111,9 @@ export default async function ArtworkDetailPage({
     relatedArtworks,
     isAdmin,
     isOwner: user?.userId === artwork.uploadedBy,
+    currentUserId: user?.userId,
+    initialLikes: likeCount,
+    initialIsLiked,
   };
 
   return <ArtworkDetailClient {...clientProps} />;

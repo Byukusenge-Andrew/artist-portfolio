@@ -6,9 +6,11 @@ type Props = {
   author: string;
   imageUrl?: string | null;
   isVideo?: boolean;
+  likesCount?: number;
+  commentsCount?: number;
 };
 
-export default function FeedCard({ title, author, imageUrl, isVideo }: Props) {
+export default function FeedCard({ title, author, imageUrl, isVideo, likesCount = 0, commentsCount = 0 }: Props) {
   return (
     <article className="rounded-2xl border bg-white/70 backdrop-blur supports-[backdrop-filter]:bg-white/60 overflow-hidden">
       <header className="flex items-center justify-between p-3">
@@ -56,10 +58,10 @@ export default function FeedCard({ title, author, imageUrl, isVideo }: Props) {
       <footer className="p-3 flex items-center justify-between text-sm text-gray-600">
         <div className="flex items-center gap-4">
           <button className="inline-flex items-center gap-2 hover:text-teal-700">
-            <Heart className="size-4" /> 41
+            <Heart className="size-4" /> {likesCount}
           </button>
           <button className="inline-flex items-center gap-2 hover:text-teal-700">
-            <MessageCircle className="size-4" /> 23
+            <MessageCircle className="size-4" /> {commentsCount}
           </button>
         </div>
         <div className="text-xs">3m ago</div>

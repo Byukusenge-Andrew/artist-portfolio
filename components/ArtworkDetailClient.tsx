@@ -47,9 +47,23 @@ type Props = {
   }>;
   isAdmin: boolean;
   isOwner?: boolean;
+  currentUserId?: string;
+  initialLikes: number;
+  initialIsLiked: boolean;
 };
 
-export default function ArtworkDetailClient({ artwork, relatedArtworks, isAdmin, isOwner }: Props) {
+import LikeButton from "@/components/LikeButton";
+import CommentSection from "@/components/CommentSection";
+
+export default function ArtworkDetailClient({
+  artwork,
+  relatedArtworks,
+  isAdmin,
+  isOwner,
+  currentUserId,
+  initialLikes,
+  initialIsLiked
+}: Props) {
   const router = useRouter();
 
   const handleDelete = () => {
@@ -85,12 +99,18 @@ export default function ArtworkDetailClient({ artwork, relatedArtworks, isAdmin,
         <div className="space-y-4">
           <ArtworkImage imageUrl={artwork.imageUrl} title={artwork.title} />
           <div className="flex items-center gap-3">
+            <LikeButton
+              artworkId={artwork.id}
+              initialLikes={initialLikes}
+              initialIsLiked={initialIsLiked}
+            />
             <FavoriteButton artworkId={artwork.id} artworkTitle={artwork.title} />
             <ShareButton
               url={`${process.env.NEXT_PUBLIC_BASE_URL || ""}/art/${artwork.slug}`}
               title={artwork.title}
             />
           </div>
+          <CommentSection artworkId={artwork.id} currentUserId={currentUserId} />
         </div>
 
         {/* Details */}

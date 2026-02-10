@@ -29,6 +29,9 @@ model Artwork {
   galleries           ArtworkGallery[] @relation("ArtworkGalleries")
   orderItems          OrderItem[]
   printOptions        PrintOption[]    @relation("ArtworkPrintOptions")
+  
+  comments            Comment[]        @relation("ArtworkComments")
+  likes               Like[]           @relation("ArtworkLikes")
 
   @@index([slug])
   @@index([deletedAt])
@@ -155,6 +158,12 @@ model User {
   orders           Order[]   @relation("UserOrders")
   uploadedArtworks Artwork[] @relation("UserArtworks")
   commissions      CommissionRequest[] @relation("ArtistCommissions")
+  
+  comments         Comment[] @relation("UserComments")
+  likes            Like[]    @relation("UserLikes")
+  
+  profileComments  Comment[] @relation("ArtistProfileComments")
+  profileLikes     Like[]    @relation("ArtistProfileLikes")
 
   @@index([email])
   @@index([role])
@@ -185,4 +194,40 @@ enum ProductType {
   ORIGINAL
   PRINT
   COMMISSION
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  content   String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  userId    String
+  user      User     @relation("UserComments", fields: [userId], references: [id], onDelete: Cascade)
+  
+  artworkId String?
+  artwork   Artwork? @relation("ArtworkComments", fields: [artworkId], references: [id], onDelete: Cascade)
+  
+  artistId  String?
+  artist    User?    @relation("ArtistProfileComments", fields: [artistId], references: [id], onDelete: Cascade)
+  
+  @@index([artworkId])
+  @@index([artistId])
+}
+
+model Like {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  
+  userId    String
+  user      User     @relation("UserLikes", fields: [userId], references: [id], onDelete: Cascade)
+  
+  artworkId String?
+  artwork   Artwork? @relation("ArtworkLikes", fields: [artworkId], references: [id], onDelete: Cascade)
+  
+  artistId  String?
+  artist    User?    @relation("ArtistProfileLikes", fields: [artistId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, artworkId])
+  @@unique([userId, artistId])
 }
