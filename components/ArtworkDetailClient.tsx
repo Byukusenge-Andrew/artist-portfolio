@@ -46,9 +46,10 @@ type Props = {
     imageUrl: string;
   }>;
   isAdmin: boolean;
+  isOwner?: boolean;
 };
 
-export default function ArtworkDetailClient({ artwork, relatedArtworks, isAdmin }: Props) {
+export default function ArtworkDetailClient({ artwork, relatedArtworks, isAdmin, isOwner }: Props) {
   const router = useRouter();
 
   const handleDelete = () => {
@@ -60,13 +61,23 @@ export default function ArtworkDetailClient({ artwork, relatedArtworks, isAdmin 
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12 animate-fade-in-up">
       <div className="grid gap-8 lg:grid-cols-2">
         {/* Admin Delete */}
-        {isAdmin && (
-          <div className="col-span-2 flex justify-end -mt-8 mb-4">
-            <ArtworkDeleteButton
-              artworkId={artwork.id}
-              artworkTitle={artwork.title}
-              onDelete={handleDelete}
-            />
+        {/* Admin/Owner Controls */}
+        {(isAdmin || isOwner) && (
+          <div className="col-span-2 flex justify-end -mt-8 mb-4 gap-2">
+            <Link
+              href={`/admin/artworks/${artwork.id}/edit`}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm font-medium"
+            >
+              <Palette className="size-4" />
+              Edit
+            </Link>
+            {isAdmin && (
+              <ArtworkDeleteButton
+                artworkId={artwork.id}
+                artworkTitle={artwork.title}
+                onDelete={handleDelete}
+              />
+            )}
           </div>
         )}
 

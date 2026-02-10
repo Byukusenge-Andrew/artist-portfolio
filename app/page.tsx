@@ -84,15 +84,15 @@ export default async function Home() {
             {/* Stats */}
             <div className="grid grid-cols-3 gap-4 sm:gap-6 lg:gap-8 pt-4 sm:pt-6 border-t border-white/20">
               <div>
-                <div className="text-2xl sm:text-3xl font-bold">{latest.length}+</div>
+                <div className="text-2xl sm:text-3xl font-bold">{(await prisma.artwork.count())}+</div>
                 <div className="text-xs sm:text-sm text-white/80">Artworks</div>
               </div>
               <div>
-                <div className="text-2xl sm:text-3xl font-bold">{artists.length}+</div>
+                <div className="text-2xl sm:text-3xl font-bold">{(await prisma.user.count({ where: { role: "ARTIST" } }))}+</div>
                 <div className="text-xs sm:text-sm text-white/80">Artists</div>
               </div>
               <div>
-                <div className="text-2xl sm:text-3xl font-bold">1000+</div>
+                <div className="text-2xl sm:text-3xl font-bold">{(await prisma.user.count({ where: { role: "USER" } }))}+</div>
                 <div className="text-xs sm:text-sm text-white/80">Collectors</div>
               </div>
             </div>

@@ -39,6 +39,28 @@ export async function getCurrentUser(request: NextRequest | Request) {
 }
 
 /**
+ * Get current user session in Server Components
+ */
+import { cookies } from "next/headers";
+
+export async function getCurrentUserSession() {
+    const cookieStore = await cookies();
+    const userSession = cookieStore.get("user_session")?.value;
+
+    if (!userSession) return null;
+
+    const payload = await verifyToken(userSession);
+    if (!payload || payload.type !== "access") return null;
+
+    return {
+        userId: payload.userId,
+        email: payload.email,
+        role: payload.role,
+        name: payload.name,
+    };
+}
+
+/**
  * Require authentication
  * Throws UnauthorizedError if not authenticated
  */

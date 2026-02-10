@@ -105,6 +105,7 @@ export default async function ArtworkDetailPage({
     },
     relatedArtworks,
     isAdmin,
+    isOwner: user?.userId === artwork.uploadedBy,
   };
 
   return <ArtworkDetailClient {...clientProps} />;

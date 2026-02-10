@@ -11,6 +11,66 @@ const deleteArtworkSchema = z.object({
 
 import { getCurrentUser } from "@/lib/authorization";
 
+const updateArtworkSchema = z.object({
+  title: z.string().min(1).optional(),
+  description: z.string().optional(),
+  slug: z.string().min(1).optional(),
+  imagePublicId: z.string().min(1).optional(),
+  imageUrl: z.string().url().optional(),
+  isOriginalAvailable: z.boolean().optional(),
+  originalPriceCents: z.number().int().optional(),
+  printEnabled: z.boolean().optional(),
+});
+
+export async function PUT(
+  req: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const user = await getCurrentUser(req);
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const { id } = await params;
+
+  const artwork = await prisma.artwork.findUnique({
+    where: { id },
+  });
+
+  if (!artwork) {
+    return NextResponse.json({ error: "Artwork not found" }, { status: 404 });
+  }
+
+  const isAdmin = user.role === "ADMIN";
+  const isOwner = artwork.uploadedBy === user.userId;
+
+  if (!isAdmin && !isOwner) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
+  const json = await req.json();
+  const parsed = updateArtworkSchema.safeParse(json);
+
+  if (!parsed.success) {
+    return NextResponse.json(
+      { error: parsed.error.flatten() },
+      { status: 400 }
+    );
+  }
+
+  const updated = await prisma.artwork.update({
+    where: { id },
+    data: parsed.data,
+  });
+
+  // Revalidate
+  revalidatePath("/galleries");
+  revalidatePath(`/art/${updated.slug}`);
+  revalidatePath("/");
+
+  return NextResponse.json(updated);
+}
+
 export async function DELETE(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -57,8 +117,11 @@ export async function DELETE(
       );
     }
 
-    // 3. Verify ownership - only the artist who uploaded can delete
-    if (artwork.uploadedBy !== user.userId) {
+    // 3. Verify ownership - Admin or the artist who uploaded can delete
+    const isAdmin = user.role === "ADMIN";
+    const isOwner = artwork.uploadedBy === user.userId;
+
+    if (!isAdmin && !isOwner) {
       return NextResponse.json(
         { error: "You can only delete your own artworks" },
         { status: 403 }
