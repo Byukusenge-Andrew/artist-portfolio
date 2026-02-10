@@ -1,12 +1,27 @@
 // app/site/galleries/page.tsx
 import { prisma } from "@/lib/prisma";
 import { ArtworkCard } from "@/components/ArtworkCard";
-import { Palette, Sparkles } from "lucide-react";
+import { Palette, Sparkles, Search } from "lucide-react";
 import Link from "next/link";
 
-export default async function GalleriesPage() {
-    // Fetch all artworks for public browsing
+export default async function GalleriesPage(props: {
+    searchParams?: Promise<{ q?: string }>;
+}) {
+    const searchParams = await props.searchParams;
+    const q = searchParams?.q || "";
+
+    // Build filter based on search query
+    const whereClause = q ? {
+        OR: [
+            { title: { contains: q } },
+            { description: { contains: q } },
+            { uploader: { name: { contains: q } } },
+        ]
+    } : {};
+
+    // Fetch artworks based on filter
     const artworks = await prisma.artwork.findMany({
+        where: whereClause,
         orderBy: { createdAt: "desc" },
         select: {
             id: true,
@@ -15,6 +30,7 @@ export default async function GalleriesPage() {
             imageUrl: true,
             description: true,
             createdAt: true,
+            originalPriceCents: true, // Needed for ArtworkCard if it shows price
         },
     });
 
@@ -23,20 +39,20 @@ export default async function GalleriesPage() {
             {/* Hero Section */}
             <div className="text-center mb-16 animate-fade-in">
                 <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-teal-600 to-emerald-600 rounded-2xl mb-6 shadow-lg">
-                    <Palette className="size-8 text-white" />
+                    {q ? <Search className="size-8 text-white" /> : <Palette className="size-8 text-white" />}
                 </div>
                 <h1 className="text-5xl md:text-6xl font-bold tracking-tight mb-4">
-                    Art Gallery
+                    {q ? "Search Results" : "Art Gallery"}
                 </h1>
                 <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-                    Explore our complete collection of exceptional artworks
+                    {q ? `Showing results for "${q}"` : "Explore our complete collection of exceptional artworks"}
                 </p>
 
                 {/* Artwork count */}
                 <div className="mt-6 inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-teal-50 to-emerald-50 px-6 py-3 border border-teal-200">
                     <Sparkles className="size-5 text-teal-600" />
                     <span className="text-gray-700 font-medium">
-                        {artworks.length} {artworks.length === 1 ? "Artwork" : "Artworks"} Available
+                        {artworks.length} {artworks.length === 1 ? "Artwork" : "Artworks"} Found
                     </span>
                 </div>
             </div>
@@ -44,15 +60,28 @@ export default async function GalleriesPage() {
             {/* Artworks Grid */}
             {artworks.length === 0 ? (
                 <div className="text-center py-20 bg-gray-50 rounded-3xl animate-scale-in">
-                    <div className="text-6xl mb-4">🎨</div>
-                    <h3 className="text-2xl font-semibold text-gray-900 mb-2">No artworks yet</h3>
-                    <p className="text-gray-600 mb-8">Check back soon for amazing artwork</p>
+                    <div className="text-6xl mb-4">🔍</div>
+                    <h3 className="text-2xl font-semibold text-gray-900 mb-2">
+                        {q ? `No artworks found for "${q}"` : "No artworks yet"}
+                    </h3>
+                    <p className="text-gray-600 mb-8">
+                        {q ? "Try checking for typos or using different keywords" : "Check back soon for amazing artwork"}
+                    </p>
                     <Link
-                        href="/"
+                        href={q ? "/site/galleries" : "/"}
                         className="inline-flex items-center gap-2 px-6 py-3 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-all"
                     >
-                        <Palette className="size-5" />
-                        Back to Home
+                        {q ? (
+                            <>
+                                <Palette className="size-5" />
+                                View All Artworks
+                            </>
+                        ) : (
+                            <>
+                                <Palette className="size-5" />
+                                Back to Home
+                            </>
+                        )}
                     </Link>
                 </div>
             ) : (
@@ -68,6 +97,7 @@ export default async function GalleriesPage() {
                                 slug={artwork.slug}
                                 title={artwork.title}
                                 imageUrl={artwork.imageUrl}
+                                price={artwork.originalPriceCents ?? undefined}
                             />
                         </div>
                     ))}
@@ -92,10 +122,10 @@ export default async function GalleriesPage() {
                             Request a Commission
                         </Link>
                         <Link
-                            href="/site/artist"
+                            href="/site/artists"
                             className="inline-flex items-center justify-center gap-2 rounded-xl border-2 border-gray-300 bg-white px-8 py-4 text-gray-900 font-semibold hover:border-teal-600 hover:text-teal-700 transition-all duration-300"
                         >
-                            Meet the Artist
+                            Meet the Artists
                         </Link>
                     </div>
                 </div>
