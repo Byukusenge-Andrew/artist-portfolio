@@ -12,7 +12,7 @@ export default function SearchBox() {
     e.preventDefault();
     const trimmed = q.trim();
     // Navigate to galleries with query param
-    router.push(`/galleries${trimmed ? `?q=${encodeURIComponent(trimmed)}` : ""}`);
+    router.push(`/site/galleries${trimmed ? `?q=${encodeURIComponent(trimmed)}` : ""}`);
   }
 
   return (
