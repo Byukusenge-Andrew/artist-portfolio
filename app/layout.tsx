@@ -18,9 +18,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  icons: {
-    icon: "/favicon.ico",
-  },
+
   title: "Artelier - Discover Exceptional Artwork",
   description: "Explore and collect exceptional artwork from talented artists around the world. Join our community of creators and art enthusiasts.",
 };
@@ -33,7 +31,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head >
-        <link rel="icon" href="/favicon.ico" sizes="any" />
+
       </head>
 
       <body

@@ -37,7 +37,7 @@ export default async function Header() {
       <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 h-14 sm:h-16 flex items-center gap-3 sm:gap-4 lg:gap-6 justify-between">
         {/* Logo */}
         <Link href="/" className="group flex items-center gap-2 sm:gap-3 hover:scale-105 transition-transform duration-300 flex-shrink-0">
-          <Image src="/icon.png" width={34} height={34} alt="Artelier" className="sm:w-10 sm:h-10" />
+          <Image src="/logo.png" width={34} height={34} alt="Artelier" className="sm:w-10 sm:h-10" />
 
         </Link>
 
