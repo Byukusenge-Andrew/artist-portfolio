@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import { MoveLeft, Home, Search } from "lucide-react";
 import SearchBox from "@/components/SearchBox";
