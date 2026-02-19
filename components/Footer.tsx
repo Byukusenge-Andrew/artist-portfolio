@@ -20,7 +20,7 @@ export default async function Footer() {
   const isAuthenticated = !!user;
 
   return (
-    <footer className="mt-auto border-t border-teal-100/50 bg-gradient-to-br from-white via-teal-50/30 to-emerald-50/30">
+    <footer className="mt-auto border-t border-teal-100/50 dark:border-gray-700/50 bg-gradient-to-br from-white via-teal-50/30 to-emerald-50/30 dark:from-[#141418] dark:via-[#1a1a24] dark:to-[#141418] transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 py-6 sm:py-8">
         {/* Main footer content */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 mb-6 sm:mb-8">
@@ -32,7 +32,7 @@ export default async function Footer() {
                 Artelier
               </span>
             </div>
-            <p className="text-sm text-gray-600 leading-relaxed">
+            <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
               Discover exceptional artwork from talented artists around the world. Explore, collect, and connect with creativity.
             </p>
             <div className="flex items-center gap-3 sm:gap-4">
@@ -57,22 +57,22 @@ export default async function Footer() {
 
           {/* Explore */}
           <div className="space-y-4 sm:col-span-1">
-            <h3 className="font-semibold text-gray-900 text-sm uppercase tracking-wider">Explore</h3>
+            <h3 className="font-semibold text-gray-900 dark:text-gray-100 text-sm uppercase tracking-wider">Explore</h3>
             <nav className="flex flex-col gap-2">
-              <Link href="/site/galleries" className="text-sm text-gray-600 hover:text-teal-700 transition-colors inline-flex items-center gap-2 group">
+              <Link href="/site/galleries" className="text-sm text-gray-600 dark:text-gray-400 hover:text-teal-700 dark:hover:text-teal-400 transition-colors inline-flex items-center gap-2 group">
                 <span className="group-hover:translate-x-1 transition-transform">→</span>
                 Galleries
               </Link>
-              <Link href="/site/artist" className="text-sm text-gray-600 hover:text-teal-700 transition-colors inline-flex items-center gap-2 group">
+              <Link href="/site/artist" className="text-sm text-gray-600 dark:text-gray-400 hover:text-teal-700 dark:hover:text-teal-400 transition-colors inline-flex items-center gap-2 group">
                 <span className="group-hover:translate-x-1 transition-transform">→</span>
                 Artist Profile
               </Link>
-              <Link href="/site/commissions" className="text-sm text-gray-600 hover:text-teal-700 transition-colors inline-flex items-center gap-2 group">
+              <Link href="/site/commissions" className="text-sm text-gray-600 dark:text-gray-400 hover:text-teal-700 dark:hover:text-teal-400 transition-colors inline-flex items-center gap-2 group">
                 <span className="group-hover:translate-x-1 transition-transform">→</span>
                 Commissions
               </Link>
               {isAuthenticated && (
-                <Link href="/user/favorites" className="text-sm text-gray-600 hover:text-teal-700 transition-colors inline-flex items-center gap-2 group">
+                <Link href="/user/favorites" className="text-sm text-gray-600 dark:text-gray-400 hover:text-teal-700 dark:hover:text-teal-400 transition-colors inline-flex items-center gap-2 group">
                   <span className="group-hover:translate-x-1 transition-transform">→</span>
                   My Favorites
                 </Link>
@@ -82,24 +82,24 @@ export default async function Footer() {
 
           {/* Account - Different for each user type */}
           <div className="hidden lg:block space-y-4">
-            <h3 className="font-semibold text-gray-900 text-sm uppercase tracking-wider">
+            <h3 className="font-semibold text-gray-900 dark:text-gray-100 text-sm uppercase tracking-wider">
               {isAuthenticated ? "My Account" : "Get Started"}
             </h3>
             <nav className="flex flex-col gap-2">
               {isAuthenticated ? (
                 /* Logged in users */
                 <>
-                  <Link href={isAdmin ? "/admin/dashboard" : "/user/dashboard"} className="text-sm text-gray-600 hover:text-teal-700 transition-colors inline-flex items-center gap-2 group">
+                  <Link href={isAdmin ? "/admin/dashboard" : "/user/dashboard"} className="text-sm text-gray-600 dark:text-gray-400 hover:text-teal-700 dark:hover:text-teal-400 transition-colors inline-flex items-center gap-2 group">
                     <span className="group-hover:translate-x-1 transition-transform">→</span>
                     Dashboard
                   </Link>
                   {!isAdmin && (
-                    <Link href="/user/orders" className="text-sm text-gray-600 hover:text-teal-700 transition-colors inline-flex items-center gap-2 group">
+                    <Link href="/user/orders" className="text-sm text-gray-600 dark:text-gray-400 hover:text-teal-700 dark:hover:text-teal-400 transition-colors inline-flex items-center gap-2 group">
                       <span className="group-hover:translate-x-1 transition-transform">→</span>
                       My Orders
                     </Link>
                   )}
-                  <Link href="/user/profile" className="text-sm text-gray-600 hover:text-teal-700 transition-colors inline-flex items-center gap-2 group">
+                  <Link href="/user/profile" className="text-sm text-gray-600 dark:text-gray-400 hover:text-teal-700 dark:hover:text-teal-400 transition-colors inline-flex items-center gap-2 group">
                     <span className="group-hover:translate-x-1 transition-transform">→</span>
                     Profile Settings
                   </Link>
@@ -107,15 +107,15 @@ export default async function Footer() {
               ) : (
                 /* Guest users */
                 <>
-                  <Link href="/auth/login" className="text-sm text-gray-600 hover:text-teal-700 transition-colors inline-flex items-center gap-2 group">
+                  <Link href="/auth/login" className="text-sm text-gray-600 dark:text-gray-400 hover:text-teal-700 dark:hover:text-teal-400 transition-colors inline-flex items-center gap-2 group">
                     <span className="group-hover:translate-x-1 transition-transform">→</span>
                     Login
                   </Link>
-                  <Link href="/auth/register" className="text-sm text-gray-600 hover:text-teal-700 transition-colors inline-flex items-center gap-2 group">
+                  <Link href="/auth/register" className="text-sm text-gray-600 dark:text-gray-400 hover:text-teal-700 dark:hover:text-teal-400 transition-colors inline-flex items-center gap-2 group">
                     <span className="group-hover:translate-x-1 transition-transform">→</span>
                     Sign Up
                   </Link>
-                  <Link href="/user/favorites" className="text-sm text-gray-600 hover:text-teal-700 transition-colors inline-flex items-center gap-2 group">
+                  <Link href="/user/favorites" className="text-sm text-gray-600 dark:text-gray-400 hover:text-teal-700 dark:hover:text-teal-400 transition-colors inline-flex items-center gap-2 group">
                     <span className="group-hover:translate-x-1 transition-transform">→</span>
                     Browse Favorites
                   </Link>
@@ -126,26 +126,26 @@ export default async function Footer() {
 
           {/* For Artists - Different for admins */}
           <div className="hidden lg:block space-y-4">
-            <h3 className="font-semibold text-gray-900 text-sm uppercase tracking-wider">
+            <h3 className="font-semibold text-gray-900 dark:text-gray-100 text-sm uppercase tracking-wider">
               {isAdmin ? "Admin Tools" : "For Artists"}
             </h3>
             <nav className="flex flex-col gap-2">
               {isAdmin ? (
                 /* Admin users */
                 <>
-                  <Link href="/admin/galleries" className="text-sm text-gray-600 hover:text-teal-700 transition-colors inline-flex items-center gap-2 group">
+                  <Link href="/admin/galleries" className="text-sm text-gray-600 dark:text-gray-400 hover:text-teal-700 dark:hover:text-teal-400 transition-colors inline-flex items-center gap-2 group">
                     <span className="group-hover:translate-x-1 transition-transform">→</span>
                     Manage Galleries
                   </Link>
-                  <Link href="/admin/artworks/new" className="text-sm text-gray-600 hover:text-teal-700 transition-colors inline-flex items-center gap-2 group">
+                  <Link href="/admin/artworks/new" className="text-sm text-gray-600 dark:text-gray-400 hover:text-teal-700 dark:hover:text-teal-400 transition-colors inline-flex items-center gap-2 group">
                     <span className="group-hover:translate-x-1 transition-transform">→</span>
                     Upload Artwork
                   </Link>
-                  <Link href="/admin/orders" className="text-sm text-gray-600 hover:text-teal-700 transition-colors inline-flex items-center gap-2 group">
+                  <Link href="/admin/orders" className="text-sm text-gray-600 dark:text-gray-400 hover:text-teal-700 dark:hover:text-teal-400 transition-colors inline-flex items-center gap-2 group">
                     <span className="group-hover:translate-x-1 transition-transform">→</span>
                     View Orders
                   </Link>
-                  <Link href="/admin/pending-approvals" className="text-sm text-gray-600 hover:text-teal-700 transition-colors inline-flex items-center gap-2 group">
+                  <Link href="/admin/pending-approvals" className="text-sm text-gray-600 dark:text-gray-400 hover:text-teal-700 dark:hover:text-teal-400 transition-colors inline-flex items-center gap-2 group">
                     <span className="group-hover:translate-x-1 transition-transform">→</span>
                     Pending Approvals
                   </Link>
@@ -153,15 +153,15 @@ export default async function Footer() {
               ) : isAuthenticated && user?.role === "ARTIST" ? (
                 /* Artist Users */
                 <>
-                  <Link href="/artist/dashboard" className="text-sm text-gray-600 hover:text-teal-700 transition-colors inline-flex items-center gap-2 group">
+                  <Link href="/artist/dashboard" className="text-sm text-gray-600 dark:text-gray-400 hover:text-teal-700 dark:hover:text-teal-400 transition-colors inline-flex items-center gap-2 group">
                     <span className="group-hover:translate-x-1 transition-transform">→</span>
                     Artist Dashboard
                   </Link>
-                  <Link href="/admin/artworks/new" className="text-sm text-gray-600 hover:text-teal-700 transition-colors inline-flex items-center gap-2 group">
+                  <Link href="/admin/artworks/new" className="text-sm text-gray-600 dark:text-gray-400 hover:text-teal-700 dark:hover:text-teal-400 transition-colors inline-flex items-center gap-2 group">
                     <span className="group-hover:translate-x-1 transition-transform">→</span>
                     Upload Artwork
                   </Link>
-                  <Link href="/admin/artworks" className="text-sm text-gray-600 hover:text-teal-700 transition-colors inline-flex items-center gap-2 group">
+                  <Link href="/admin/artworks" className="text-sm text-gray-600 dark:text-gray-400 hover:text-teal-700 dark:hover:text-teal-400 transition-colors inline-flex items-center gap-2 group">
                     <span className="group-hover:translate-x-1 transition-transform">→</span>
                     My Artworks
                   </Link>
@@ -169,15 +169,15 @@ export default async function Footer() {
               ) : (
                 /* Non-admin / Non-artist users */
                 <>
-                  <Link href="/auth/login" className="text-sm text-gray-600 hover:text-teal-700 transition-colors inline-flex items-center gap-2 group">
+                  <Link href="/auth/login" className="text-sm text-gray-600 dark:text-gray-400 hover:text-teal-700 dark:hover:text-teal-400 transition-colors inline-flex items-center gap-2 group">
                     <span className="group-hover:translate-x-1 transition-transform">→</span>
                     Artist Login
                   </Link>
-                  <Link href="/auth/artist-signup" className="text-sm text-gray-600 hover:text-teal-700 transition-colors inline-flex items-center gap-2 group">
+                  <Link href="/auth/artist-signup" className="text-sm text-gray-600 dark:text-gray-400 hover:text-teal-700 dark:hover:text-teal-400 transition-colors inline-flex items-center gap-2 group">
                     <span className="group-hover:translate-x-1 transition-transform">→</span>
                     Join as Artist
                   </Link>
-                  <Link href="/site/commissions" className="text-sm text-gray-600 hover:text-teal-700 transition-colors inline-flex items-center gap-2 group">
+                  <Link href="/site/commissions" className="text-sm text-gray-600 dark:text-gray-400 hover:text-teal-700 dark:hover:text-teal-400 transition-colors inline-flex items-center gap-2 group">
                     <span className="group-hover:translate-x-1 transition-transform">→</span>
                     Request Commission
                   </Link>
@@ -188,7 +188,7 @@ export default async function Footer() {
         </div>
 
         {/* Bottom bar */}
-        <div className="pt-4 sm:pt-6 border-t border-gray-200/60 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4 text-sm text-gray-600">
+        <div className="pt-4 sm:pt-6 border-t border-gray-200/60 dark:border-gray-700/40 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4 text-sm text-gray-600 dark:text-gray-400">
           <div className="flex items-center gap-2">
             <span>© {currentYear} Artelier</span>
             <span className="hidden sm:inline">•</span>
@@ -197,11 +197,11 @@ export default async function Footer() {
             </span>
           </div>
           <div className="flex items-center gap-4">
-            <Link href="/privacy" className="hover:text-teal-700 transition-colors">Privacy</Link>
+            <Link href="/privacy" className="hover:text-teal-700 dark:hover:text-teal-400 transition-colors">Privacy</Link>
             <span>•</span>
-            <Link href="/terms" className="hover:text-teal-700 transition-colors">Terms</Link>
+            <Link href="/terms" className="hover:text-teal-700 dark:hover:text-teal-400 transition-colors">Terms</Link>
             <span>•</span>
-            <Link href="/contact" className="hover:text-teal-700 transition-colors">Contact</Link>
+            <Link href="/contact" className="hover:text-teal-700 dark:hover:text-teal-400 transition-colors">Contact</Link>
           </div>
         </div>
       </div>

@@ -61,7 +61,7 @@ export default async function Home() {
     <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6">
       {/* Hero Section */}
       <section className="relative overflow-hidden rounded-2xl sm:rounded-3xl my-6 sm:my-8 lg:my-10 animate-fade-in ">
-        <div className="absolute inset-0 bg-gradient-to-br from-teal-500 via-emerald-500 to-cyan-600 opacity-90"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-teal-500 via-emerald-500 to-cyan-600 dark:from-teal-700 dark:via-emerald-800 dark:to-cyan-900 opacity-90"></div>
         <div className="absolute inset-0">
           <div className="absolute top-10 left-10 w-72 h-72 bg-white/10 rounded-full blur-3xl animate-pulse"></div>
           <div className="absolute bottom-10 right-10 w-96 h-96 bg-white/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
@@ -146,7 +146,7 @@ export default async function Home() {
       {/* Community row (stories-like) */}
       {artists.length > 0 && (
         <div className="my-12 animate-fade-in-up">
-          <h2 className="text-2xl font-bold mb-6 flex items-center gap-3">
+          <h2 className="text-2xl font-bold mb-6 flex items-center gap-3 dark:text-gray-100">
             <span className="p-2 bg-gradient-to-br from-purple-500 to-pink-600 rounded-lg">
               <Users className="size-5 text-white" />
             </span>
@@ -160,12 +160,12 @@ export default async function Home() {
       <section className="my-12 animate-fade-in-up">
         <div className="flex items-end justify-between mb-6">
           <div>
-            <h2 className="text-3xl font-bold tracking-tight">Latest Artworks</h2>
-            <p className="text-gray-600 mt-1">Discover fresh pieces from our talented artists</p>
+            <h2 className="text-3xl font-bold tracking-tight dark:text-gray-100">Latest Artworks</h2>
+            <p className="text-gray-600 dark:text-gray-400 mt-1">Discover fresh pieces from our talented artists</p>
           </div>
           <Link
             href="/site/galleries"
-            className="inline-flex items-center gap-2 text-teal-700 hover:text-teal-800 font-medium group transition-colors"
+            className="inline-flex items-center gap-2 text-teal-700 dark:text-teal-400 hover:text-teal-800 dark:hover:text-teal-300 font-medium group transition-colors"
           >
             <span>View All</span>
             <span className="group-hover:translate-x-1 transition-transform">→</span>
@@ -179,10 +179,10 @@ export default async function Home() {
             ))}
           </div>
         ) : (
-          <div className="text-center py-20 bg-gray-50 rounded-2xl">
+          <div className="text-center py-20 bg-gray-50 dark:bg-[#1a1a24] rounded-2xl transition-colors">
             <div className="text-6xl mb-4">🎨</div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">No artworks yet</h3>
-            <p className="text-gray-600 mb-6">Be the first to upload amazing artwork!</p>
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">No artworks yet</h3>
+            <p className="text-gray-600 dark:text-gray-400 mb-6">Be the first to upload amazing artwork!</p>
             <Link
               href="/auth/artist-signup"
               className="inline-flex items-center gap-2 px-6 py-3 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-all"
@@ -197,7 +197,7 @@ export default async function Home() {
       {/* Feature cards (only show uploaded artworks; otherwise placeholder with no image) */}
       {latest.length > 2 && (
         <section className="my-12 animate-fade-in-up">
-          <h2 className="text-2xl font-bold mb-6">Trending Now</h2>
+          <h2 className="text-2xl font-bold mb-6 dark:text-gray-100">Trending Now</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {latest.slice(0, 2).map((a) => (
               <FeedCard
@@ -214,15 +214,15 @@ export default async function Home() {
       )}
 
       {/* CTA Section */}
-      <div className="my-12 sm:my-16 text-center bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl sm:rounded-3xl p-8 sm:p-10 lg:p-12 animate-scale-in">
+      <div className="my-12 sm:my-16 text-center bg-gradient-to-br from-gray-50 to-gray-100 dark:from-[#1a1a24] dark:to-[#141418] rounded-2xl sm:rounded-3xl p-8 sm:p-10 lg:p-12 animate-scale-in transition-colors">
         <div className="max-w-2xl mx-auto">
           <div className="inline-flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 bg-gradient-to-br from-teal-600 to-emerald-600 rounded-xl sm:rounded-2xl mb-4 sm:mb-6 shadow-lg">
             <Sparkles className="size-6 sm:size-7 lg:size-8 text-white" />
           </div>
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-3 sm:mb-4">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-gray-100 mb-3 sm:mb-4">
             Ready to Start Your Collection?
           </h2>
-          <p className="text-base sm:text-lg text-gray-600 mb-6 sm:mb-8 px-4">
+          <p className="text-base sm:text-lg text-gray-600 dark:text-gray-400 mb-6 sm:mb-8 px-4">
             Join thousands of art enthusiasts discovering and collecting extraordinary pieces from talented artists worldwide.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
@@ -235,7 +235,7 @@ export default async function Home() {
             </Link>
             <Link
               href="/auth/artist-signup"
-              className="inline-flex items-center justify-center gap-2 rounded-xl border-2 border-gray-300 bg-white px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-base text-gray-900 font-semibold hover:border-teal-600 hover:text-teal-700 transition-all duration-300"
+              className="inline-flex items-center justify-center gap-2 rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-[#1a1a24] px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-base text-gray-900 dark:text-gray-100 font-semibold hover:border-teal-600 dark:hover:border-teal-400 hover:text-teal-700 dark:hover:text-teal-400 transition-all duration-300"
             >
               <TrendingUp className="size-4 sm:size-5" />
               Join as Artist

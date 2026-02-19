@@ -54,14 +54,14 @@ export default async function GalleriesPage(props: {
                 <h1 className="text-5xl md:text-6xl font-bold tracking-tight mb-4">
                     {q ? "Search Results" : "Art Gallery"}
                 </h1>
-                <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+                <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
                     {q ? `Showing results for "${q}"` : "Explore our complete collection of exceptional artworks"}
                 </p>
 
                 {/* Artwork count */}
-                <div className="mt-6 inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-teal-50 to-emerald-50 px-6 py-3 border border-teal-200">
-                    <Sparkles className="size-5 text-teal-600" />
-                    <span className="text-gray-700 font-medium">
+                <div className="mt-6 inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-teal-50 to-emerald-50 dark:from-teal-900/30 dark:to-emerald-900/30 px-6 py-3 border border-teal-200 dark:border-teal-800">
+                    <Sparkles className="size-5 text-teal-600 dark:text-teal-400" />
+                    <span className="text-gray-700 dark:text-gray-300 font-medium">
                         {totalCount} {totalCount === 1 ? "Artwork" : "Artworks"} Found
                     </span>
                 </div>
@@ -69,12 +69,12 @@ export default async function GalleriesPage(props: {
 
             {/* Artworks Grid */}
             {artworks.length === 0 ? (
-                <div className="text-center py-20 bg-gray-50 rounded-3xl animate-scale-in">
+                <div className="text-center py-20 bg-gray-50 dark:bg-[#1a1a24] rounded-3xl animate-scale-in transition-colors">
                     <div className="text-6xl mb-4">🔍</div>
-                    <h3 className="text-2xl font-semibold text-gray-900 mb-2">
+                    <h3 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
                         {q ? `No artworks found for "${q}"` : "No artworks yet"}
                     </h3>
-                    <p className="text-gray-600 mb-8">
+                    <p className="text-gray-600 dark:text-gray-400 mb-8">
                         {q ? "Try checking for typos or using different keywords" : "Check back soon for amazing artwork"}
                     </p>
                     <Link
@@ -124,11 +124,11 @@ export default async function GalleriesPage(props: {
 
             {/* CTA Section */}
             {artworks.length > 0 && (
-                <div className="mt-20 text-center bg-gradient-to-br from-gray-50 to-gray-100 rounded-3xl p-12 animate-scale-in">
-                    <h2 className="text-3xl font-bold text-gray-900 mb-4">
+                <div className="mt-20 text-center bg-gradient-to-br from-gray-50 to-gray-100 dark:from-[#1a1a24] dark:to-[#141418] rounded-3xl p-12 animate-scale-in transition-colors">
+                    <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4">
                         Love What You See?
                     </h2>
-                    <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
+                    <p className="text-lg text-gray-600 dark:text-gray-400 mb-8 max-w-2xl mx-auto">
                         Commission a custom piece or explore more about the artist
                     </p>
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -141,7 +141,7 @@ export default async function GalleriesPage(props: {
                         </Link>
                         <Link
                             href="/site/artists"
-                            className="inline-flex items-center justify-center gap-2 rounded-xl border-2 border-gray-300 bg-white px-8 py-4 text-gray-900 font-semibold hover:border-teal-600 hover:text-teal-700 transition-all duration-300"
+                            className="inline-flex items-center justify-center gap-2 rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-[#1a1a24] px-8 py-4 text-gray-900 dark:text-gray-200 font-semibold hover:border-teal-600 dark:hover:border-teal-500 hover:text-teal-700 dark:hover:text-teal-400 transition-all duration-300"
                         >
                             Meet the Artists
                         </Link>

@@ -50,15 +50,15 @@ export default function AdminLoginPage() {
       showBackHome={true}
     >
       {error && (
-        <div className="mb-6 rounded-lg bg-red-50 border border-red-200 p-4 flex gap-3">
+        <div className="mb-6 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 p-4 flex gap-3">
           <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
-          <p className="text-sm text-red-700">{error}</p>
+          <p className="text-sm text-red-700 dark:text-red-400">{error}</p>
         </div>
       )}
 
       <form onSubmit={handleSubmit} className="space-y-5">
         <div>
-          <label className="block text-sm font-medium text-gray-900 mb-2">
+          <label className="block text-sm font-medium text-gray-900 dark:text-gray-200 mb-2">
             Email Address
           </label>
           <input
@@ -66,13 +66,13 @@ export default function AdminLoginPage() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="admin@artelier.com"
-            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-100 transition-all"
+            className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-[#1a1a24] dark:text-gray-200 dark:placeholder:text-gray-500 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-100 dark:focus:ring-teal-900 transition-all"
             required
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-900 mb-2">
+          <label className="block text-sm font-medium text-gray-900 dark:text-gray-200 mb-2">
             Password
           </label>
           <input
@@ -80,7 +80,7 @@ export default function AdminLoginPage() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="••••••••"
-            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-100 transition-all"
+            className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-[#1a1a24] dark:text-gray-200 dark:placeholder:text-gray-500 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-100 dark:focus:ring-teal-900 transition-all"
             required
           />
         </div>
@@ -94,7 +94,7 @@ export default function AdminLoginPage() {
         </button>
       </form>
 
-      <p className="text-center text-gray-600 mt-6 text-sm">
+      <p className="text-center text-gray-600 dark:text-gray-400 mt-6 text-sm">
         Not authorized? Contact the system administrator
       </p>
     </AuthLayout>

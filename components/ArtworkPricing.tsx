@@ -30,15 +30,15 @@ export default function ArtworkPricing({
     printOptions,
 }: ArtworkPricingProps) {
     return (
-        <div className="border-t border-gray-200 pt-6 space-y-4">
+        <div className="border-t border-gray-200 dark:border-gray-700 pt-6 space-y-4">
             {isOriginalAvailable && originalPriceCents && (
-                <div className="p-6 bg-gradient-to-br from-teal-50 via-emerald-50 to-teal-50 rounded-xl border border-teal-100 shadow-sm">
+                <div className="p-6 bg-gradient-to-br from-teal-50 via-emerald-50 to-teal-50 dark:from-teal-900/20 dark:via-emerald-900/20 dark:to-teal-900/20 rounded-xl border border-teal-100 dark:border-teal-800 shadow-sm">
                     <div className="flex items-center justify-between mb-4">
                         <div>
-                            <h3 className="text-lg font-semibold text-gray-900">Original Artwork</h3>
-                            <p className="text-sm text-gray-600">One of a kind piece</p>
+                            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Original Artwork</h3>
+                            <p className="text-sm text-gray-600 dark:text-gray-400">One of a kind piece</p>
                         </div>
-                        <div className="text-3xl font-bold text-teal-700">
+                        <div className="text-3xl font-bold text-teal-700 dark:text-teal-400">
                             {(originalPriceCents / 100).toLocaleString()} RWF
                         </div>
                     </div>
@@ -54,17 +54,17 @@ export default function ArtworkPricing({
             )}
 
             {printEnabled && printOptions.length > 0 && (
-                <div className="p-6 bg-white rounded-xl border border-gray-200 shadow-sm">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Available Prints</h3>
+                <div className="p-6 bg-white dark:bg-[#1a1a24] rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Available Prints</h3>
                     <div className="space-y-3">
                         {printOptions.map((opt) => (
                             <div
                                 key={opt.id}
-                                className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                                className="flex items-center justify-between p-4 bg-gray-50 dark:bg-[#141418] rounded-lg hover:bg-gray-100 dark:hover:bg-[#1a1a24] transition-colors"
                             >
                                 <div>
-                                    <div className="font-medium text-gray-900">{opt.name}</div>
-                                    <div className="text-sm text-gray-600">
+                                    <div className="font-medium text-gray-900 dark:text-gray-100">{opt.name}</div>
+                                    <div className="text-sm text-gray-600 dark:text-gray-400">
                                         {(opt.priceCents / 100).toLocaleString()} RWF
                                     </div>
                                 </div>
@@ -84,9 +84,9 @@ export default function ArtworkPricing({
             )}
 
             {!isOriginalAvailable && !printEnabled && (
-                <div className="p-6 bg-gray-50 rounded-xl text-center">
-                    <p className="text-gray-600">This artwork is currently not available for purchase.</p>
-                    <Link href="/site/galleries" className="inline-block mt-4 text-teal-600 hover:text-teal-700 font-medium">
+                <div className="p-6 bg-gray-50 dark:bg-[#1a1a24] rounded-xl text-center">
+                    <p className="text-gray-600 dark:text-gray-400">This artwork is currently not available for purchase.</p>
+                    <Link href="/site/galleries" className="inline-block mt-4 text-teal-600 dark:text-teal-400 hover:text-teal-700 dark:hover:text-teal-300 font-medium">
                         Browse more artworks
                     </Link>
                 </div>

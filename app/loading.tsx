@@ -8,10 +8,10 @@ export default function GlobalLoading() {
                     <Palette className="size-7 text-white" />
                 </div>
                 <div className="space-y-2">
-                    <div className="h-2 w-48 bg-gray-200 rounded-full overflow-hidden mx-auto">
+                    <div className="h-2 w-48 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden mx-auto">
                         <div className="h-full w-1/2 bg-gradient-to-r from-teal-500 to-emerald-500 rounded-full animate-[loading_1.5s_ease-in-out_infinite]" />
                     </div>
-                    <p className="text-sm text-gray-500">Loading...</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">Loading...</p>
                 </div>
             </div>
         </div>

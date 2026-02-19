@@ -27,22 +27,22 @@ export default function Sidebar() {
 
   return (
     <aside className="sticky top-20 hidden md:block">
-      <div className="rounded-2xl border bg-white/70 backdrop-blur supports-[backdrop-filter]:bg-white/60 p-4">
-        <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Section</div>
+      <div className="rounded-2xl border dark:border-gray-700/40 bg-white/70 dark:bg-[#1a1a24]/70 backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:supports-[backdrop-filter]:bg-[#1a1a24]/60 p-4 transition-colors">
+        <div className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Section</div>
         <nav className="mt-3 space-y-2 text-sm">
-          <a className="flex items-center gap-2 rounded-md px-3 py-2 hover:bg-teal-50 hover:text-teal-800 transition" href="#">
+          <a className="flex items-center gap-2 rounded-md px-3 py-2 hover:bg-teal-50 dark:hover:bg-teal-900/30 hover:text-teal-800 dark:hover:text-teal-400 transition" href="#">
             <Home className="size-4" />
             <span>Feeds</span>
           </a>
-          <a className="flex items-center gap-2 rounded-md px-3 py-2 hover:bg-teal-50 hover:text-teal-800 transition" href="#">
+          <a className="flex items-center gap-2 rounded-md px-3 py-2 hover:bg-teal-50 dark:hover:bg-teal-900/30 hover:text-teal-800 dark:hover:text-teal-400 transition" href="#">
             <Search className="size-4" />
             <span>Search</span>
           </a>
         </nav>
       </div>
 
-      <div className="mt-4 rounded-2xl border bg-white/70 backdrop-blur supports-[backdrop-filter]:bg-white/60 p-4">
-        <div className="flex items-center gap-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+      <div className="mt-4 rounded-2xl border dark:border-gray-700/40 bg-white/70 dark:bg-[#1a1a24]/70 backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:supports-[backdrop-filter]:bg-[#1a1a24]/60 p-4 transition-colors">
+        <div className="flex items-center gap-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
           <Users className="size-3" />
           <span>Artists</span>
         </div>
@@ -56,7 +56,7 @@ export default function Sidebar() {
                 height={28}
                 className="rounded-full"
               />
-              <div className="text-sm text-gray-700">{a.name}</div>
+              <div className="text-sm text-gray-700 dark:text-gray-300">{a.name}</div>
             </div>
           ))}
         </div>

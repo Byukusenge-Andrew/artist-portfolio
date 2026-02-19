@@ -79,7 +79,7 @@ export default function ArtworkDetailClient({
           <div className="col-span-2 flex justify-end -mt-8 mb-4 gap-2">
             <Link
               href={`/admin/artworks/${artwork.id}/edit`}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm font-medium"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors text-sm font-medium"
             >
               <Palette className="size-4" />
               Edit
@@ -115,9 +115,9 @@ export default function ArtworkDetailClient({
         {/* Details */}
         <div className="space-y-6">
           <div>
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">{artwork.title}</h1>
+            <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-4">{artwork.title}</h1>
 
-            <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 mb-6">
+            <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 dark:text-gray-400 mb-6">
               <div className="flex items-center gap-2">
                 <Calendar className="size-4" />
                 <span>
@@ -138,11 +138,11 @@ export default function ArtworkDetailClient({
 
             {artwork.tags.length > 0 && (
               <div className="flex items-center gap-2 flex-wrap mb-6">
-                <Tag className="size-4 text-gray-500" />
+                <Tag className="size-4 text-gray-500 dark:text-gray-400" />
                 {artwork.tags.map((tag) => (
                   <span
                     key={tag}
-                    className="px-3 py-1 bg-gradient-to-br from-teal-50 to-emerald-50 text-teal-700 rounded-full text-sm font-medium border border-teal-100"
+                    className="px-3 py-1 bg-gradient-to-br from-teal-50 to-emerald-50 dark:from-teal-900/30 dark:to-emerald-900/30 text-teal-700 dark:text-teal-400 rounded-full text-sm font-medium border border-teal-100 dark:border-teal-800"
                   >
                     {tag}
                   </span>
@@ -154,7 +154,7 @@ export default function ArtworkDetailClient({
             {artwork.artist && <ArtistProfile artist={artwork.artist} />}
 
             {artwork.description && (
-              <p className="text-gray-700 text-lg leading-relaxed whitespace-pre-wrap">
+              <p className="text-gray-700 dark:text-gray-300 text-lg leading-relaxed whitespace-pre-wrap">
                 {artwork.description}
               </p>
             )}

@@ -42,12 +42,12 @@ export default function PasswordStrengthIndicator({ password }: Props) {
 
     return (
         <div className="mt-2">
-            <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+            <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
                 <div
                     className={`h-full transition-all duration-300 ${getColor()} ${getWidth()}`}
                 />
             </div>
-            <p className="text-xs mt-1 capitalize text-gray-600">
+            <p className="text-xs mt-1 capitalize text-gray-600 dark:text-gray-400">
                 Password strength: <span className={`font-medium ${strength === "weak" ? "text-red-600" :
                     strength === "medium" ? "text-yellow-600" :
                         "text-green-600"

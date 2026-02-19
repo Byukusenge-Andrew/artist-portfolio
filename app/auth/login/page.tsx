@@ -51,15 +51,15 @@ function LoginForm() {
       subtitle="Sign in to your account"
     >
       {error && (
-        <div className="mb-6 rounded-lg bg-red-50 border border-red-200 p-4 flex gap-3">
+        <div className="mb-6 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 p-4 flex gap-3">
           <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
-          <p className="text-sm text-red-700">{error}</p>
+          <p className="text-sm text-red-700 dark:text-red-400">{error}</p>
         </div>
       )}
 
       <form onSubmit={handleSubmit} className="space-y-5">
         <div>
-          <label className="block text-sm font-medium text-gray-900 mb-2">
+          <label className="block text-sm font-medium text-gray-900 dark:text-gray-200 mb-2">
             Email Address
           </label>
           <input
@@ -67,13 +67,13 @@ function LoginForm() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="you@example.com"
-            className="w-full px-4 py-3 sm:py-3.5 rounded-lg border border-gray-300 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-100 transition-all text-base"
+            className="w-full px-4 py-3 sm:py-3.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-[#1a1a24] dark:text-gray-200 dark:placeholder:text-gray-500 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-100 dark:focus:ring-teal-900 transition-all text-base"
             required
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-900 mb-2">
+          <label className="block text-sm font-medium text-gray-900 dark:text-gray-200 mb-2">
             Password
           </label>
           <div className="relative">
@@ -82,13 +82,13 @@ function LoginForm() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
-              className="w-full px-4 py-3 sm:py-3.5 rounded-lg border border-gray-300 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-100 transition-all pr-12 text-base"
+              className="w-full px-4 py-3 sm:py-3.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-[#1a1a24] dark:text-gray-200 dark:placeholder:text-gray-500 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-100 dark:focus:ring-teal-900 transition-all pr-12 text-base"
               required
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 p-2 -m-2 touch-manipulation"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 p-2 -m-2 touch-manipulation"
             >
               {showPassword ? <EyeOff className="size-5" /> : <Eye className="size-5" />}
             </button>
@@ -103,11 +103,11 @@ function LoginForm() {
               onChange={(e) => setRememberMe(e.target.checked)}
               className="w-4 h-4 text-teal-600 border-gray-300 rounded focus:ring-teal-500"
             />
-            <span className="text-sm text-gray-700">Remember me</span>
+            <span className="text-sm text-gray-700 dark:text-gray-300">Remember me</span>
           </label>
           <Link
             href="/auth/forgot-password"
-            className="text-sm text-teal-600 hover:text-teal-700 font-medium"
+            className="text-sm text-teal-600 dark:text-teal-400 hover:text-teal-700 dark:hover:text-teal-300 font-medium"
           >
             Forgot password?
           </Link>
@@ -122,9 +122,9 @@ function LoginForm() {
         </button>
       </form>
 
-      <p className="text-center text-gray-600 mt-6">
+      <p className="text-center text-gray-600 dark:text-gray-400 mt-6">
         Don&apos;t have an account?{" "}
-        <Link href="/auth/register" className="text-teal-600 hover:text-teal-700 font-semibold">
+        <Link href="/auth/register" className="text-teal-600 dark:text-teal-400 hover:text-teal-700 dark:hover:text-teal-300 font-semibold">
           Create one
         </Link>
       </p>
@@ -135,8 +135,8 @@ function LoginForm() {
 export default function LoginPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-gradient-to-br from-teal-50 to-emerald-50 flex items-center justify-center">
-        <div className="text-gray-600">Loading...</div>
+      <div className="min-h-screen bg-gradient-to-br from-teal-50 to-emerald-50 dark:from-[#0f0f12] dark:to-[#141418] flex items-center justify-center">
+        <div className="text-gray-600 dark:text-gray-400">Loading...</div>
       </div>
     }>
       <LoginForm />

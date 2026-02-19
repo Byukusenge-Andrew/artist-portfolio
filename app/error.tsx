@@ -23,16 +23,16 @@ export default function GlobalError({
                 </div>
 
                 <div>
-                    <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                    <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
                         Something went wrong
                     </h2>
-                    <p className="text-gray-600">
+                    <p className="text-gray-600 dark:text-gray-400">
                         {error.message?.includes("database") || error.message?.includes("prisma")
                             ? "We're having trouble connecting to our servers. Please try again in a moment."
                             : "An unexpected error occurred. Our team has been notified."}
                     </p>
                     {error.digest && (
-                        <p className="text-xs text-gray-400 mt-2 font-mono">
+                        <p className="text-xs text-gray-400 dark:text-gray-500 mt-2 font-mono">
                             Error ID: {error.digest}
                         </p>
                     )}
@@ -48,7 +48,7 @@ export default function GlobalError({
                     </button>
                     <Link
                         href="/"
-                        className="inline-flex items-center justify-center gap-2 px-6 py-3 border-2 border-gray-300 text-gray-700 font-semibold rounded-xl hover:border-teal-600 hover:text-teal-700 transition-all duration-300"
+                        className="inline-flex items-center justify-center gap-2 px-6 py-3 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-semibold rounded-xl hover:border-teal-600 dark:hover:border-teal-500 hover:text-teal-700 dark:hover:text-teal-400 transition-all duration-300"
                     >
                         <Home className="size-4" />
                         Go Home

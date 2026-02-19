@@ -87,7 +87,7 @@ export default function CommentSection({ artworkId, artistId, currentUserId }: P
 
     return (
         <div className="mt-8 space-y-6">
-            <h3 className="text-xl font-bold flex items-center gap-2">
+            <h3 className="text-xl font-bold flex items-center gap-2 dark:text-gray-100">
                 <MessageCircle className="size-5" />
                 Comments ({comments.length})
             </h3>
@@ -100,7 +100,7 @@ export default function CommentSection({ artworkId, artistId, currentUserId }: P
                         onChange={(e) => setNewComment(e.target.value)}
                         placeholder={currentUserId ? "Add a comment..." : "Login to comment"}
                         disabled={submitting}
-                        className="w-full border rounded-lg p-3 focus:ring-2 focus:ring-teal-500 outline-none resize-none min-h-[80px]"
+                        className="w-full border dark:border-gray-600 rounded-lg p-3 bg-white dark:bg-[#1a1a24] dark:text-gray-200 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-teal-500 outline-none resize-none min-h-[80px] transition-colors"
                     />
                 </div>
                 <button
@@ -114,20 +114,20 @@ export default function CommentSection({ artworkId, artistId, currentUserId }: P
             {/* List */}
             <div className="space-y-6">
                 {comments.map((comment) => (
-                    <div key={comment.id} className="flex gap-4 p-4 bg-gray-50 rounded-lg group">
+                    <div key={comment.id} className="flex gap-4 p-4 bg-gray-50 dark:bg-[#1a1a24] rounded-lg group transition-colors">
                         <div className="shrink-0">
                             {comment.user.avatarUrl ? (
                                 <img src={comment.user.avatarUrl} alt={comment.user.name || "User"} className="w-10 h-10 rounded-full object-cover" />
                             ) : (
-                                <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 text-sm font-bold">
+                                <div className="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-400 text-sm font-bold">
                                     {(comment.user.name || "U")[0].toUpperCase()}
                                 </div>
                             )}
                         </div>
                         <div className="flex-1">
                             <div className="flex items-center justify-between mb-1">
-                                <div className="font-semibold text-gray-900">{comment.user.name || "Anonymous"}</div>
-                                <div className="text-xs text-gray-500">
+                                <div className="font-semibold text-gray-900 dark:text-gray-100">{comment.user.name || "Anonymous"}</div>
+                                <div className="text-xs text-gray-500 dark:text-gray-400">
                                     {new Date(comment.createdAt).toLocaleDateString()}
                                     {currentUserId === comment.user.id && (
                                         <button onClick={() => handleDelete(comment.id)} className="ml-3 text-red-500 hover:text-red-700 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -136,12 +136,12 @@ export default function CommentSection({ artworkId, artistId, currentUserId }: P
                                     )}
                                 </div>
                             </div>
-                            <p className="text-gray-700 leading-relaxed whitespace-pre-wrap text-sm">{comment.content}</p>
+                            <p className="text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-wrap text-sm">{comment.content}</p>
                         </div>
                     </div>
                 ))}
                 {comments.length === 0 && (
-                    <p className="text-gray-500 text-center py-4">No comments yet. Be the first to share your thoughts!</p>
+                    <p className="text-gray-500 dark:text-gray-400 text-center py-4">No comments yet. Be the first to share your thoughts!</p>
                 )}
             </div>
         </div>

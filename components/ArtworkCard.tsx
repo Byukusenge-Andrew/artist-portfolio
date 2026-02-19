@@ -20,10 +20,10 @@ export function ArtworkCard({ id, slug, title, imageUrl, price, artistName }: Pr
     <Link
       key={id}
       href={`/site/${slug}`}
-      className="group rounded-xl overflow-hidden border border-gray-200/60 bg-white shadow-sm hover:shadow-2xl hover:border-teal-200 transition-all duration-500 hover:-translate-y-2 h-full flex flex-col"
+      className="group rounded-xl overflow-hidden border border-gray-200/60 dark:border-gray-700/40 bg-white dark:bg-[#1a1a24] shadow-sm hover:shadow-2xl dark:hover:shadow-teal-900/20 hover:border-teal-200 dark:hover:border-teal-700 transition-all duration-500 hover:-translate-y-2 h-full flex flex-col"
       aria-label={`View artwork ${title}`}
     >
-      <div className="relative aspect-square bg-gradient-to-br from-gray-100 to-gray-50 overflow-hidden">
+      <div className="relative aspect-square bg-gradient-to-br from-gray-100 to-gray-50 dark:from-gray-800 dark:to-gray-900 overflow-hidden">
         <Image
           src={imageUrl}
           alt={title}
@@ -59,19 +59,19 @@ export function ArtworkCard({ id, slug, title, imageUrl, price, artistName }: Pr
       </div>
 
       <div className="p-4 flex flex-col flex-1 gap-2">
-        <h3 className="text-base font-semibold text-gray-900 truncate group-hover:text-teal-700 transition-colors duration-300">
+        <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100 truncate group-hover:text-teal-700 dark:group-hover:text-teal-400 transition-colors duration-300">
           {title}
         </h3>
 
         <div className="flex items-center justify-between mt-auto">
           {artistName && (
-            <p className="text-xs text-gray-500 truncate max-w-[60%]">
+            <p className="text-xs text-gray-500 dark:text-gray-400 truncate max-w-[60%]">
               by {artistName}
             </p>
           )}
 
           {price !== undefined && price !== null && (
-            <p className="text-sm font-bold text-teal-700">
+            <p className="text-sm font-bold text-teal-700 dark:text-teal-400">
               {(price / 100).toLocaleString()} RWF
             </p>
           )}

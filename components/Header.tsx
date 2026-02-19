@@ -7,6 +7,7 @@ import CartButton from "./CartButton";
 import Image from "next/image";
 import { parseUserSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import ThemeToggle from "./ThemeToggle";
 
 export default async function Header() {
   let user: Awaited<ReturnType<typeof parseUserSession>> = null;
@@ -38,12 +39,13 @@ export default async function Header() {
   }
 
   return (
-    <header className="sticky top-0 z-50 border-b border-teal-100/50 bg-white/80 backdrop-blur-xl supports-[backdrop-filter]:bg-white/70 shadow-sm">
+    <header className="sticky top-0 z-50 border-b border-teal-100/50 dark:border-gray-700/50 bg-white/80 dark:bg-[#1a1a24]/80 backdrop-blur-xl supports-[backdrop-filter]:bg-white/70 dark:supports-[backdrop-filter]:bg-[#1a1a24]/70 shadow-sm dark:shadow-gray-900/20 transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 h-14 sm:h-16 flex items-center gap-3 sm:gap-4 lg:gap-6 justify-between">
         {/* Logo */}
         <Link href="/" className="group flex items-center gap-2 sm:gap-3 hover:scale-105 transition-transform duration-300 flex-shrink-0">
-          <Image src="/logo.png" width={34} height={34} alt="Artelier" className="sm:w-10 sm:h-10" />
-
+          <div className="dark:bg-[#faf7f2] dark:rounded-lg dark:p-0.5 transition-all duration-300">
+            <Image src="/logo.png" width={34} height={34} alt="Artelier" className="sm:w-10 sm:h-10" />
+          </div>
         </Link>
 
         {/* Search - Desktop & Tablet */}
@@ -56,7 +58,7 @@ export default async function Header() {
           {/* Public Links - Hidden on small mobile */}
           <Link
             href="/site/galleries"
-            className="hidden sm:inline-flex group items-center gap-2 rounded-lg px-2 lg:px-3 py-2 text-gray-700 hover:text-teal-800 hover:bg-gradient-to-br hover:from-teal-50 hover:to-emerald-50 transition-all duration-300"
+            className="hidden sm:inline-flex group items-center gap-2 rounded-lg px-2 lg:px-3 py-2 text-gray-700 dark:text-gray-300 hover:text-teal-800 dark:hover:text-teal-400 hover:bg-gradient-to-br hover:from-teal-50 hover:to-emerald-50 dark:hover:from-teal-900/30 dark:hover:to-emerald-900/30 transition-all duration-300"
           >
             <Images className="size-4 group-hover:scale-110 transition-transform" />
             <span className="hidden lg:inline font-medium">Galleries</span>
@@ -64,7 +66,7 @@ export default async function Header() {
 
           <Link
             href="/site/commissions"
-            className="hidden md:inline-flex group items-center gap-2 rounded-lg px-2 lg:px-3 py-2 text-gray-700 hover:text-teal-800 hover:bg-gradient-to-br hover:from-teal-50 hover:to-emerald-50 transition-all duration-300"
+            className="hidden md:inline-flex group items-center gap-2 rounded-lg px-2 lg:px-3 py-2 text-gray-700 dark:text-gray-300 hover:text-teal-800 dark:hover:text-teal-400 hover:bg-gradient-to-br hover:from-teal-50 hover:to-emerald-50 dark:hover:from-teal-900/30 dark:hover:to-emerald-900/30 transition-all duration-300"
           >
             <span className="hidden lg:inline font-medium">Commission</span>
             <span className="lg:hidden font-medium">Comm.</span>
@@ -72,11 +74,12 @@ export default async function Header() {
 
           <FavoritesButton />
           <CartButton />
+          <ThemeToggle />
 
           {/* Admin/Artist Section */}
           {(isAdmin || isArtist) && (
             <>
-              <div className="h-6 w-px bg-gray-300 mx-1 sm:mx-2 hidden sm:block" />
+              <div className="h-6 w-px bg-gray-300 dark:bg-gray-600 mx-1 sm:mx-2 hidden sm:block" />
 
               {/* Pending Approvals Notification */}
               {pendingAdminCount > 0 && (
@@ -94,7 +97,7 @@ export default async function Header() {
 
               <Link
                 href={isAdmin ? "/admin/dashboard" : "/artist/dashboard"}
-                className="hidden sm:inline-flex group items-center gap-2 rounded-lg px-2 lg:px-3 py-2 text-gray-700 hover:text-teal-800 hover:bg-teal-50 transition-all duration-300"
+                className="hidden sm:inline-flex group items-center gap-2 rounded-lg px-2 lg:px-3 py-2 text-gray-700 dark:text-gray-300 hover:text-teal-800 dark:hover:text-teal-400 hover:bg-teal-50 dark:hover:bg-teal-900/30 transition-all duration-300"
               >
                 <Shield className="size-4 group-hover:scale-110 transition-transform" />
                 <span className="hidden lg:inline font-medium">{isAdmin ? "Admin" : "Dashboard"}</span>
@@ -113,11 +116,11 @@ export default async function Header() {
           {/* User Menu */}
           {isAuthenticated ? (
             <>
-              {!(isAdmin || isArtist) && <div className="h-6 w-px bg-gray-300 mx-1 sm:mx-2 hidden sm:block" />}
+              {!(isAdmin || isArtist) && <div className="h-6 w-px bg-gray-300 dark:bg-gray-600 mx-1 sm:mx-2 hidden sm:block" />}
 
               <Link
                 href={isAdmin ? "/admin/dashboard" : isArtist ? "/artist/dashboard" : "/user/dashboard"}
-                className="group inline-flex items-center gap-2 rounded-lg px-2 lg:px-3 py-2 text-gray-700 hover:text-teal-800 hover:bg-gradient-to-br hover:from-teal-50 hover:to-emerald-50 transition-all duration-300"
+                className="group inline-flex items-center gap-2 rounded-lg px-2 lg:px-3 py-2 text-gray-700 dark:text-gray-300 hover:text-teal-800 dark:hover:text-teal-400 hover:bg-gradient-to-br hover:from-teal-50 hover:to-emerald-50 dark:hover:from-teal-900/30 dark:hover:to-emerald-900/30 transition-all duration-300"
               >
                 <User className="size-4 group-hover:scale-110 transition-transform" />
                 <span className="hidden xl:inline font-medium max-w-[120px] truncate">{user?.name || user?.email}</span>
@@ -125,7 +128,7 @@ export default async function Header() {
 
               <form action="/api/auth/logout" method="post">
                 <button
-                  className="group inline-flex items-center gap-2 rounded-lg px-2 lg:px-3 py-2 text-gray-700 hover:text-red-700 hover:bg-red-50 transition-all duration-300"
+                  className="group inline-flex items-center gap-2 rounded-lg px-2 lg:px-3 py-2 text-gray-700 dark:text-gray-300 hover:text-red-700 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 transition-all duration-300"
                   title="Logout"
                 >
                   <LogOut className="size-4 group-hover:-translate-x-1 transition-transform" />
@@ -136,11 +139,11 @@ export default async function Header() {
           ) : (
             /* Guest Links */
             <>
-              <div className="h-6 w-px bg-gray-300 mx-1 sm:mx-2 hidden sm:block" />
+              <div className="h-6 w-px bg-gray-300 dark:bg-gray-600 mx-1 sm:mx-2 hidden sm:block" />
 
               <Link
                 href="/auth/login"
-                className="group inline-flex items-center gap-2 rounded-lg px-2 lg:px-3 py-2 text-gray-700 hover:text-teal-800 hover:bg-gradient-to-br hover:from-teal-50 hover:to-emerald-50 transition-all duration-300"
+                className="group inline-flex items-center gap-2 rounded-lg px-2 lg:px-3 py-2 text-gray-700 dark:text-gray-300 hover:text-teal-800 dark:hover:text-teal-400 hover:bg-gradient-to-br hover:from-teal-50 hover:to-emerald-50 dark:hover:from-teal-900/30 dark:hover:to-emerald-900/30 transition-all duration-300"
               >
                 <User className="size-4 group-hover:scale-110 transition-transform" />
                 <span className="hidden lg:inline font-medium">Login</span>

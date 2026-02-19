@@ -18,7 +18,7 @@ export default function AuthLayout({
     showBackHome = true,
 }: AuthLayoutProps) {
     return (
-        <div className="min-h-screen w-full flex bg-white">
+        <div className="min-h-screen w-full flex bg-white dark:bg-[#0f0f12] transition-colors">
             {/* Left Side - Art/Image */}
             <div className="hidden lg:flex w-1/2 relative bg-gray-900 overflow-hidden">
                 <div className="absolute inset-0 z-0">
@@ -59,7 +59,7 @@ export default function AuthLayout({
                 {showBackHome && (
                     <Link
                         href="/"
-                        className="absolute top-6 left-6 lg:top-6 lg:left-12 flex items-center text-sm text-gray-500 hover:text-gray-900 transition-colors"
+                        className="absolute top-6 left-6 lg:top-6 lg:left-12 flex items-center text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 transition-colors"
                     >
                         <ArrowLeft className="h-4 w-4 mr-2 " />
                         Back to Home
@@ -68,8 +68,8 @@ export default function AuthLayout({
 
                 <div className="w-full max-w-md space-y-8">
                     <div className="text-center lg:text-left">
-                        <h1 className="text-3xl font-bold text-gray-900 tracking-tight">{title}</h1>
-                        <p className="mt-2 text-gray-600">{subtitle}</p>
+                        <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 tracking-tight">{title}</h1>
+                        <p className="mt-2 text-gray-600 dark:text-gray-400">{subtitle}</p>
                     </div>
 
                     {children}
