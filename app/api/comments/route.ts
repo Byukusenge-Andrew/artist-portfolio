@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/authorization";
 import { z } from "zod";
+import { sanitizeText } from "@/lib/sanitize";
 
 const createCommentSchema = z.object({
     content: z.string().min(1).max(1000),
@@ -28,7 +29,7 @@ export async function POST(req: Request) {
 
     const comment = await prisma.comment.create({
         data: {
-            content,
+            content: sanitizeText(content),
             userId: user.userId,
             artworkId,
             artistId,

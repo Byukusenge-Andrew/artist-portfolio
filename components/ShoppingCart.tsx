@@ -1,10 +1,10 @@
 "use client";
 
 import { useCart } from "@/contexts/CartContext";
-import { X, Minus, Plus, ShoppingBag, ArrowRight, Trash2 } from "lucide-react";
-import Image from "next/image";
+import { X, ShoppingBag, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import CartItem from "@/components/CartItem";
 
 interface ShoppingCartProps {
     isOpen: boolean;
@@ -82,65 +82,17 @@ export default function ShoppingCart({ isOpen, onClose }: ShoppingCartProps) {
                         ) : (
                             <>
                                 {items.map((item, index) => (
-                                    <div
+                                    <CartItem
                                         key={index}
-                                        className="flex gap-3 sm:gap-4 p-3 sm:p-4 bg-gray-50 rounded-xl border border-gray-200 hover:border-teal-200 transition-colors"
-                                    >
-                                        {/* Image */}
-                                        <div className="relative w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-200">
-                                            <Image
-                                                src={item.imageUrl}
-                                                alt={item.title}
-                                                fill
-                                                className="object-cover"
-                                            />
-                                        </div>
-
-                                        {/* Details */}
-                                        <div className="flex-1 min-w-0">
-                                            <h3 className="font-semibold text-sm sm:text-base text-gray-900 truncate mb-1">
-                                                {item.title}
-                                            </h3>
-                                            <p className="text-sm text-gray-600 mb-2">
-                                                {item.productType === "ORIGINAL" && "Original Painting"}
-                                                {item.productType === "PRINT" && "Print"}
-                                                {item.productType === "COMMISSION" && "Commission"}
-                                            </p>
-                                            <div className="flex items-center gap-3">
-                                                {/* Quantity Controls */}
-                                                <div className="flex items-center gap-2 bg-white rounded-lg border border-gray-300 p-0.5">
-                                                    <button
-                                                        onClick={() => updateQuantity(index, item.quantity - 1)}
-                                                        disabled={item.quantity <= 1}
-                                                        className="p-2 sm:p-2.5 hover:bg-gray-100 rounded-l-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors touch-manipulation"
-                                                    >
-                                                        <Minus className="size-4" />
-                                                    </button>
-                                                    <span className="text-sm font-medium min-w-[32px] text-center">
-                                                        {item.quantity}
-                                                    </span>
-                                                    <button
-                                                        onClick={() => updateQuantity(index, item.quantity + 1)}
-                                                        className="p-2 sm:p-2.5 hover:bg-gray-100 rounded-r-lg transition-colors touch-manipulation"
-                                                    >
-                                                        <Plus className="size-4" />
-                                                    </button>
-                                                </div>
-                                                <span className="text-sm font-bold text-teal-700">
-                                                    RWF {((item.price * item.quantity) / 100).toLocaleString()}
-                                                </span>
-                                            </div>
-                                        </div>
-
-                                        {/* Remove Button */}
-                                        <button
-                                            onClick={() => removeItem(index)}
-                                            className="p-2 sm:p-2.5 hover:bg-red-50 rounded-lg transition-colors self-start touch-manipulation"
-                                            aria-label="Remove item"
-                                        >
-                                            <Trash2 className="size-4 text-red-600" />
-                                        </button>
-                                    </div>
+                                        index={index}
+                                        title={item.title}
+                                        imageUrl={item.imageUrl}
+                                        productType={item.productType}
+                                        price={item.price}
+                                        quantity={item.quantity}
+                                        onUpdateQuantity={updateQuantity}
+                                        onRemove={removeItem}
+                                    />
                                 ))}
                             </>
                         )}
@@ -149,15 +101,12 @@ export default function ShoppingCart({ isOpen, onClose }: ShoppingCartProps) {
                     {/* Footer */}
                     {items.length > 0 && (
                         <div className="border-t border-gray-200 p-4 sm:p-6 space-y-3 sm:space-y-4 bg-gray-50">
-                            {/* Total */}
                             <div className="flex items-center justify-between text-lg">
                                 <span className="font-semibold text-gray-900">Total</span>
                                 <span className="font-bold text-2xl text-teal-700">
                                     RWF {(totalPrice / 100).toLocaleString()}
                                 </span>
                             </div>
-
-                            {/* Buttons */}
                             <div className="space-y-2">
                                 <button
                                     onClick={handleCheckout}

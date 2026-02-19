@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
+import { sanitizeText } from "@/lib/sanitize";
 
 const createArtworkSchema = z.object({
   title: z.string().min(1),
@@ -54,14 +55,14 @@ export async function POST(req: Request) {
 
   const created = await prisma.artwork.create({
     data: {
-      title: data.title,
+      title: sanitizeText(data.title),
       slug: data.slug,
-      description: data.description,
+      description: data.description ? sanitizeText(data.description) : data.description,
       imagePublicId: data.imagePublicId,
       imageUrl: data.imageUrl,
       width: data.width,
       height: data.height,
-      tags: data.tags,
+      tags: data.tags.map(sanitizeText),
       isOriginalAvailable: data.isOriginalAvailable,
       originalPriceCents: data.originalPriceCents,
       printEnabled: data.printEnabled,

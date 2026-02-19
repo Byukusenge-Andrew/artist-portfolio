@@ -1,0 +1,84 @@
+// components/CartItem.tsx
+"use client";
+
+import { Minus, Plus, Trash2 } from "lucide-react";
+import Image from "next/image";
+
+interface CartItemProps {
+    index: number;
+    title: string;
+    imageUrl: string;
+    productType: string;
+    price: number;
+    quantity: number;
+    onUpdateQuantity: (index: number, quantity: number) => void;
+    onRemove: (index: number) => void;
+}
+
+export default function CartItem({
+    index,
+    title,
+    imageUrl,
+    productType,
+    price,
+    quantity,
+    onUpdateQuantity,
+    onRemove,
+}: CartItemProps) {
+    const productLabel =
+        productType === "ORIGINAL"
+            ? "Original Painting"
+            : productType === "PRINT"
+                ? "Print"
+                : "Commission";
+
+    return (
+        <div className="flex gap-3 sm:gap-4 p-3 sm:p-4 bg-gray-50 rounded-xl border border-gray-200 hover:border-teal-200 transition-colors">
+            {/* Image */}
+            <div className="relative w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-200">
+                <Image src={imageUrl} alt={title} fill className="object-cover" />
+            </div>
+
+            {/* Details */}
+            <div className="flex-1 min-w-0">
+                <h3 className="font-semibold text-sm sm:text-base text-gray-900 truncate mb-1">
+                    {title}
+                </h3>
+                <p className="text-sm text-gray-600 mb-2">{productLabel}</p>
+                <div className="flex items-center gap-3">
+                    {/* Quantity Controls */}
+                    <div className="flex items-center gap-2 bg-white rounded-lg border border-gray-300 p-0.5">
+                        <button
+                            onClick={() => onUpdateQuantity(index, quantity - 1)}
+                            disabled={quantity <= 1}
+                            className="p-2 sm:p-2.5 hover:bg-gray-100 rounded-l-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors touch-manipulation"
+                        >
+                            <Minus className="size-4" />
+                        </button>
+                        <span className="text-sm font-medium min-w-[32px] text-center">
+                            {quantity}
+                        </span>
+                        <button
+                            onClick={() => onUpdateQuantity(index, quantity + 1)}
+                            className="p-2 sm:p-2.5 hover:bg-gray-100 rounded-r-lg transition-colors touch-manipulation"
+                        >
+                            <Plus className="size-4" />
+                        </button>
+                    </div>
+                    <span className="text-sm font-bold text-teal-700">
+                        RWF {((price * quantity) / 100).toLocaleString()}
+                    </span>
+                </div>
+            </div>
+
+            {/* Remove Button */}
+            <button
+                onClick={() => onRemove(index)}
+                className="p-2 sm:p-2.5 hover:bg-red-50 rounded-lg transition-colors self-start touch-manipulation"
+                aria-label="Remove item"
+            >
+                <Trash2 className="size-4 text-red-600" />
+            </button>
+        </div>
+    );
+}

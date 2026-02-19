@@ -3,12 +3,16 @@ import { prisma } from "@/lib/prisma";
 import { ArtworkCard } from "@/components/ArtworkCard";
 import { Palette, Sparkles, Search } from "lucide-react";
 import Link from "next/link";
+import Pagination from "@/components/Pagination";
+
+const ITEMS_PER_PAGE = 12;
 
 export default async function GalleriesPage(props: {
-    searchParams?: Promise<{ q?: string }>;
+    searchParams?: Promise<{ q?: string; page?: string }>;
 }) {
     const searchParams = await props.searchParams;
     const q = searchParams?.q || "";
+    const currentPage = Math.max(1, parseInt(searchParams?.page || "1", 10) || 1);
 
     // Build filter based on search query
     const whereClause = q ? {
@@ -19,10 +23,16 @@ export default async function GalleriesPage(props: {
         ]
     } : {};
 
-    // Fetch artworks based on filter
+    // Get total count for pagination
+    const totalCount = await prisma.artwork.count({ where: whereClause });
+    const totalPages = Math.max(1, Math.ceil(totalCount / ITEMS_PER_PAGE));
+
+    // Fetch paginated artworks
     const artworks = await prisma.artwork.findMany({
         where: whereClause,
         orderBy: { createdAt: "desc" },
+        skip: (currentPage - 1) * ITEMS_PER_PAGE,
+        take: ITEMS_PER_PAGE,
         select: {
             id: true,
             slug: true,
@@ -30,7 +40,7 @@ export default async function GalleriesPage(props: {
             imageUrl: true,
             description: true,
             createdAt: true,
-            originalPriceCents: true, // Needed for ArtworkCard if it shows price
+            originalPriceCents: true,
         },
     });
 
@@ -52,7 +62,7 @@ export default async function GalleriesPage(props: {
                 <div className="mt-6 inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-teal-50 to-emerald-50 px-6 py-3 border border-teal-200">
                     <Sparkles className="size-5 text-teal-600" />
                     <span className="text-gray-700 font-medium">
-                        {artworks.length} {artworks.length === 1 ? "Artwork" : "Artworks"} Found
+                        {totalCount} {totalCount === 1 ? "Artwork" : "Artworks"} Found
                     </span>
                 </div>
             </div>
@@ -103,6 +113,14 @@ export default async function GalleriesPage(props: {
                     ))}
                 </div>
             )}
+
+            {/* Pagination */}
+            <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                basePath="/site/galleries"
+                searchQuery={q || undefined}
+            />
 
             {/* CTA Section */}
             {artworks.length > 0 && (
