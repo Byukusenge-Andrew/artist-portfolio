@@ -2,14 +2,12 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
+    formats: ["image/avif", "image/webp"],
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256],
     remotePatterns: [
-      // Keep common hosts minimal; Supabase is our primary storage now
-      // Supabase public storage for this project
       { protocol: "https", hostname: "oailqxrteoswjnlprsrn.supabase.co" },
-      // Optionally allow your specific Supabase project domain via env at runtime
-      // Wikimedia for external images
       { protocol: "https", hostname: "upload.wikimedia.org" },
-      // Unsplash images
       { protocol: "https", hostname: "images.unsplash.com" },
       { protocol: "https", hostname: "plus.unsplash.com" },
     ],

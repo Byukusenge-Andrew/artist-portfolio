@@ -34,9 +34,17 @@ class InMemoryRateLimiter {
     }
 }
 
-// Use in-memory rate limiter for now
-// TODO: Replace with Redis in production for distributed rate limiting
+// Use in-memory rate limiter for development, Upstash Redis for production
 const memoryLimiter = new InMemoryRateLimiter();
+
+let redisLimiter: Ratelimit | null = null;
+if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) {
+    redisLimiter = new Ratelimit({
+        redis: Redis.fromEnv(),
+        limiter: Ratelimit.slidingWindow(100, "1 m"),
+        analytics: true,
+    });
+}
 
 /**
  * Rate limit configurations
@@ -63,6 +71,18 @@ export async function rateLimit(
     type: keyof typeof rateLimitConfig
 ): Promise<{ success: boolean; remaining: number; reset: number }> {
     const config = rateLimitConfig[type];
+
+    // Use Redis-backed limiter in production if available
+    if (redisLimiter) {
+        const result = await redisLimiter.limit(`${type}:${identifier}`);
+        return {
+            success: result.success,
+            remaining: result.remaining,
+            reset: result.reset,
+        };
+    }
+
+    // Fallback to in-memory for development
     return memoryLimiter.limit(identifier, config.requests, config.window);
 }
 

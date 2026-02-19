@@ -14,15 +14,8 @@ export async function middleware(request: NextRequest) {
         role: payload.role,
         userId: payload.userId,
       };
-    } else {
-      // Fallback to legacy base64 format for backward compatibility
-      try {
-        const decoded = JSON.parse(Buffer.from(userSession, "base64").toString());
-        user = decoded;
-      } catch (e) {
-        // Invalid session
-      }
     }
+    // Invalid/expired JWT — session is null (no legacy fallback for security)
   }
 
   const isAuthenticated = !!user;

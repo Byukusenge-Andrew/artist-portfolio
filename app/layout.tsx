@@ -18,9 +18,41 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-
-  title: "Artelier - Discover Exceptional Artwork",
-  description: "Explore and collect exceptional artwork from talented artists around the world. Join our community of creators and art enthusiasts.",
+  title: {
+    default: "Artelier — Discover Exceptional Artwork",
+    template: "%s | Artelier",
+  },
+  description:
+    "Explore and collect exceptional artwork from talented artists around the world. Join our community of creators and art enthusiasts.",
+  keywords: [
+    "art",
+    "artwork",
+    "gallery",
+    "artist portfolio",
+    "buy art online",
+    "commission art",
+    "original paintings",
+    "art prints",
+  ],
+  openGraph: {
+    type: "website",
+    siteName: "Artelier",
+    title: "Artelier — Discover Exceptional Artwork",
+    description:
+      "Explore and collect exceptional artwork from talented artists worldwide.",
+    locale: "en_US",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Artelier — Discover Exceptional Artwork",
+    description:
+      "Explore and collect exceptional artwork from talented artists worldwide.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true },
+  },
 };
 
 export default function RootLayout({
@@ -29,11 +61,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <head >
-
-      </head>
-
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen bg-[#f5f5f0]`}
       >

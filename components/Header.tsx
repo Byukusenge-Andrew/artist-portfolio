@@ -9,9 +9,14 @@ import { parseUserSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
 export default async function Header() {
-  const cookieStore = await cookies();
-  const userSession = cookieStore.get("user_session")?.value;
-  const user = await parseUserSession(userSession);
+  let user: Awaited<ReturnType<typeof parseUserSession>> = null;
+  try {
+    const cookieStore = await cookies();
+    const userSession = cookieStore.get("user_session")?.value;
+    user = await parseUserSession(userSession);
+  } catch {
+    // Gracefully degrade — show guest header
+  }
 
   const isAdmin = user?.role === "ADMIN";
   const isArtist = user?.role === "ARTIST";
@@ -115,7 +120,7 @@ export default async function Header() {
                 className="group inline-flex items-center gap-2 rounded-lg px-2 lg:px-3 py-2 text-gray-700 hover:text-teal-800 hover:bg-gradient-to-br hover:from-teal-50 hover:to-emerald-50 transition-all duration-300"
               >
                 <User className="size-4 group-hover:scale-110 transition-transform" />
-                <span className="hidden xl:inline font-medium max-w-[120px] truncate">{user.name || user.email}</span>
+                <span className="hidden xl:inline font-medium max-w-[120px] truncate">{user?.name || user?.email}</span>
               </Link>
 
               <form action="/api/auth/logout" method="post">

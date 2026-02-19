@@ -7,10 +7,14 @@ import { parseUserSession } from "@/lib/auth";
 export default async function Footer() {
   const currentYear = new Date().getFullYear();
 
-  // Get user session
-  const cookieStore = await cookies();
-  const userSession = cookieStore.get("user_session")?.value;
-  const user = await parseUserSession(userSession);
+  let user: Awaited<ReturnType<typeof parseUserSession>> = null;
+  try {
+    const cookieStore = await cookies();
+    const userSession = cookieStore.get("user_session")?.value;
+    user = await parseUserSession(userSession);
+  } catch {
+    // Gracefully degrade — show guest footer
+  }
 
   const isAdmin = user?.role === "ADMIN";
   const isAuthenticated = !!user;
