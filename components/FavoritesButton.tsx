@@ -13,7 +13,7 @@ export default function FavoritesButton() {
   return (
     <Link
       href={href}
-      className="group relative inline-flex items-center gap-2 rounded-lg px-4 py-2 text-gray-700 hover:text-teal-800 hover:bg-gradient-to-br hover:from-teal-50 hover:to-emerald-50 transition-all duration-300"
+      className="group relative inline-flex items-center gap-2 rounded-lg px-4 py-2 text-gray-700 dark:text-gray-300 hover:text-teal-800 dark:hover:text-teal-400 hover:bg-gradient-to-br hover:from-teal-50 hover:to-emerald-50 dark:hover:from-teal-900/30 dark:hover:to-emerald-900/30 transition-all duration-300"
       aria-label="View favorites"
       title={!isAuthenticated ? "Login to view favorites" : "View favorites"}
     >

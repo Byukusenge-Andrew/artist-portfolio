@@ -85,7 +85,7 @@ export default async function Header() {
               {pendingAdminCount > 0 && (
                 <Link
                   href="/admin/pending-approvals"
-                  className="relative group inline-flex items-center gap-2 rounded-lg px-2 lg:px-3 py-2 text-amber-700 hover:text-amber-800 hover:bg-amber-50 transition-all duration-300"
+                  className="relative group inline-flex items-center gap-2 rounded-lg px-2 lg:px-3 py-2 text-amber-700 dark:text-amber-500 hover:text-amber-800 dark:hover:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/30 transition-all duration-300"
                   title={`${pendingAdminCount} pending admin approval${pendingAdminCount > 1 ? 's' : ''}`}
                 >
                   <Bell className="size-4 group-hover:scale-110 transition-transform" />

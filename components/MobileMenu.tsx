@@ -15,14 +15,14 @@ export default function MobileMenu({ children }: MobileMenuProps) {
             {/* Hamburger Button */}
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="lg:hidden p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                className="lg:hidden p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
                 aria-label="Toggle menu"
                 aria-expanded={isOpen}
             >
                 {isOpen ? (
-                    <X className="size-6 text-gray-700" />
+                    <X className="size-6 text-gray-700 dark:text-gray-300" />
                 ) : (
-                    <Menu className="size-6 text-gray-700" />
+                    <Menu className="size-6 text-gray-700 dark:text-gray-300" />
                 )}
             </button>
 
@@ -36,7 +36,7 @@ export default function MobileMenu({ children }: MobileMenuProps) {
                     />
 
                     {/* Menu Panel */}
-                    <div className="fixed top-16 left-0 right-0 bg-white border-b border-gray-200 shadow-lg z-50 lg:hidden animate-slide-down">
+                    <div className="fixed top-16 left-0 right-0 bg-white dark:bg-[#1a1a24] border-b border-gray-200 dark:border-gray-700 shadow-lg z-50 lg:hidden animate-slide-down">
                         <nav className="max-w-7xl mx-auto px-4 py-4 space-y-2">
                             {children}
                         </nav>

@@ -67,36 +67,36 @@ export default function ArtworkForm({ initialValues, artworkId, isEditing = fals
     return (
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div>
-                <label className="block text-sm mb-1 font-medium">Title</label>
-                <input className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-teal-500 outline-none transition-all" {...register("title")} />
-                {errors.title && <p className="text-sm text-red-600 mt-1">{errors.title.message}</p>}
+                <label className="block text-sm mb-1 font-medium text-gray-900 dark:text-gray-100">Title</label>
+                <input className="w-full border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 bg-white dark:bg-[#141418] text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-teal-500 outline-none transition-all" {...register("title")} />
+                {errors.title && <p className="text-sm text-red-600 dark:text-red-400 mt-1">{errors.title.message}</p>}
             </div>
             <div>
-                <label className="block text-sm mb-1 font-medium">Slug (URL)</label>
-                <input className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-teal-500 outline-none transition-all" {...register("slug")} />
-                {errors.slug && <p className="text-sm text-red-600 mt-1">{errors.slug.message}</p>}
+                <label className="block text-sm mb-1 font-medium text-gray-900 dark:text-gray-100">Slug (URL)</label>
+                <input className="w-full border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 bg-white dark:bg-[#141418] text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-teal-500 outline-none transition-all" {...register("slug")} />
+                {errors.slug && <p className="text-sm text-red-600 dark:text-red-400 mt-1">{errors.slug.message}</p>}
             </div>
             <div>
-                <label className="block text-sm mb-1 font-medium">Description</label>
-                <textarea className="w-full border rounded-lg px-3 py-2 h-32 focus:ring-2 focus:ring-teal-500 outline-none transition-all" {...register("description")} />
+                <label className="block text-sm mb-1 font-medium text-gray-900 dark:text-gray-100">Description</label>
+                <textarea className="w-full border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 h-32 bg-white dark:bg-[#141418] text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-teal-500 outline-none transition-all" {...register("description")} />
             </div>
 
             <div className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label className="block text-sm mb-1 font-medium">Image URL</label>
-                        <input className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-teal-500 outline-none transition-all" {...register("imageUrl")} />
-                        {errors.imageUrl && <p className="text-sm text-red-600 mt-1">{errors.imageUrl.message}</p>}
+                        <label className="block text-sm mb-1 font-medium text-gray-900 dark:text-gray-100">Image URL</label>
+                        <input className="w-full border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 bg-white dark:bg-[#141418] text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-teal-500 outline-none transition-all" {...register("imageUrl")} />
+                        {errors.imageUrl && <p className="text-sm text-red-600 dark:text-red-400 mt-1">{errors.imageUrl.message}</p>}
                     </div>
                     <div>
-                        <label className="block text-sm mb-1 font-medium">Image Public ID</label>
-                        <input className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-teal-500 outline-none transition-all" {...register("imagePublicId")} />
-                        {errors.imagePublicId && <p className="text-sm text-red-600 mt-1">{errors.imagePublicId.message}</p>}
+                        <label className="block text-sm mb-1 font-medium text-gray-900 dark:text-gray-100">Image Public ID</label>
+                        <input className="w-full border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 bg-white dark:bg-[#141418] text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-teal-500 outline-none transition-all" {...register("imagePublicId")} />
+                        {errors.imagePublicId && <p className="text-sm text-red-600 dark:text-red-400 mt-1">{errors.imagePublicId.message}</p>}
                     </div>
                 </div>
 
-                <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                    <p className="text-sm font-medium text-gray-700 mb-3">Upload Image</p>
+                <div className="bg-gray-50 dark:bg-[#1a1a24] border border-gray-200 dark:border-gray-700 rounded-lg p-4 transition-colors">
+                    <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Upload Image</p>
                     <div className="flex flex-wrap gap-3">
                         <SupabaseUpload
                             label="Upload Image"
@@ -109,23 +109,23 @@ export default function ArtworkForm({ initialValues, artworkId, isEditing = fals
                 </div>
             </div>
 
-            <div className="flex items-center gap-6 p-4 bg-gray-50 rounded-lg border border-gray-100">
+            <div className="flex items-center gap-6 p-4 bg-gray-50 dark:bg-[#1a1a24] rounded-lg border border-gray-200 dark:border-gray-700 transition-colors">
                 <label className="flex items-center gap-2 cursor-pointer">
-                    <input type="checkbox" className="w-4 h-4 text-teal-600 rounded focus:ring-teal-500" {...register("isOriginalAvailable")} />
-                    <span className="font-medium text-gray-700">Original Available</span>
+                    <input type="checkbox" className="w-4 h-4 text-teal-600 rounded focus:ring-teal-500 bg-white dark:bg-[#141418] border-gray-300 dark:border-gray-600" {...register("isOriginalAvailable")} />
+                    <span className="font-medium text-gray-700 dark:text-gray-300">Original Available</span>
                 </label>
                 <label className="flex items-center gap-2 cursor-pointer">
-                    <input type="checkbox" className="w-4 h-4 text-teal-600 rounded focus:ring-teal-500" {...register("printEnabled")} />
-                    <span className="font-medium text-gray-700">Prints Enabled</span>
+                    <input type="checkbox" className="w-4 h-4 text-teal-600 rounded focus:ring-teal-500 bg-white dark:bg-[#141418] border-gray-300 dark:border-gray-600" {...register("printEnabled")} />
+                    <span className="font-medium text-gray-700 dark:text-gray-300">Prints Enabled</span>
                 </label>
             </div>
 
             <div>
-                <label className="block text-sm mb-1 font-medium">Original Price (RWF)</label>
-                <p className="text-xs text-gray-500 mb-1">Enter price in RWF (e.g. 5000)</p>
+                <label className="block text-sm mb-1 font-medium text-gray-900 dark:text-gray-100">Original Price (RWF)</label>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Enter price in RWF (e.g. 5000)</p>
                 <input
                     type="number"
-                    className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-teal-500 outline-none transition-all"
+                    className="w-full border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 bg-white dark:bg-[#141418] text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-teal-500 outline-none transition-all"
                     {...register("originalPriceCents", {
                         valueAsNumber: true,
                         setValueAs: (v) => v === "" ? undefined : parseInt(v) * 100 // Convert input RWF to cents
@@ -144,7 +144,7 @@ export default function ArtworkForm({ initialValues, artworkId, isEditing = fals
                 // The label said "cents". It's confusing.
                 // I should explicitly ask for RWF and convert to cents.
                 />
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                     *Stored as cents. If you enter 5000, it means 5000 cents (50 RWF).
                     Wait, if displayed as `price/100`, then 5000 cents = 50.
                     I should probably fix the input to be RWF and convert on submit.
