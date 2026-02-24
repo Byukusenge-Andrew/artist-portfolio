@@ -27,7 +27,11 @@ export default async function Footer() {
           {/* Brand section */}
           <div className="space-y-3">
             <div className="flex items-center gap-3">
-              <Image src="/logo.png" alt="Artelier" height={50} width={50} />
+              <Link href="/" className="group flex items-center gap-2 sm:gap-3 hover:scale-105 transition-transform duration-300 flex-shrink-0">
+                <div className="dark:bg-[#faf7f2] dark:rounded-lg dark:p-0.5 transition-all duration-300">
+                  <Image src="/logo.png" width={34} height={34} alt="Artelier" className="sm:w-10 sm:h-10" />
+                </div>
+              </Link> 
               <span className="font-bold text-xl bg-gradient-to-r from-teal-600 via-emerald-600 to-teal-700 bg-clip-text text-transparent">
                 Artelier
               </span>
