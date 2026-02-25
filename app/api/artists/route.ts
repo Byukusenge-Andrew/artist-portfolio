@@ -1,18 +1,39 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { cookies } from "next/headers";
 import { z } from "zod";
+import bcrypt from "bcryptjs";
+import { getCurrentUser } from "@/lib/authorization";
 
 const artistSchema = z.object({
   name: z.string().min(1, "Name is required"),
-  email: z.string().email().optional(),
-  phone: z.string().optional(),
+  email: z.string().email(),
   bio: z.string().optional(),
 });
 
 export async function GET() {
   try {
-    const artists = await prisma.artist.findMany({
+    const artists = await prisma.user.findMany({
+      where: { role: "ARTIST" },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        bio: true,
+        avatarUrl: true,
+        isActive: true,
+        isApproved: true,
+        createdAt: true,
+        uploadedArtworks: {
+          orderBy: { createdAt: "desc" },
+          select: {
+            id: true,
+            title: true,
+            slug: true,
+            imageUrl: true,
+            originalPriceCents: true,
+          }
+        }
+      },
       orderBy: { name: "asc" },
     });
     return NextResponse.json(artists);
@@ -25,8 +46,6 @@ export async function GET() {
   }
 }
 
-import { getCurrentUser } from "@/lib/authorization";
-
 export async function POST(req: Request) {
   const user = await getCurrentUser(req as any);
 
@@ -38,13 +57,41 @@ export async function POST(req: Request) {
     const body = await req.json();
     const validated = artistSchema.parse(body);
 
-    const artist = await prisma.artist.create({
+    const existingUser = await prisma.user.findUnique({
+      where: { email: validated.email },
+    });
+
+    if (existingUser) {
+      return NextResponse.json(
+        { error: "User with this email already exists" },
+        { status: 400 }
+      );
+    }
+
+    // Generate a secure random password for admin-created artists
+    // They can reset it using forgot password flow later
+    const randomPassword = Math.random().toString(36).slice(-10) + Math.random().toString(36).slice(-10);
+    const hashedPassword = await bcrypt.hash(randomPassword, 10);
+
+    const artist = await prisma.user.create({
       data: {
         name: validated.name,
-        email: validated.email || null,
-        phone: validated.phone || null,
+        email: validated.email,
+        password: hashedPassword,
         bio: validated.bio || null,
+        role: "ARTIST",
+        isActive: true,
+        isApproved: true,
       },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        bio: true,
+        avatarUrl: true,
+        isActive: true,
+        isApproved: true,
+      }
     });
 
     return NextResponse.json(artist, { status: 201 });
@@ -62,5 +109,3 @@ export async function POST(req: Request) {
     );
   }
 }
-
-

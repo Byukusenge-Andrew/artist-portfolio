@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { cookies } from "next/headers";
 import { z } from "zod";
+import { getCurrentUser } from "@/lib/authorization";
 
 const updateSchema = z.object({
   name: z.string().min(1).optional(),
   email: z.string().email().optional(),
-  phone: z.string().optional(),
   bio: z.string().optional(),
+  isActive: z.boolean().optional(),
 });
 
 // GET /api/artists/[id] - Get single artist
@@ -17,8 +17,30 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    const artist = await prisma.artist.findUnique({
-      where: { id: id },
+    const artist = await prisma.user.findFirst({
+      where: {
+        id: id,
+        role: "ARTIST"
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        bio: true,
+        avatarUrl: true,
+        isActive: true,
+        isApproved: true,
+        createdAt: true,
+        uploadedArtworks: {
+          orderBy: { createdAt: "desc" },
+          select: {
+            id: true,
+            title: true,
+            slug: true,
+            imageUrl: true,
+          }
+        }
+      }
     });
 
     if (!artist) {
@@ -35,8 +57,6 @@ export async function GET(
   }
 }
 
-import { getCurrentUser } from "@/lib/authorization";
-
 export async function PATCH(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -52,14 +72,23 @@ export async function PATCH(
     const body = await req.json();
     const validated = updateSchema.parse(body);
 
-    const artist = await prisma.artist.update({
+    const artist = await prisma.user.update({
       where: { id: id },
       data: {
         ...(validated.name && { name: validated.name }),
-        ...(validated.email !== undefined && { email: validated.email || null }),
-        ...(validated.phone !== undefined && { phone: validated.phone || null }),
+        ...(validated.email !== undefined && { email: validated.email }),
         ...(validated.bio !== undefined && { bio: validated.bio || null }),
+        ...(validated.isActive !== undefined && { isActive: validated.isActive }),
       },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        bio: true,
+        avatarUrl: true,
+        isActive: true,
+        isApproved: true,
+      }
     });
 
     return NextResponse.json(artist);
@@ -90,7 +119,19 @@ export async function DELETE(
 
   try {
     const { id } = await params;
-    await prisma.artist.delete({
+
+    // Check if artist exists
+    const artist = await prisma.user.findFirst({
+      where: { id: id, role: "ARTIST" }
+    });
+
+    if (!artist) {
+      return NextResponse.json({ error: "Artist not found" }, { status: 404 });
+    }
+
+    // Instead of deleting the user entirely, which might cascade and break references,
+    // we can either delete or deactivate. Let's delete the user.
+    await prisma.user.delete({
       where: { id: id },
     });
 

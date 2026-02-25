@@ -28,10 +28,10 @@ export default async function CommissionsPage({ searchParams }: Props) {
                 <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-teal-600 to-emerald-600 rounded-2xl mb-6 shadow-lg">
                     <Palette className="size-8 text-white" />
                 </div>
-                <h1 className="text-5xl md:text-6xl font-bold tracking-tight mb-4">
+                <h1 className="text-5xl md:text-6xl font-bold tracking-tight mb-4 text-gray-900 dark:text-gray-100">
                     {artistName ? `Commission ${artistName}` : "Commission Custom Art"}
                 </h1>
-                <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+                <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
                     {artistName
                         ? `Request a unique, personalized artwork from ${artistName}`
                         : "Bring your vision to life with a unique, personalized artwork created just for you"}
@@ -42,7 +42,7 @@ export default async function CommissionsPage({ searchParams }: Props) {
                 {/* Left Column - Information */}
                 <div className="space-y-8 animate-slide-in-left">
                     <div>
-                        <h2 className="text-3xl font-bold mb-6">How It Works</h2>
+                        <h2 className="text-3xl font-bold mb-6 text-gray-900 dark:text-gray-100">How It Works</h2>
                         <div className="space-y-6">
                             {/* Step 1 */}
                             <div className="flex gap-4">
@@ -52,12 +52,12 @@ export default async function CommissionsPage({ searchParams }: Props) {
                                     </div>
                                 </div>
                                 <div>
-                                    <h3 className="text-xl font-semibold mb-2 flex items-center gap-2">
-                                        <MessageSquare className="size-5 text-teal-600" />
+                                    <h3 className="text-xl font-semibold mb-2 flex items-center gap-2 text-gray-900 dark:text-gray-100">
+                                        <MessageSquare className="size-5 text-teal-600 dark:text-teal-400" />
                                         Share Your Vision
                                     </h3>
-                                    <p className="text-gray-600">
-                                        Fill out the commission request form with details about what you'd like created.
+                                    <p className="text-gray-600 dark:text-gray-400">
+                                        Fill out the commission request form with details about what you&apos;d like created.
                                         Include any reference images, preferred styles, sizes, and other specifications.
                                     </p>
                                 </div>
@@ -71,11 +71,11 @@ export default async function CommissionsPage({ searchParams }: Props) {
                                     </div>
                                 </div>
                                 <div>
-                                    <h3 className="text-xl font-semibold mb-2 flex items-center gap-2">
-                                        <Sparkles className="size-5 text-teal-600" />
+                                    <h3 className="text-xl font-semibold mb-2 flex items-center gap-2 text-gray-900 dark:text-gray-100">
+                                        <Sparkles className="size-5 text-teal-600 dark:text-teal-400" />
                                         Get a Quote
                                     </h3>
-                                    <p className="text-gray-600">
+                                    <p className="text-gray-600 dark:text-gray-400">
                                         The artist will review your request and reach out to discuss details,
                                         timeline, and provide a custom quote based on your requirements.
                                     </p>
@@ -90,13 +90,13 @@ export default async function CommissionsPage({ searchParams }: Props) {
                                     </div>
                                 </div>
                                 <div>
-                                    <h3 className="text-xl font-semibold mb-2 flex items-center gap-2">
-                                        <CheckCircle className="size-5 text-teal-600" />
+                                    <h3 className="text-xl font-semibold mb-2 flex items-center gap-2 text-gray-900 dark:text-gray-100">
+                                        <CheckCircle className="size-5 text-teal-600 dark:text-teal-400" />
                                         Receive Your Art
                                     </h3>
-                                    <p className="text-gray-600">
+                                    <p className="text-gray-600 dark:text-gray-400">
                                         Once approved and payment is confirmed, the artist will create your custom piece.
-                                        You'll receive updates throughout the process and the final artwork upon completion.
+                                        You&apos;ll receive updates throughout the process and the final artwork upon completion.
                                     </p>
                                 </div>
                             </div>
@@ -104,27 +104,27 @@ export default async function CommissionsPage({ searchParams }: Props) {
                     </div>
 
                     {/* Additional Info */}
-                    <div className="bg-gradient-to-br from-teal-50 via-emerald-50 to-cyan-50 rounded-2xl p-6 border border-teal-100">
-                        <h3 className="text-xl font-semibold mb-3 text-gray-900">What to Include</h3>
-                        <ul className="space-y-2 text-gray-700">
+                    <div className="bg-gradient-to-br from-teal-50 via-emerald-50 to-cyan-50 dark:from-teal-900/20 dark:via-emerald-900/20 dark:to-cyan-900/20 rounded-2xl p-6 border border-teal-100 dark:border-teal-800/50">
+                        <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-gray-100">What to Include</h3>
+                        <ul className="space-y-2 text-gray-700 dark:text-gray-300">
                             <li className="flex items-start gap-2">
-                                <span className="text-teal-600 mt-1">•</span>
+                                <span className="text-teal-600 dark:text-teal-400 mt-1">•</span>
                                 <span>Detailed description of what you want</span>
                             </li>
                             <li className="flex items-start gap-2">
-                                <span className="text-teal-600 mt-1">•</span>
+                                <span className="text-teal-600 dark:text-teal-400 mt-1">•</span>
                                 <span>Preferred style, colors, and mood</span>
                             </li>
                             <li className="flex items-start gap-2">
-                                <span className="text-teal-600 mt-1">•</span>
+                                <span className="text-teal-600 dark:text-teal-400 mt-1">•</span>
                                 <span>Desired size and medium</span>
                             </li>
                             <li className="flex items-start gap-2">
-                                <span className="text-teal-600 mt-1">•</span>
+                                <span className="text-teal-600 dark:text-teal-400 mt-1">•</span>
                                 <span>Reference images (if available)</span>
                             </li>
                             <li className="flex items-start gap-2">
-                                <span className="text-teal-600 mt-1">•</span>
+                                <span className="text-teal-600 dark:text-teal-400 mt-1">•</span>
                                 <span>Timeline or deadline (if applicable)</span>
                             </li>
                         </ul>
@@ -133,8 +133,8 @@ export default async function CommissionsPage({ searchParams }: Props) {
 
                 {/* Right Column - Form */}
                 <div className="animate-slide-in-right">
-                    <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8">
-                        <h2 className="text-2xl font-bold mb-6">
+                    <div className="bg-white dark:bg-[#1a1a24] rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 p-8 transition-colors">
+                        <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-gray-100">
                             {artistName ? `Request for ${artistName}` : "Request a Commission"}
                         </h2>
                         <CommissionRequestForm artistId={artistId} />
@@ -143,11 +143,11 @@ export default async function CommissionsPage({ searchParams }: Props) {
             </div>
 
             {/* CTA Section */}
-            <div className="text-center bg-gradient-to-br from-gray-50 to-gray-100 rounded-3xl p-12 animate-scale-in">
-                <h2 className="text-3xl font-bold text-gray-900 mb-4">
+            <div className="text-center bg-gradient-to-br from-gray-50 to-gray-100 dark:from-[#1a1a24] dark:to-[#1a1a24] rounded-3xl p-12 transition-colors border border-transparent dark:border-gray-800 animate-scale-in">
+                <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4">
                     Not Sure About Commissioning?
                 </h2>
-                <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
+                <p className="text-lg text-gray-600 dark:text-gray-400 mb-8 max-w-2xl mx-auto">
                     Browse our existing collection of artworks or explore curated galleries
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -160,7 +160,7 @@ export default async function CommissionsPage({ searchParams }: Props) {
                     </Link>
                     <Link
                         href="/"
-                        className="inline-flex items-center justify-center gap-2 rounded-xl border-2 border-gray-300 bg-white px-8 py-4 text-gray-900 font-semibold hover:border-teal-600 hover:text-teal-700 transition-all duration-300"
+                        className="inline-flex items-center justify-center gap-2 rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1a1a24] px-8 py-4 text-gray-900 dark:text-gray-100 font-semibold hover:border-teal-600 dark:hover:border-teal-500 hover:text-teal-700 dark:hover:text-teal-400 transition-all duration-300"
                     >
                         Browse All Artworks
                     </Link>

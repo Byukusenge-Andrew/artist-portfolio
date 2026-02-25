@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import Link from "next/link";
+import Image from "next/image";
 import { Palette, Package, ShoppingCart, User, Upload, TrendingUp, MessageSquare } from "lucide-react";
 
 import { parseUserSession } from "@/lib/auth";
@@ -62,6 +63,19 @@ export default async function ArtistDashboard() {
         where: { artistId: user.userId },
         orderBy: { createdAt: "desc" },
         take: 5,
+    });
+
+    const recentArtworks = await prisma.artwork.findMany({
+        where: artworkWhere,
+        take: 4,
+        orderBy: { createdAt: "desc" },
+        select: {
+            id: true,
+            title: true,
+            slug: true,
+            imageUrl: true,
+            originalPriceCents: true,
+        }
     });
 
     const formatPrice = (price: number) => {
@@ -222,6 +236,50 @@ export default async function ArtistDashboard() {
                             </tbody>
                         </table>
                     </div>
+                </div>
+
+                {/* Recent Artworks */}
+                <div className="bg-white dark:bg-[#1a1a24] rounded-lg border border-gray-200 dark:border-gray-700 mb-12 transition-colors">
+                    <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+                        <div className="flex items-center gap-2">
+                            <Palette className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                            <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Recent Artworks</h2>
+                        </div>
+                        <Link href="/admin/artworks" className="text-sm text-purple-600 dark:text-purple-400 font-medium hover:underline">
+                            View All
+                        </Link>
+                    </div>
+                    {recentArtworks.length === 0 ? (
+                        <div className="px-6 py-8 text-center text-gray-600 dark:text-gray-400">
+                            You haven&apos;t uploaded any artworks yet.
+                        </div>
+                    ) : (
+                        <div className="p-6 grid grid-cols-2 sm:grid-cols-4 gap-4">
+                            {recentArtworks.map((artwork: any) => (
+                                <Link
+                                    key={artwork.id}
+                                    href={`/site/artworks/${artwork.slug}`}
+                                    className="group relative aspect-square rounded-lg overflow-hidden border border-gray-200 dark:border-gray-800 hover:border-purple-500 transition-colors block"
+                                >
+                                    <div className="absolute inset-0">
+                                        <Image
+                                            src={artwork.imageUrl}
+                                            alt={artwork.title}
+                                            fill
+                                            className="object-cover group-hover:scale-105 transition-transform duration-300"
+                                            sizes="(max-width: 768px) 50vw, 25vw"
+                                        />
+                                    </div>
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-3">
+                                        <p className="text-white font-medium truncate text-sm">{artwork.title}</p>
+                                        <p className="text-white/80 text-xs mt-1">
+                                            {formatPrice((artwork.originalPriceCents || 0) / 100)}
+                                        </p>
+                                    </div>
+                                </Link>
+                            ))}
+                        </div>
+                    )}
                 </div>
 
                 {/* Recent Orders */}
