@@ -46,6 +46,8 @@ export default async function ArtistProfilePage({ params }: Props) {
         ? !!(await prisma.like.findFirst({ where: { artistId: artist.id, userId: currentUser.userId } }))
         : false;
 
+    const isOwnProfile = currentUser?.userId === artist.id;
+
     return (
         <div className="min-h-screen bg-[#f5f5f0] dark:bg-[#0f0f12] transition-colors">
             {/* Hero Section / Header */}
@@ -69,6 +71,7 @@ export default async function ArtistProfilePage({ params }: Props) {
                                     src={artist.avatarUrl}
                                     alt={artist.name || "Artist"}
                                     fill
+                                    sizes="192px"
                                     className="object-cover"
                                 />
                             ) : (
@@ -100,24 +103,41 @@ export default async function ArtistProfilePage({ params }: Props) {
                                         initialIsLiked={isLiked}
                                     />
                                 </div>
-                                {/* Email is kept private usually, but if public profile implies contact: */}
-                                <div className="flex items-center gap-2 px-4 py-2 bg-gray-50 dark:bg-gray-800/50 rounded-full border border-gray-100 dark:border-gray-700/50 transition-colors">
-                                    <Mail className="w-4 h-4 text-teal-600 dark:text-teal-400" />
-                                    <span>Contact via Commission</span>
-                                </div>
+                                {/* Commission link pill — only for other users */}
+                                {!isOwnProfile && (
+                                    <Link
+                                        href={`/site/commissions?artistId=${artist.id}`}
+                                        className="flex items-center gap-2 px-4 py-2 bg-gray-50 dark:bg-gray-800/50 rounded-full border border-gray-100 dark:border-gray-700/50 hover:border-teal-400 dark:hover:border-teal-600 transition-colors"
+                                    >
+                                        <Mail className="w-4 h-4 text-teal-600 dark:text-teal-400" />
+                                        <span>Contact via Commission</span>
+                                    </Link>
+                                )}
                             </div>
                         </div>
 
-                        {/* CTA */}
-                        <div className="flex-shrink-0">
-                            <Link
-                                href={`/site/commissions?artistId=${artist.id}`}
-                                className="inline-flex items-center justify-center gap-2 bg-gray-900 dark:bg-teal-600 text-white px-8 py-4 rounded-xl font-semibold hover:bg-gray-800 dark:hover:bg-teal-700 transition-all shadow-lg hover:shadow-xl hover:scale-105"
-                            >
-                                <Palette className="w-5 h-5" />
-                                Request Commission
-                            </Link>
-                        </div>
+                        {/* CTA — only show if not viewing own profile */}
+                        {isOwnProfile ? (
+                            <div className="flex-shrink-0">
+                                <Link
+                                    href="/artist/profile"
+                                    className="inline-flex items-center justify-center gap-2 bg-purple-600 hover:bg-purple-700 text-white px-8 py-4 rounded-xl font-semibold transition-all shadow-lg hover:shadow-xl hover:scale-105"
+                                >
+                                    <User className="w-5 h-5" />
+                                    Edit My Profile
+                                </Link>
+                            </div>
+                        ) : (
+                            <div className="flex-shrink-0">
+                                <Link
+                                    href={`/site/commissions?artistId=${artist.id}`}
+                                    className="inline-flex items-center justify-center gap-2 bg-gray-900 dark:bg-teal-600 text-white px-8 py-4 rounded-xl font-semibold hover:bg-gray-800 dark:hover:bg-teal-700 transition-all shadow-lg hover:shadow-xl hover:scale-105"
+                                >
+                                    <Palette className="w-5 h-5" />
+                                    Request Commission
+                                </Link>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

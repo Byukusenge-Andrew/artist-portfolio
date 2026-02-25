@@ -6,18 +6,20 @@ export async function POST(req: NextRequest) {
   try {
     const user = await getCurrentUser(req);
 
-    // Allow both ADMIN and ARTIST roles to upload
-    if (!user || (user.role !== "ADMIN" && user.role !== "ARTIST")) {
+    // Allow all authenticated users to upload avatars;
+    // only ADMIN and ARTIST can upload to other buckets (e.g. artworks)
+    const formData = await req.formData();
+    const bucket = formData.get("bucket") as string || "artworks";
+
+    const isAvatarBucket = bucket === "avatars";
+    if (!user || (!isAvatarBucket && user.role !== "ADMIN" && user.role !== "ARTIST")) {
       return NextResponse.json(
         { error: "Unauthorized. Admin or Artist access required." },
         { status: 403 }
       );
     }
 
-    // Parse form data
-    const formData = await req.formData();
     const file = formData.get("file") as File;
-    const bucket = formData.get("bucket") as string || "artworks";
 
     if (!file) {
       return NextResponse.json(

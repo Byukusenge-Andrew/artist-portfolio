@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { usePathname } from "next/navigation";
 
 type FavoritesContextType = {
   favorites: string[];
@@ -11,6 +12,7 @@ type FavoritesContextType = {
   clearAllFavorites: () => void;
   isAuthenticated: boolean;
   isLoading: boolean;
+  hasUnseenFavorites: boolean;
 };
 
 const FavoritesContext = createContext<FavoritesContextType | undefined>(undefined);
@@ -20,12 +22,26 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
   const [mounted, setMounted] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [hasUnseenFavorites, setHasUnseenFavorites] = useState(false);
 
-  // Check authentication and load favorites on mount
+  // Initial load
   useEffect(() => {
     setMounted(true);
     checkAuthAndLoadFavorites();
   }, []);
+
+  // Re-sync favorites when navigating between pages
+  const pathname = usePathname();
+  useEffect(() => {
+    if (mounted) {
+      checkAuthAndLoadFavorites();
+    }
+    // When user visits favorites page, mark all as seen
+    if (pathname === "/user/favorites") {
+      setHasUnseenFavorites(false);
+      localStorage.setItem("favoritesLastSeenCount", String(favorites.length));
+    }
+  }, [pathname]); // eslint-disable-line react-hooks/exhaustive-deps
 
   async function checkAuthAndLoadFavorites() {
     try {
@@ -102,6 +118,9 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
 
       const data = await res.json();
       setFavorites(data.favorites);
+      // Mark as unseen so badge shows until user visits favorites page
+      setHasUnseenFavorites(true);
+      localStorage.setItem("favoritesLastSeenCount", String((data.favorites.length - 1) || 0));
     } catch (error) {
       console.error("Error adding favorite:", error);
       // Revert optimistic update
@@ -165,6 +184,7 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
         clearAllFavorites,
         isAuthenticated,
         isLoading,
+        hasUnseenFavorites,
       }}
     >
       {children}

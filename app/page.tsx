@@ -204,6 +204,7 @@ export default async function Home() {
                 key={a.id}
                 title={a.title}
                 author={a.uploader?.name || "Featured Artist"}
+                avatarUrl={a.uploader?.avatarUrl}
                 imageUrl={a.imageUrl}
                 likesCount={a._count.likes}
                 commentsCount={a._count.comments}

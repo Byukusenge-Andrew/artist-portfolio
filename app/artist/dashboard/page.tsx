@@ -78,6 +78,11 @@ export default async function ArtistDashboard() {
         }
     });
 
+    const artistProfile = await prisma.user.findUnique({
+        where: { id: user.userId },
+        select: { avatarUrl: true, name: true },
+    });
+
     const formatPrice = (price: number) => {
         return new Intl.NumberFormat("en-US", {
             style: "currency",
@@ -98,13 +103,32 @@ export default async function ArtistDashboard() {
             {/* Main Content */}
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
                 {/* Welcome Section */}
-                <div className="mb-12">
-                    <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">
-                        Welcome back, {user.name}!
-                    </h2>
-                    <p className="text-gray-600 dark:text-gray-400">
-                        Manage your artworks, track sales, and grow your portfolio
-                    </p>
+                <div className="mb-12 flex items-center gap-5">
+                    {/* Artist Avatar */}
+                    <div className="relative w-16 h-16 rounded-full overflow-hidden border-2 border-purple-200 dark:border-purple-700 bg-gray-100 dark:bg-gray-800 flex-shrink-0 shadow-md">
+                        {artistProfile?.avatarUrl ? (
+                            <Image
+                                src={artistProfile.avatarUrl}
+                                alt={user.name || "Artist"}
+                                fill
+                                className="object-cover"
+                            />
+                        ) : (
+                            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-purple-600 to-pink-600">
+                                <span className="text-xl font-bold text-white">
+                                    {(user.name || "A")[0].toUpperCase()}
+                                </span>
+                            </div>
+                        )}
+                    </div>
+                    <div>
+                        <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-1">
+                            Welcome back, {user.name}!
+                        </h2>
+                        <p className="text-gray-600 dark:text-gray-400">
+                            Manage your artworks, track sales, and grow your portfolio
+                        </p>
+                    </div>
                 </div>
 
                 {/* Stats Grid */}
@@ -264,7 +288,7 @@ export default async function ArtistDashboard() {
                             {recentArtworks.map((artwork: any) => (
                                 <Link
                                     key={artwork.id}
-                                    href={`/site/artworks/${artwork.slug}`}
+                                    href={`/site/${artwork.slug}`}
                                     className="group relative aspect-square rounded-lg overflow-hidden border border-gray-200 dark:border-gray-800 hover:border-purple-500 transition-colors block"
                                 >
                                     <div className="absolute inset-0">

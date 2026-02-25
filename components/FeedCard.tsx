@@ -4,27 +4,30 @@ import { Heart, MessageCircle, MoreHorizontal, Play } from "lucide-react";
 type Props = {
   title: string;
   author: string;
+  avatarUrl?: string | null;
   imageUrl?: string | null;
   isVideo?: boolean;
   likesCount?: number;
   commentsCount?: number;
 };
 
-export default function FeedCard({ title, author, imageUrl, isVideo, likesCount = 0, commentsCount = 0 }: Props) {
+export default function FeedCard({ title, author, avatarUrl, imageUrl, isVideo, likesCount = 0, commentsCount = 0 }: Props) {
   return (
     <article className="rounded-2xl border dark:border-gray-700/40 bg-white/70 dark:bg-[#1a1a24]/70 backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:supports-[backdrop-filter]:bg-[#1a1a24]/60 overflow-hidden transition-colors">
       <header className="flex items-center justify-between p-3">
         <div className="flex items-center gap-3">
-          {imageUrl ? (
+          {avatarUrl ? (
             <Image
-              src={imageUrl}
+              src={avatarUrl}
               alt={author}
               width={36}
               height={36}
-              className="rounded-full object-cover"
+              className="rounded-full object-cover w-9 h-9 flex-shrink-0"
             />
           ) : (
-            <div className="size-9 rounded-full bg-gray-100 dark:bg-gray-800 border dark:border-gray-700" />
+            <div className="size-9 rounded-full bg-gradient-to-br from-teal-500 to-emerald-600 flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
+              {(author || "A")[0].toUpperCase()}
+            </div>
           )}
           <div>
             <div className="text-sm font-medium text-gray-800 dark:text-gray-200">{title}</div>

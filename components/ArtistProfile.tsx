@@ -25,6 +25,7 @@ export default function ArtistProfile({ artist }: ArtistProfileProps) {
                                 src={artist.avatarUrl}
                                 alt={artist.name}
                                 fill
+                                sizes="64px"
                                 className="object-cover"
                             />
                         ) : (

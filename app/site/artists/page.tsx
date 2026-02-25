@@ -107,7 +107,7 @@ export default async function ArtistsPage() {
                                             {artist.uploadedArtworks.map((artwork) => (
                                                 <Link
                                                     key={artwork.id}
-                                                    href={`/site/artworks/${artwork.slug}`}
+                                                    href={`/site/${artwork.slug}`}
                                                     className="group relative aspect-square bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden block"
                                                 >
                                                     <Image

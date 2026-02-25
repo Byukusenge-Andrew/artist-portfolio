@@ -1,7 +1,9 @@
-import { prisma } from "@/lib/prisma"; // Make sure to import prisma if not already available globally or imported
+import { prisma } from "@/lib/prisma";
 import CommissionRequestForm from "@/components/CommissionRequestForm";
-import { Palette, CheckCircle, MessageSquare, Sparkles } from "lucide-react";
+import { Palette, CheckCircle, MessageSquare, Sparkles, Clock, ArrowRight, XCircle, FileText } from "lucide-react";
 import Link from "next/link";
+import { cookies } from "next/headers";
+import { parseUserSession } from "@/lib/auth";
 
 interface Props {
     searchParams: Promise<{
@@ -12,6 +14,12 @@ interface Props {
 export default async function CommissionsPage({ searchParams }: Props) {
     const { artistId } = await searchParams;
 
+    // Get current user (if logged in)
+    const cookieStore = await cookies();
+    const userSession = cookieStore.get("user_session")?.value;
+    const currentUser = userSession ? await parseUserSession(userSession) : null;
+
+    // Fetch the target artist name if artistId is provided
     let artistName = "";
     if (artistId) {
         const artist = await prisma.user.findUnique({
@@ -21,10 +29,52 @@ export default async function CommissionsPage({ searchParams }: Props) {
         if (artist) artistName = artist.name || "the Artist";
     }
 
+    // Fetch past commissions for logged-in users (matched by email)
+    let pastCommissions: {
+        id: string;
+        name: string;
+        details: string;
+        status: string;
+        createdAt: Date;
+        artist: { name: string | null } | null;
+    }[] = [];
+
+    if (currentUser?.email) {
+        pastCommissions = await prisma.commissionRequest.findMany({
+            where: { email: currentUser.email },
+            orderBy: { createdAt: "desc" },
+            select: {
+                id: true,
+                name: true,
+                details: true,
+                status: true,
+                createdAt: true,
+                artist: { select: { name: true } },
+            }
+        });
+    }
+
+    const getStatusBadge = (status: string) => {
+        switch (status) {
+            case "NEW":
+                return { label: "New", color: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400", icon: Clock };
+            case "IN_REVIEW":
+                return { label: "In Review", color: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400", icon: MessageSquare };
+            case "INVOICE_SENT":
+                return { label: "Invoice Sent", color: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400", icon: FileText };
+            case "PAID":
+                return { label: "Paid", color: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400", icon: CheckCircle };
+            case "REJECTED":
+                return { label: "Rejected", color: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400", icon: XCircle };
+            default:
+                return { label: status, color: "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300", icon: Clock };
+        }
+    };
+
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12">
             {/* Hero Section */}
-            <div className="text-center mb-16 animate-fade-in">
+            <div className="text-center mb-16">
                 <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-teal-600 to-emerald-600 rounded-2xl mb-6 shadow-lg">
                     <Palette className="size-8 text-white" />
                 </div>
@@ -38,9 +88,60 @@ export default async function CommissionsPage({ searchParams }: Props) {
                 </p>
             </div>
 
+            {/* Past Commissions — shown when user is logged in and has made commissions */}
+            {pastCommissions.length > 0 && (
+                <div className="mb-14">
+                    <div className="flex items-center justify-between mb-5">
+                        <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2">
+                            <MessageSquare className="h-6 w-6 text-teal-600 dark:text-teal-400" />
+                            Your Commission Requests
+                        </h2>
+                    </div>
+                    <div className="space-y-3">
+                        {pastCommissions.map((commission) => {
+                            const badge = getStatusBadge(commission.status);
+                            const BadgeIcon = badge.icon;
+                            return (
+                                <Link
+                                    key={commission.id}
+                                    href={`/user/commissions/${commission.id}`}
+                                    className="flex items-center justify-between p-4 bg-white dark:bg-[#1a1a24] rounded-xl border border-gray-200 dark:border-gray-700 hover:border-teal-400 dark:hover:border-teal-600 hover:shadow-md transition-all group"
+                                >
+                                    <div className="flex-1 min-w-0 pr-4">
+                                        <div className="flex items-center gap-2 mb-1">
+                                            <p className="font-semibold text-gray-900 dark:text-gray-100 text-sm truncate">
+                                                For {commission.artist?.name || "Unassigned Artist"}
+                                            </p>
+                                            <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${badge.color}`}>
+                                                <BadgeIcon className="w-3 h-3" />
+                                                {badge.label}
+                                            </span>
+                                        </div>
+                                        <p className="text-sm text-gray-500 dark:text-gray-400 truncate">{commission.details}</p>
+                                        <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                                            {new Date(commission.createdAt).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })}
+                                        </p>
+                                    </div>
+                                    <ArrowRight className="h-4 w-4 text-gray-400 group-hover:text-teal-600 dark:group-hover:text-teal-400 flex-shrink-0 transition-colors" />
+                                </Link>
+                            );
+                        })}
+                    </div>
+
+                    <div className="mt-8 border-t border-gray-200 dark:border-gray-800 pt-8">
+                        <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+                            {artistName ? `Submit Another Request to ${artistName}` : "Submit a New Commission Request"}
+                        </h3>
+                        <p className="text-gray-500 dark:text-gray-400 text-sm mb-6">
+                            You can have multiple commissions open at a time.
+                        </p>
+                    </div>
+                </div>
+            )}
+
             <div className="grid lg:grid-cols-2 gap-12 mb-16">
                 {/* Left Column - Information */}
-                <div className="space-y-8 animate-slide-in-left">
+                <div className="space-y-8">
                     <div>
                         <h2 className="text-3xl font-bold mb-6 text-gray-900 dark:text-gray-100">How It Works</h2>
                         <div className="space-y-6">
@@ -132,7 +233,7 @@ export default async function CommissionsPage({ searchParams }: Props) {
                 </div>
 
                 {/* Right Column - Form */}
-                <div className="animate-slide-in-right">
+                <div>
                     <div className="bg-white dark:bg-[#1a1a24] rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 p-8 transition-colors">
                         <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-gray-100">
                             {artistName ? `Request for ${artistName}` : "Request a Commission"}
@@ -143,7 +244,7 @@ export default async function CommissionsPage({ searchParams }: Props) {
             </div>
 
             {/* CTA Section */}
-            <div className="text-center bg-gradient-to-br from-gray-50 to-gray-100 dark:from-[#1a1a24] dark:to-[#1a1a24] rounded-3xl p-12 transition-colors border border-transparent dark:border-gray-800 animate-scale-in">
+            <div className="text-center bg-gradient-to-br from-gray-50 to-gray-100 dark:from-[#1a1a24] dark:to-[#1a1a24] rounded-3xl p-12 transition-colors border border-transparent dark:border-gray-800">
                 <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4">
                     Not Sure About Commissioning?
                 </h2>

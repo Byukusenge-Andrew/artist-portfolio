@@ -181,7 +181,7 @@ export default function CommissionMessages({
                                     {isFirstOfGroup ? (
                                         <div className="flex-shrink-0 relative w-8 h-8 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700 border border-gray-300 dark:border-gray-600">
                                             {msg.sender.avatarUrl ? (
-                                                <Image src={msg.sender.avatarUrl} alt={msg.sender.name || "User"} fill className="object-cover" />
+                                                <Image src={msg.sender.avatarUrl} alt={msg.sender.name || "User"} fill sizes="40px" className="object-cover" />
                                             ) : (
                                                 <UserIcon className="w-4 h-4 text-gray-500 dark:text-gray-400 m-auto mt-2" />
                                             )}

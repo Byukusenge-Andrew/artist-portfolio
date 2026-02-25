@@ -16,9 +16,7 @@ async function getCurrentUser() {
     const user = await parseUserSession(userSession);
     if (!user) redirect("/auth/login");
 
-    // Only users/buyers can view this page
-    if (user.role === "ARTIST") redirect("/artist/dashboard");
-
+    // Artists and users can both view commissions they submitted
     return user;
 }
 
@@ -40,7 +38,9 @@ export default async function UserCommissionPage(props: { params: Promise<{ id: 
     });
 
     if (!commission || commission.email !== user.email) {
-        redirect("/user/dashboard");
+        // Also allow when the user is the assigned artist viewing their own commission
+        // (but that case is handled in the artist detail page)
+        redirect(user.role === "ARTIST" ? "/artist/dashboard" : "/user/dashboard");
     }
 
     const formatDate = (date: Date) => {
@@ -91,7 +91,7 @@ export default async function UserCommissionPage(props: { params: Promise<{ id: 
                 {/* Header */}
                 <div className="mb-8">
                     <Link
-                        href="/user/dashboard"
+                        href={user.role === "ARTIST" ? "/artist/dashboard" : "/user/dashboard"}
                         className="inline-flex items-center gap-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors mb-4"
                     >
                         <ArrowLeft className="w-4 h-4" />

@@ -6,7 +6,8 @@ import { getCurrentUser } from "@/lib/authorization";
 const profileSchema = z.object({
     name: z.string().min(2, "Name must be at least 2 characters").max(50, "Name is too long"),
     bio: z.string().max(500, "Bio max length is 500 characters").optional().nullable(),
-    avatarUrl: z.string().url("Must be a valid URL").optional().nullable(),
+    // Accept both full https:// URLs (Supabase) and relative /uploads/ paths (local fallback)
+    avatarUrl: z.string().min(1).optional().nullable(),
 });
 
 export async function GET(req: Request) {

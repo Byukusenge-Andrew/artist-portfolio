@@ -5,7 +5,7 @@ import { Heart } from "lucide-react";
 import { useFavorites } from "@/contexts/FavoritesContext";
 
 export default function FavoritesButton() {
-  const { favorites, isAuthenticated, isLoading } = useFavorites();
+  const { favorites, isAuthenticated, isLoading, hasUnseenFavorites } = useFavorites();
 
   // If not authenticated, redirect to login
   const href = isAuthenticated ? "/user/favorites" : "/auth/login?redirect=/user/favorites";
@@ -19,7 +19,8 @@ export default function FavoritesButton() {
     >
       <Heart className="size-4 group-hover:scale-110 group-hover:fill-red-400 group-hover:text-red-400 transition-all" />
       <span className="hidden sm:inline font-medium">Favorites</span>
-      {!isLoading && isAuthenticated && favorites.length > 0 && (
+      {/* Badge: only shown for unseen (newly added) favorites, clears on page visit */}
+      {!isLoading && isAuthenticated && hasUnseenFavorites && favorites.length > 0 && (
         <span className="absolute -top-1 -right-1 flex items-center justify-center min-w-[20px] h-5 px-1.5 text-xs font-bold text-white bg-gradient-to-r from-red-500 to-pink-600 rounded-full shadow-lg animate-scale-in">
           {favorites.length}
         </span>

@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { User, Mail, Camera, Save, ArrowLeft, Loader2, Image as ImageIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { CloudinaryUpload } from "@/components/CloudinaryUpload";
+import { SupabaseUpload } from "@/components/SupabaseUpload";
 
 export default function EditProfilePage() {
     const router = useRouter();
@@ -62,11 +62,28 @@ export default function EditProfilePage() {
         }
     };
 
-    const handleUploadSuccess = (result: { url: string }) => {
-        setFormData((prev) => ({
-            ...prev,
-            avatarUrl: result.url,
-        }));
+    const handleUploadSuccess = async (result: { url: string }) => {
+        const newUrl = result.url;
+        setFormData((prev) => ({ ...prev, avatarUrl: newUrl }));
+
+        // Auto-save the avatar immediately so it persists on reload
+        try {
+            const res = await fetch("/api/user/profile", {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    name: formData.name,
+                    bio: formData.bio,
+                    avatarUrl: newUrl,
+                }),
+            });
+            if (res.ok) {
+                setSuccess("Profile picture updated!");
+                setTimeout(() => setSuccess(""), 3000);
+            }
+        } catch {
+            // Silent — the image URL is already in the form, user can still Save manually
+        }
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -166,12 +183,13 @@ export default function EditProfilePage() {
                                     </div>
 
                                     <div>
-                                        <CloudinaryUpload
+                                        <SupabaseUpload
                                             onUploaded={(res) => handleUploadSuccess(res)}
                                             label="Change Picture"
+                                            bucket="avatars"
                                         />
                                         <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
-                                            JPG, GIF or PNG. 1MB max.
+                                            JPG, GIF or PNG. Max 10MB.
                                         </p>
                                     </div>
                                 </div>
