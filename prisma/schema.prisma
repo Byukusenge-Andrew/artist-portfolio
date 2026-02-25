@@ -118,9 +118,23 @@ model CommissionRequest {
   updatedAt              DateTime         @updatedAt
   artistId               String?
   artist                 User?            @relation("ArtistCommissions", fields: [artistId], references: [id])
+  messages               CommissionMessage[]
 
   @@index([email, createdAt])
   @@index([artistId])
+}
+
+model CommissionMessage {
+  id                  String             @id @default(cuid())
+  content             String             @db.Text
+  createdAt           DateTime           @default(now())
+  commissionRequestId String
+  commissionRequest   CommissionRequest  @relation(fields: [commissionRequestId], references: [id], onDelete: Cascade)
+  senderId            String
+  sender              User               @relation("UserCommissionMessages", fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@index([commissionRequestId])
+  @@index([senderId])
 }
 
 model Artist {
@@ -158,6 +172,7 @@ model User {
   orders           Order[]   @relation("UserOrders")
   uploadedArtworks Artwork[] @relation("UserArtworks")
   commissions      CommissionRequest[] @relation("ArtistCommissions")
+  commissionMessages CommissionMessage[] @relation("UserCommissionMessages")
   
   comments         Comment[] @relation("UserComments")
   likes            Like[]    @relation("UserLikes")

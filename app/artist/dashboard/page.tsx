@@ -172,7 +172,7 @@ export default async function ArtistDashboard() {
                     </Link>
 
                     <Link
-                        href="#"
+                        href="/artist/profile"
                         className="bg-white dark:bg-[#1a1a24] p-6 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-purple-500 dark:hover:border-purple-500 hover:shadow-lg transition-all group"
                     >
                         <User className="h-8 w-8 text-purple-600 dark:text-purple-400 mb-3 group-hover:scale-110 transition-transform" />
@@ -193,7 +193,9 @@ export default async function ArtistDashboard() {
                             <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Direct Commissions</h2>
                         </div>
                         {/* Could link to a full commissions page if needed */}
-                        <span className="text-sm text-gray-500 dark:text-gray-400">Recent Requests</span>
+                        <Link href="/admin/commissions" className="text-sm text-purple-600 dark:text-purple-400 font-medium hover:underline">
+                            View All
+                        </Link>
                     </div>
                     <div className="overflow-x-auto">
                         <table className="w-full">
@@ -216,7 +218,11 @@ export default async function ArtistDashboard() {
                                 ) : (
                                     commissions.map((c) => (
                                         <tr key={c.id} className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-[#141418] transition-colors">
-                                            <td className="px-6 py-4 text-sm font-medium text-gray-900 dark:text-gray-100">{c.name}</td>
+                                            <td className="px-6 py-4 text-sm font-medium text-gray-900 dark:text-gray-100">
+                                                <Link href={`/artist/commissions/${c.id}`} className="hover:text-purple-600 transition-colors">
+                                                    {c.name}
+                                                </Link>
+                                            </td>
                                             <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">{c.email}</td>
                                             <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400 max-w-xs truncate" title={c.details}>
                                                 {c.details}

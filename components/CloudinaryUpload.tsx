@@ -1,6 +1,5 @@
 "use client";
 import { CldUploadWidget } from "next-cloudinary";
-import { useMemo } from "react";
 
 type Props = {
   onUploaded: (args: { publicId: string; url: string; width?: number; height?: number }) => void;
@@ -8,9 +7,9 @@ type Props = {
 };
 
 export function CloudinaryUpload({ onUploaded, label = "Upload image" }: Props) {
-  const cloudName = useMemo(() => process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME, []);
-  const apiKey = useMemo(() => process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY, []);
-  const unsignedPreset = useMemo(() => process.env.NEXT_PUBLIC_CLOUDINARY_UNSIGNED_PRESET, []);
+  const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+  const apiKey = process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY;
+  const unsignedPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UNSIGNED_PRESET || "artist_portfolio";
 
   if (!cloudName || !apiKey) {
     return (
