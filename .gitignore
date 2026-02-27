@@ -46,3 +46,13 @@ yarn-error.log*
 next-env.d.ts
 
 /app/generated/prisma
+
+# Internal/sensitive documentation (do not expose publicly)
+AUTH_SYSTEM.md
+AUTH_CHECK_DIAGNOSTIC.md
+ARCHITECTURE.md
+RLS_FIX_CHECKLIST.md
+SERVER_UPLOAD_SETUP.md
+SSL_SETUP_GUIDE.md
+SUPABASE_SETUP.md
+UPLOAD_QUICKSTART.md
