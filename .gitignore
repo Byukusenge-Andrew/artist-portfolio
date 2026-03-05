@@ -57,3 +57,4 @@ SSL_SETUP_GUIDE.md
 SUPABASE_SETUP.md
 UPLOAD_QUICKSTART.md
 supabase-storage-policies.sql
+debug.js

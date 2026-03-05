@@ -119,7 +119,7 @@ export default async function Header() {
               {!(isAdmin || isArtist) && <div className="h-6 w-px bg-gray-300 dark:bg-gray-600 mx-1 sm:mx-2 hidden sm:block" />}
 
               <Link
-                href={isAdmin ? "/admin/dashboard" : isArtist ? "/artist/dashboard" : "/user/dashboard"}
+                href={isAdmin ? "/admin/dashboard" : isArtist ? "/artist/profile" : "/user/dashboard"}
                 className="group inline-flex items-center gap-2 rounded-lg px-2 lg:px-3 py-2 text-gray-700 dark:text-gray-300 hover:text-teal-800 dark:hover:text-teal-400 hover:bg-gradient-to-br hover:from-teal-50 hover:to-emerald-50 dark:hover:from-teal-900/30 dark:hover:to-emerald-900/30 transition-all duration-300"
               >
                 <User className="size-4 group-hover:scale-110 transition-transform" />

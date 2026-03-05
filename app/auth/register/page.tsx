@@ -73,7 +73,7 @@ function RegisterForm() {
       subtitle="Join Artelier to explore & collect art"
     >
       {error && (
-        <div className="mb-6 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 p-4 flex gap-3">
+        <div className="mb-6 mt-2 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 p-4 flex gap-3">
           <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
           <p className="text-sm text-red-700 dark:text-red-400">{error}</p>
         </div>

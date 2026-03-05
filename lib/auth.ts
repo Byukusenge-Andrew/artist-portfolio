@@ -1,4 +1,5 @@
 import bcrypt from "bcryptjs";
+import crypto from "crypto";
 import { signToken, verifyToken, JWTPayload } from "./jwt";
 
 // Re-export password utilities for backward compatibility
@@ -32,6 +33,7 @@ export async function verifyPassword(password: string, hash: string): Promise<bo
  * Generate secure random token for password reset
  */
 export function generateResetToken(): string {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const crypto = require("crypto");
   return crypto.randomBytes(32).toString("hex");
 }
