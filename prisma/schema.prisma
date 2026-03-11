@@ -187,6 +187,7 @@ model User {
 enum OrderStatus {
   PENDING
   PAID
+  PENDING_DELIVERY
   FULFILLED
   CANCELED
 }

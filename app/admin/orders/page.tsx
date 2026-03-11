@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
-import { Eye, CheckCircle, Clock, XCircle, Package } from "lucide-react";
+import { CheckCircle, Clock, XCircle, Package, Truck, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
 type OrderItem = {
   id: string;
@@ -15,7 +16,7 @@ type Order = {
   id: string;
   email: string;
   customerName?: string;
-  status: "PENDING" | "PAID" | "FULFILLED" | "CANCELED";
+  status: "PENDING" | "PAID" | "PENDING_DELIVERY" | "FULFILLED" | "CANCELED";
   currency: string;
   totalCents: number;
   createdAt: string;
@@ -26,6 +27,7 @@ type Order = {
 const statusConfig: Record<Order["status"], { label: string; color: string; icon: any }> = {
   PENDING: { label: "Pending", color: "bg-yellow-100 text-yellow-800 border-yellow-300 dark:bg-yellow-900/30 dark:text-yellow-400 dark:border-yellow-800/50", icon: Clock },
   PAID: { label: "Paid", color: "bg-blue-100 text-blue-800 border-blue-300 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800/50", icon: CheckCircle },
+  PENDING_DELIVERY: { label: "Shipped", color: "bg-orange-100 text-orange-800 border-orange-300 dark:bg-orange-900/30 dark:text-orange-400 dark:border-orange-800/50", icon: Package },
   FULFILLED: { label: "Fulfilled", color: "bg-green-100 text-green-800 border-green-300 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800/50", icon: Package },
   CANCELED: { label: "Canceled", color: "bg-red-100 text-red-800 border-red-300 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800/50", icon: XCircle },
 };
@@ -35,9 +37,16 @@ export default function OrdersAdminPage() {
   const [loading, setLoading] = useState(true);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [filterStatus, setFilterStatus] = useState<Order["status"] | "ALL">("ALL");
+  const [userRole, setUserRole] = useState<"ADMIN" | "ARTIST" | "USER" | null>(null);
+  const [updatingId, setUpdatingId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchOrders();
+    // Fetch current user role
+    fetch("/api/auth/session")
+      .then(r => r.json())
+      .then(d => setUserRole(d?.user?.role ?? null))
+      .catch(() => {});
   }, []);
 
   async function fetchOrders() {
@@ -56,16 +65,23 @@ export default function OrdersAdminPage() {
   }
 
   async function updateStatus(id: string, status: Order["status"]) {
+    setUpdatingId(id);
     try {
       const res = await fetch(`/api/orders/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status }),
       });
-      if (!res.ok) throw new Error("Failed to update");
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || "Failed to update");
+      }
+      toast.success("Order status updated");
       await fetchOrders();
     } catch (error) {
-      alert(error instanceof Error ? error.message : "Failed to update");
+      toast.error(error instanceof Error ? error.message : "Failed to update order");
+    } finally {
+      setUpdatingId(null);
     }
   }
 
@@ -86,16 +102,17 @@ export default function OrdersAdminPage() {
 
       {/* Filter */}
       <div className="mb-6 flex gap-2 flex-wrap">
-        {(["ALL", "PENDING", "PAID", "FULFILLED", "CANCELED"] as const).map((status) => (
+        {(["ALL", "PENDING", "PAID", "PENDING_DELIVERY", "FULFILLED", "CANCELED"] as const).map((status) => (
           <button
             key={status}
-            onClick={() => setFilterStatus(status)}
-            className={`px-4 py-2 rounded-lg font-medium transition-all ${filterStatus === status
-              ? "bg-teal-600 text-white"
-              : "bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
-              }`}
+            onClick={() => setFilterStatus(status as any)}
+            className={`px-4 py-2 rounded-lg font-medium transition-all ${
+              filterStatus === status
+                ? "bg-teal-600 text-white"
+                : "bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+            }`}
           >
-            {status === "ALL" ? "All" : statusConfig[status].label}
+            {status === "ALL" ? "All" : status === "PENDING_DELIVERY" ? "Shipped" : statusConfig[status as Order["status"]].label}
           </button>
         ))}
       </div>
@@ -218,22 +235,60 @@ export default function OrdersAdminPage() {
               </div>
 
               {/* Status Update */}
-              <div className="space-y-2">
-                <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Status</p>
-                <div className="grid grid-cols-2 gap-2">
-                  {Object.entries(statusConfig).map(([status, config]) => (
-                    <button
-                      key={status}
-                      onClick={() => updateStatus(selectedOrder.id, status as Order["status"])}
-                      className={`px-2 py-2 rounded text-xs font-semibold transition-all ${selectedOrder.status === status
-                        ? `${config.color} border`
-                        : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-[#141418] dark:text-gray-300 dark:hover:bg-gray-800 dark:border-gray-700 border"
-                        }`}
-                    >
-                      {config.label}
-                    </button>
-                  ))}
-                </div>
+              <div className="space-y-3">
+                <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Update Status</p>
+
+                {/* ARTIST: simplified flow — only one relevant action */}
+                {userRole === "ARTIST" ? (
+                  <div>
+                    {(selectedOrder.status === "PAID" || selectedOrder.status === "PENDING") && (
+                      <button
+                        onClick={() => updateStatus(selectedOrder.id, "PENDING_DELIVERY")}
+                        disabled={updatingId === selectedOrder.id}
+                        className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-orange-500 hover:bg-orange-600 text-white font-semibold text-sm transition-all disabled:opacity-60"
+                      >
+                        {updatingId === selectedOrder.id
+                          ? <Loader2 className="w-4 h-4 animate-spin" />
+                          : <Truck className="w-4 h-4" />}
+                        Mark as Shipped
+                      </button>
+                    )}
+                    {selectedOrder.status === "PENDING_DELIVERY" && (
+                      <div className="flex items-start gap-2 p-3 bg-orange-50 dark:bg-orange-900/20 rounded-lg border border-orange-200 dark:border-orange-800/50">
+                        <Truck className="w-4 h-4 text-orange-500 flex-shrink-0 mt-0.5" />
+                        <p className="text-sm text-orange-800 dark:text-orange-300">
+                          Order has been marked as shipped. Waiting for the customer to confirm receipt.
+                        </p>
+                      </div>
+                    )}
+                    {selectedOrder.status === "FULFILLED" && (
+                      <div className="flex items-center gap-2 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800/50">
+                        <CheckCircle className="w-4 h-4 text-green-600" />
+                        <p className="text-sm text-green-800 dark:text-green-300 font-medium">Order fully completed.</p>
+                      </div>
+                    )}
+                    {(selectedOrder.status === "PENDING" || selectedOrder.status === "CANCELED") && (
+                      <p className="text-sm text-gray-500 dark:text-gray-400 italic">No actions available for this order status.</p>
+                    )}
+                  </div>
+                ) : (
+                  /* ADMIN: full status grid */
+                  <div className="grid grid-cols-2 gap-2">
+                    {Object.entries(statusConfig).map(([status, config]) => (
+                      <button
+                        key={status}
+                        onClick={() => updateStatus(selectedOrder.id, status as Order["status"])}
+                        disabled={updatingId === selectedOrder.id}
+                        className={`px-2 py-2 rounded text-xs font-semibold transition-all disabled:opacity-60 ${selectedOrder.status === status
+                          ? `${config.color} border`
+                          : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-[#141418] dark:text-gray-300 dark:hover:bg-gray-800 dark:border-gray-700 border"
+                          }`}
+                      >
+                        {config.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {/* Metadata */}

@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { CheckCircle, Package, Mail, Phone, MapPin, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
+import { getCurrentUserSession } from "@/lib/authorization";
 
 export default async function OrderConfirmationPage({
     params,
@@ -19,6 +20,9 @@ export default async function OrderConfirmationPage({
     if (!order) {
         notFound();
     }
+
+    const user = await getCurrentUserSession();
+
 
     return (
         <div className="max-w-4xl mx-auto px-4 py-12">
@@ -39,6 +43,27 @@ export default async function OrderConfirmationPage({
                 </div>
             </div>
 
+       <div className="flex justify-center">
+        {user == null && (
+            <div className="flex gap-2 mb-6">
+            <Link
+                href="/login"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors"
+            >
+                Login
+                <ArrowRight className="size-5" />
+            </Link>
+            <Link 
+            href="/register"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors"
+            >
+                Register
+                <ArrowRight className="size-5" />
+            </Link>
+            </div>
+        )}
+       </div>
+
             {/* What's Next */}
             <div className="bg-gradient-to-br from-teal-50 to-emerald-50 rounded-xl p-8 mb-8 border border-teal-100 animate-fade-in-up">
                 <h2 className="text-2xl font-bold text-gray-900 mb-4">What happens next?</h2>
@@ -48,7 +73,7 @@ export default async function OrderConfirmationPage({
                             1
                         </div>
                         <div>
-                            <h3 className="font-semibold text-gray-900 mb-1">We'll review your order</h3>
+                            <h3 className="font-semibold text-gray-900 mb-1">We&apos;ll review your order</h3>
                             <p className="text-gray-700">Our team will review your order details and artwork availability.</p>
                         </div>
                     </div>
@@ -57,8 +82,8 @@ export default async function OrderConfirmationPage({
                             2
                         </div>
                         <div>
-                            <h3 className="font-semibold text-gray-900 mb-1">We'll contact you</h3>
-                            <p className="text-gray-700">We'll reach out via email or phone to confirm details and arrange payment.</p>
+                            <h3 className="font-semibold text-gray-900 mb-1">We&apos;ll contact you</h3>
+                            <p className="text-gray-700">We&apos;ll reach out via email or phone to confirm details and arrange payment.</p>
                         </div>
                     </div>
                     <div className="flex gap-4">
@@ -67,7 +92,7 @@ export default async function OrderConfirmationPage({
                         </div>
                         <div>
                             <h3 className="font-semibold text-gray-900 mb-1">Prepare & deliver</h3>
-                            <p className="text-gray-700">Once payment is confirmed, we'll prepare your artwork for delivery.</p>
+                            <p className="text-gray-700">Once payment is confirmed, we&apos;ll prepare your artwork for delivery.</p>
                         </div>
                     </div>
                 </div>

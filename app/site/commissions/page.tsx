@@ -1,9 +1,10 @@
 import { prisma } from "@/lib/prisma";
 import CommissionRequestForm from "@/components/CommissionRequestForm";
-import { Palette, CheckCircle, MessageSquare, Sparkles, Clock, ArrowRight, XCircle, FileText } from "lucide-react";
+import { Palette, CheckCircle, MessageSquare, Sparkles, Clock, ArrowRight, XCircle, FileText, MessageCircle, User as UserIcon } from "lucide-react";
 import Link from "next/link";
 import { cookies } from "next/headers";
 import { parseUserSession } from "@/lib/auth";
+import Image from "next/image";
 
 interface Props {
     searchParams: Promise<{
@@ -19,6 +20,13 @@ export default async function CommissionsPage({ searchParams }: Props) {
     const userSession = cookieStore.get("user_session")?.value;
     const currentUser = userSession ? await parseUserSession(userSession) : null;
 
+    // Fetch all active artists for the selector
+    const artists = await prisma.user.findMany({
+        where: { role: "ARTIST", isActive: true },
+        select: { id: true, name: true, avatarUrl: true },
+        orderBy: { name: "asc" },
+    });
+
     // Fetch the target artist name if artistId is provided
     let artistName = "";
     if (artistId) {
@@ -29,15 +37,17 @@ export default async function CommissionsPage({ searchParams }: Props) {
         if (artist) artistName = artist.name || "the Artist";
     }
 
-    // Fetch past commissions for logged-in users (matched by email)
-    let pastCommissions: {
+    // Fetch past commissions for logged-in users (matched by email), including latest message
+    type PastCommission = {
         id: string;
         name: string;
         details: string;
         status: string;
         createdAt: Date;
-        artist: { name: string | null } | null;
-    }[] = [];
+        artist: { name: string | null; avatarUrl: string | null } | null;
+        messages: { content: string; createdAt: Date; sender: { name: string | null; role: string } }[];
+    };
+    let pastCommissions: PastCommission[] = [];
 
     if (currentUser?.email) {
         pastCommissions = await prisma.commissionRequest.findMany({
@@ -49,9 +59,18 @@ export default async function CommissionsPage({ searchParams }: Props) {
                 details: true,
                 status: true,
                 createdAt: true,
-                artist: { select: { name: true } },
+                artist: { select: { name: true, avatarUrl: true } },
+                messages: {
+                    orderBy: { createdAt: "desc" },
+                    take: 1,
+                    select: {
+                        content: true,
+                        createdAt: true,
+                        sender: { select: { name: true, role: true } },
+                    },
+                },
             }
-        });
+        }) as PastCommission[];
     }
 
     const getStatusBadge = (status: string) => {
@@ -96,33 +115,84 @@ export default async function CommissionsPage({ searchParams }: Props) {
                             <MessageSquare className="h-6 w-6 text-teal-600 dark:text-teal-400" />
                             Your Commission Requests
                         </h2>
+                        <span className="text-sm text-gray-500 dark:text-gray-400">
+                            {pastCommissions.length} request{pastCommissions.length !== 1 ? "s" : ""}
+                        </span>
                     </div>
                     <div className="space-y-3">
                         {pastCommissions.map((commission) => {
                             const badge = getStatusBadge(commission.status);
                             const BadgeIcon = badge.icon;
+                            const latestMessage = commission.messages[0];
+                            const isResponse = latestMessage && latestMessage.sender.role !== "USER";
+
                             return (
                                 <Link
                                     key={commission.id}
                                     href={`/user/commissions/${commission.id}`}
-                                    className="flex items-center justify-between p-4 bg-white dark:bg-[#1a1a24] rounded-xl border border-gray-200 dark:border-gray-700 hover:border-teal-400 dark:hover:border-teal-600 hover:shadow-md transition-all group"
+                                    className="flex items-start justify-between p-4 bg-white dark:bg-[#1a1a24] rounded-xl border border-gray-200 dark:border-gray-700 hover:border-teal-400 dark:hover:border-teal-600 hover:shadow-md transition-all group"
                                 >
-                                    <div className="flex-1 min-w-0 pr-4">
-                                        <div className="flex items-center gap-2 mb-1">
-                                            <p className="font-semibold text-gray-900 dark:text-gray-100 text-sm truncate">
-                                                For {commission.artist?.name || "Unassigned Artist"}
-                                            </p>
-                                            <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${badge.color}`}>
-                                                <BadgeIcon className="w-3 h-3" />
-                                                {badge.label}
-                                            </span>
+                                    <div className="flex items-start gap-4 flex-1 min-w-0 pr-4">
+                                        {/* Artist avatar or admin icon */}
+                                        <div className="flex-shrink-0 mt-0.5">
+                                            {commission.artist?.avatarUrl ? (
+                                                <div className="relative w-10 h-10 rounded-full overflow-hidden border border-gray-200 dark:border-gray-700">
+                                                    <Image
+                                                        src={commission.artist.avatarUrl}
+                                                        alt={commission.artist.name || "Artist"}
+                                                        fill
+                                                        className="object-cover"
+                                                    />
+                                                </div>
+                                            ) : (
+                                                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-teal-500 to-emerald-600 flex items-center justify-center">
+                                                    <UserIcon className="w-5 h-5 text-white" />
+                                                </div>
+                                            )}
                                         </div>
-                                        <p className="text-sm text-gray-500 dark:text-gray-400 truncate">{commission.details}</p>
-                                        <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
-                                            {new Date(commission.createdAt).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })}
-                                        </p>
+
+                                        <div className="flex-1 min-w-0">
+                                            <div className="flex flex-wrap items-center gap-2 mb-1">
+                                                <p className="font-semibold text-gray-900 dark:text-gray-100 text-sm">
+                                                    {commission.artist?.name ? `For ${commission.artist.name}` : "General Request (Admin)"}
+                                                </p>
+                                                <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${badge.color}`}>
+                                                    <BadgeIcon className="w-3 h-3" />
+                                                    {badge.label}
+                                                </span>
+                                                {isResponse && (
+                                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-400">
+                                                        <MessageCircle className="w-3 h-3" />
+                                                        New Response
+                                                    </span>
+                                                )}
+                                            </div>
+
+                                            {/* Commission details preview */}
+                                            <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
+                                                {commission.details}
+                                            </p>
+
+                                            {/* Latest message preview */}
+                                            {latestMessage && (
+                                                <div className={`mt-2 text-xs rounded-lg px-3 py-2 ${
+                                                    isResponse
+                                                        ? "bg-teal-50 dark:bg-teal-900/20 text-teal-800 dark:text-teal-300 border border-teal-100 dark:border-teal-800/50"
+                                                        : "bg-gray-50 dark:bg-gray-800/50 text-gray-600 dark:text-gray-400"
+                                                }`}>
+                                                    <span className="font-medium">
+                                                        {isResponse ? (latestMessage.sender.name || "Admin") : "You"}:
+                                                    </span>{" "}
+                                                    <span className="line-clamp-1">{latestMessage.content}</span>
+                                                </div>
+                                            )}
+
+                                            <p className="text-xs text-gray-400 dark:text-gray-500 mt-1.5">
+                                                {new Date(commission.createdAt).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })}
+                                            </p>
+                                        </div>
                                     </div>
-                                    <ArrowRight className="h-4 w-4 text-gray-400 group-hover:text-teal-600 dark:group-hover:text-teal-400 flex-shrink-0 transition-colors" />
+                                    <ArrowRight className="h-4 w-4 text-gray-400 group-hover:text-teal-600 dark:group-hover:text-teal-400 flex-shrink-0 mt-3 transition-colors" />
                                 </Link>
                             );
                         })}
@@ -238,7 +308,7 @@ export default async function CommissionsPage({ searchParams }: Props) {
                         <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-gray-100">
                             {artistName ? `Request for ${artistName}` : "Request a Commission"}
                         </h2>
-                        <CommissionRequestForm artistId={artistId} />
+                        <CommissionRequestForm artistId={artistId} artists={artists} />
                     </div>
                 </div>
             </div>

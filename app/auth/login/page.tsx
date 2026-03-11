@@ -36,8 +36,8 @@ function LoginForm() {
       }
 
       const data = await res.json();
-      router.refresh();
-      router.push(data.redirectUrl || "/user/dashboard");
+      // Hard navigation: forces server re-render so the Header picks up the new session cookie
+      window.location.href = data.redirectUrl || "/user/dashboard";
     } catch (err) {
       setError(err instanceof Error ? err.message : "Login failed");
     } finally {

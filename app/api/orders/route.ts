@@ -14,8 +14,13 @@ export async function GET(req: Request) {
     let whereClause = {};
 
     if (user.role === "USER") {
-      // Buyers: only their own orders
-      whereClause = { userId: user.userId };
+      // Buyers: match by userId OR email (for guest/email-placed orders)
+      whereClause = {
+        OR: [
+          { userId: user.userId },
+          { email: user.email },
+        ]
+      };
     } else if (user.role === "ARTIST") {
       // Artists: orders containing their artworks
       whereClause = {
