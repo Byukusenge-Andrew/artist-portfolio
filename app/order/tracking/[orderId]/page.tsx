@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { Package, CheckCircle, Clock, XCircle, ArrowLeft } from "lucide-react";
+import { Package, CheckCircle, Clock, XCircle, ArrowLeft, Truck } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -28,6 +28,14 @@ const statusConfig = {
         border: "border-green-200",
         label: "Fulfilled",
         description: "Your order has been completed and delivered",
+    },
+    PENDING_DELIVERY: {
+        icon: Truck,
+        color: "text-orange-600",
+        bg: "bg-orange-50",
+        border: "border-orange-200",
+        label: "Shipped",
+        description: "Your order has been shipped and is on its way",
     },
     CANCELED: {
         icon: XCircle,
