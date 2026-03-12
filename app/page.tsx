@@ -45,6 +45,22 @@ export default async function Home() {
     } as any,
   })) as unknown as ArtworkWithStats[];
 
+  // Trending: rank by likes + comments (true engagement, not recency)
+  const allWithEngagement = (await prisma.artwork.findMany({
+    take: 50,
+    include: {
+      uploader: {
+        select: { id: true, name: true, avatarUrl: true, bio: true },
+      },
+      _count: { select: { likes: true, comments: true } },
+    } as any,
+  })) as unknown as ArtworkWithStats[];
+
+  const trending = [...allWithEngagement]
+    .sort((a, b) => (b._count.likes + b._count.comments) - (a._count.likes + a._count.comments))
+    .filter((a) => a._count.likes + a._count.comments > 0)
+    .slice(0, 3);
+
   // Optional: artist list, if the model/migration is applied
   let artists: Array<{ name: string; avatarUrl: string | null }> = [];
   try {
@@ -339,12 +355,12 @@ export default async function Home() {
         )}
       </section>
 
-      {/* Feature cards (only show uploaded artworks; otherwise placeholder with no image) */}
-      {latest.length > 2 && (
+      {/* Trending Now – ranked by likes + comments */}
+      {trending.length > 0 && (
         <section className="my-12 animate-fade-in-up">
           <h2 className="text-2xl font-bold mb-6 dark:text-gray-100">Trending Now</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {latest.slice(0, 2).map((a) => (
+            {trending.map((a) => (
               <FeedCard
                 key={a.id}
                 title={a.title}
