@@ -187,7 +187,7 @@ export default async function OrderTrackingPage({
                                 <div className="flex items-center justify-between">
                                     <span className="text-sm text-gray-600">Quantity: {item.quantity}</span>
                                     <span className="font-bold text-teal-700">
-                                        RWF {((item.unitPriceCents * item.quantity) / 100).toLocaleString()}
+                                        RWF {(item.unitPrice * item.quantity).toLocaleString()}
                                     </span>
                                 </div>
                             </div>
@@ -198,7 +198,7 @@ export default async function OrderTrackingPage({
                 <div className="border-t border-gray-200 pt-4">
                     <div className="flex items-center justify-between text-lg font-bold">
                         <span className="text-gray-900">Total</span>
-                        <span className="text-2xl text-teal-700">RWF {(order.totalCents / 100).toLocaleString()}</span>
+                        <span className="text-2xl text-teal-700">RWF {order.total.toLocaleString()}</span>
                     </div>
                 </div>
             </div>

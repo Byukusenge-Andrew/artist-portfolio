@@ -52,7 +52,7 @@ export default async function AdminDashboard() {
 
     const orderStats = await prisma.order.aggregate({
       where: orderWhere,
-      _sum: { totalCents: true },
+      _sum: { total: true },
       _count: true,
     });
 
@@ -63,7 +63,7 @@ export default async function AdminDashboard() {
     Object.assign(stats, {
       totalUsers: isArtist ? 0 : users, // Hide user count for artists
       totalOrders: orderStats._count || 0,
-      totalRevenue: (orderStats._sum?.totalCents || 0) / 100,
+      totalRevenue: orderStats._sum?.total || 0,
       totalArtworks: artworks,
     });
 
@@ -73,10 +73,7 @@ export default async function AdminDashboard() {
   }
 
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-    }).format(price);
+    return `RWF ${price.toLocaleString()}`;
   };
 
   const formatDate = (date: Date) => {
@@ -208,7 +205,7 @@ export default async function AdminDashboard() {
                       <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">{order.user?.name || "Unknown"}</td>
                       <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">{order.items?.[0]?.titleSnapshot || "Deleted"}</td>
                       <td className="px-6 py-4 text-sm font-semibold text-gray-900 dark:text-gray-100">
-                        {formatPrice((order.totalCents || 0) / 100)}
+                        {formatPrice(order.total || 0)}
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">{formatDate(order.createdAt)}</td>
                       <td className="px-6 py-4">

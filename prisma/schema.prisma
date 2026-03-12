@@ -21,7 +21,7 @@ model Artwork {
   createdAt           DateTime         @default(now())
   updatedAt           DateTime         @updatedAt
   isOriginalAvailable Boolean          @default(true)
-  originalPriceCents  Int?
+  originalPrice       Int?             @map("originalPriceCents")
   printEnabled        Boolean          @default(false)
   deletedAt           DateTime?
   uploadedBy          String?
@@ -41,7 +41,7 @@ model PrintOption {
   id         String      @id @default(cuid())
   artworkId  String
   name       String
-  priceCents Int
+  price      Int         @map("priceCents")
   orderItems OrderItem[]
   artwork    Artwork     @relation("ArtworkPrintOptions", fields: [artworkId], references: [id], onDelete: Cascade)
 
@@ -78,7 +78,7 @@ model Order {
   user         User?       @relation("UserOrders", fields: [userId], references: [id], onDelete: SetNull)
   status       OrderStatus @default(PENDING)
   currency     String      @default("RWF")
-  totalCents   Int         @default(0)
+  total        Int         @default(0) @map("totalCents")
   createdAt    DateTime    @default(now())
   updatedAt    DateTime    @updatedAt
   items        OrderItem[]
@@ -96,7 +96,7 @@ model OrderItem {
   printOptionId    String?
   titleSnapshot    String
   imageUrlSnapshot String
-  unitPriceCents   Int
+  unitPrice        Int          @map("unitPriceCents")
   artwork          Artwork?     @relation(fields: [artworkId], references: [id])
   order            Order        @relation(fields: [orderId], references: [id], onDelete: Cascade)
   printOption      PrintOption? @relation(fields: [printOptionId], references: [id])

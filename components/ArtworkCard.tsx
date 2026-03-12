@@ -72,7 +72,7 @@ export function ArtworkCard({ id, slug, title, imageUrl, price, artistName }: Pr
 
           {price !== undefined && price !== null && (
             <p className="text-sm font-bold text-teal-700 dark:text-teal-400">
-              {(price / 100).toLocaleString()} RWF
+              {price.toLocaleString()} RWF
             </p>
           )}
         </div>

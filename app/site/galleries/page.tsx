@@ -40,7 +40,7 @@ export default async function GalleriesPage(props: {
             imageUrl: true,
             description: true,
             createdAt: true,
-            originalPriceCents: true,
+            originalPrice: true,
         },
     });
 
@@ -107,7 +107,7 @@ export default async function GalleriesPage(props: {
                                 slug={artwork.slug}
                                 title={artwork.title}
                                 imageUrl={artwork.imageUrl}
-                                price={artwork.originalPriceCents ?? undefined}
+                                price={artwork.originalPrice ?? undefined}
                             />
                         </div>
                     ))}

@@ -104,7 +104,7 @@ export default function ShoppingCart({ isOpen, onClose }: ShoppingCartProps) {
                             <div className="flex items-center justify-between text-lg">
                                 <span className="font-semibold text-gray-900 dark:text-gray-100">Total</span>
                                 <span className="font-bold text-2xl text-teal-700 dark:text-teal-400">
-                                    RWF {(totalPrice / 100).toLocaleString()}
+                                    RWF {totalPrice.toLocaleString()}
                                 </span>
                             </div>
                             <div className="space-y-2">

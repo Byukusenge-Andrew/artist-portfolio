@@ -5,7 +5,7 @@ import { z } from "zod";
 
 const printOptionSchema = z.object({
   name: z.string().min(1, "Name is required"),
-  priceCents: z.number().int().positive("Price must be positive"),
+  price: z.number().int().positive("Price must be positive"),
 });
 
 export async function GET(
@@ -21,7 +21,7 @@ export async function GET(
         id: true,
         artworkId: true,
         name: true,
-        priceCents: true,
+        price: true,
       },
     });
     return NextResponse.json(printOptions);
@@ -84,7 +84,7 @@ export async function POST(
       data: {
         artworkId: artworkId,
         name: validated.name,
-        priceCents: validated.priceCents,
+        price: validated.price,
       },
     });
 

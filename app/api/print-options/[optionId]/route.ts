@@ -5,7 +5,7 @@ import { z } from "zod";
 
 const updateSchema = z.object({
   name: z.string().min(1).optional(),
-  priceCents: z.number().int().positive().optional(),
+  price: z.number().int().positive().optional(),
 });
 
 import { getCurrentUser } from "@/lib/authorization";
@@ -56,7 +56,7 @@ export async function PATCH(
       where: { id: optionId },
       data: {
         ...(validated.name && { name: validated.name }),
-        ...(validated.priceCents && { priceCents: validated.priceCents }),
+        ...(validated.price && { price: validated.price }),
       },
     });
 

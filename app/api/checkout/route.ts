@@ -47,19 +47,19 @@ export async function POST(req: NextRequest) {
     printOptionId?: string;
     titleSnapshot: string;
     imageUrlSnapshot: string;
-    unitPriceCents: number;
+    unitPrice: number;
   }> = [];
 
   for (const item of items) {
     if (item.productType === "COMMISSION") {
       // Placeholder commission product
-      const unitPriceCents = 10000; // $100 deposit example
+      const unitPrice = 10000; // $100 deposit example
       lineItems.push({
         quantity: item.quantity,
         price_data: {
           currency,
           product_data: { name: "Commission Deposit" },
-          unit_amount: unitPriceCents,
+          unit_amount: unitPrice,
         },
       });
       orderItemsData.push({
@@ -67,11 +67,11 @@ export async function POST(req: NextRequest) {
         quantity: item.quantity,
         titleSnapshot: "Commission Deposit",
         imageUrlSnapshot: "",
-        unitPriceCents,
+        unitPrice,
       });
     } else if (item.productType === "ORIGINAL") {
       const artwork = await prisma.artwork.findUnique({ where: { id: item.artworkId! } });
-      if (!artwork || !artwork.originalPriceCents) {
+      if (!artwork || !artwork.originalPrice) {
         return NextResponse.json({ error: "Artwork not available" }, { status: 400 });
       }
       lineItems.push({
@@ -79,7 +79,7 @@ export async function POST(req: NextRequest) {
         price_data: {
           currency,
           product_data: { name: artwork.title, images: [artwork.imageUrl] },
-          unit_amount: artwork.originalPriceCents,
+          unit_amount: artwork.originalPrice,
         },
       });
       orderItemsData.push({
@@ -88,7 +88,7 @@ export async function POST(req: NextRequest) {
         artworkId: artwork.id,
         titleSnapshot: artwork.title,
         imageUrlSnapshot: artwork.imageUrl,
-        unitPriceCents: artwork.originalPriceCents,
+        unitPrice: artwork.originalPrice,
       });
     } else if (item.productType === "PRINT") {
       const print = await prisma.printOption.findUnique({ where: { id: item.printOptionId! }, include: { artwork: true } });
@@ -100,7 +100,7 @@ export async function POST(req: NextRequest) {
         price_data: {
           currency,
           product_data: { name: `${print.artwork.title} - ${print.name}`, images: [print.artwork.imageUrl] },
-          unit_amount: print.priceCents,
+          unit_amount: print.price,
         },
       });
       orderItemsData.push({
@@ -110,7 +110,7 @@ export async function POST(req: NextRequest) {
         printOptionId: print.id,
         titleSnapshot: `${print.artwork.title} - ${print.name}`,
         imageUrlSnapshot: print.artwork.imageUrl,
-        unitPriceCents: print.priceCents,
+        unitPrice: print.price,
       });
     }
   }

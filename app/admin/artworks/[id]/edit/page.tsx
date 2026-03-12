@@ -4,12 +4,13 @@ import { getCurrentUserSession } from "@/lib/authorization";
 import ArtworkForm from "@/components/ArtworkForm";
 import type { ArtworkFormValues } from "@/components/ArtworkForm";
 
-export default async function EditArtworkPage({ params }: { params: { id: string } }) {
+export default async function EditArtworkPage({ params }: { params: Promise<{ id: string }> }) {
+    const { id: artworkId } = await params;
     const user = await getCurrentUserSession();
     if (!user) return redirect("/auth/login?redirect=/admin/artworks");
 
     const artwork = await prisma.artwork.findUnique({
-        where: { id: params.id },
+        where: { id: artworkId },
         include: { printOptions: true },
     });
 
@@ -37,7 +38,7 @@ export default async function EditArtworkPage({ params }: { params: { id: string
         imageUrl: artwork.imageUrl,
         imagePublicId: artwork.imagePublicId,
         isOriginalAvailable: artwork.isOriginalAvailable,
-        originalPriceCents: artwork.originalPriceCents || undefined,
+        originalPrice: artwork.originalPrice || undefined,
         printEnabled: artwork.printEnabled,
         // Note: tags are not in form schema yet per previous file content, but are in db.
         // If we want to edit tags, we need to update ArtworkForm.

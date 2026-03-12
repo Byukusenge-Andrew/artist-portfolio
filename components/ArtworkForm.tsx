@@ -14,7 +14,7 @@ const schema = z.object({
     imageUrl: z.string().url("Image URL is required"),
     imagePublicId: z.string().min(1, "Image Public ID is required"),
     isOriginalAvailable: z.boolean(),
-    originalPriceCents: z.number().int().optional(),
+    originalPrice: z.number().int().optional(),
     printEnabled: z.boolean(),
 });
 
@@ -126,29 +126,10 @@ export default function ArtworkForm({ initialValues, artworkId, isEditing = fals
                 <input
                     type="number"
                     className="w-full border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 bg-white dark:bg-[#141418] text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-teal-500 outline-none transition-all"
-                    {...register("originalPriceCents", {
-                        valueAsNumber: true,
-                        setValueAs: (v) => v === "" ? undefined : parseInt(v) * 100 // Convert input RWF to cents
+                    {...register("originalPrice", {
+                        setValueAs: (v) => v === "" ? undefined : parseInt(v)
                     })}
-                // We need to handle display value vs form value. 
-                // Ideally we separate form schema (cents) from input (RWF).
-                // But easiest way is to let user input pure number and we treat it as Cents in schema?
-                // Wait, schema says `originalPriceCents`.
-                // User sees "Original Price (cents)" in old form (1376 line 104).
-                // But everywhere we display RWF / 100.
-                // So user should input RWF, and we save RWF * 100.
-                // Or user inputs Cents directly? "Original Price (cents)" label suggests cents.
-                // If they input 5000, is it 50 RWF? Or 5000 Cents (50 RWF)?
-                // Display: `price / 100`. So 5000 cents = 50 RWF.
-                // So if I want 5000 RWF, I need 500000 cents.
-                // The label said "cents". It's confusing.
-                // I should explicitly ask for RWF and convert to cents.
                 />
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    *Stored as cents. If you enter 5000, it means 5000 cents (50 RWF).
-                    Wait, if displayed as `price/100`, then 5000 cents = 50.
-                    I should probably fix the input to be RWF and convert on submit.
-                </p>
             </div>
 
             <button

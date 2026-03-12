@@ -7,7 +7,7 @@ import Link from "next/link";
 type PrintOption = {
     id: string;
     name: string;
-    priceCents: number;
+    price: number;
 };
 
 interface ArtworkPricingProps {
@@ -15,7 +15,7 @@ interface ArtworkPricingProps {
     title: string;
     imageUrl: string;
     isOriginalAvailable: boolean;
-    originalPriceCents?: number | null;
+    originalPrice?: number | null;
     printEnabled: boolean;
     printOptions: PrintOption[];
 }
@@ -25,13 +25,13 @@ export default function ArtworkPricing({
     title,
     imageUrl,
     isOriginalAvailable,
-    originalPriceCents,
+    originalPrice,
     printEnabled,
     printOptions,
 }: ArtworkPricingProps) {
     return (
         <div className="border-t border-gray-200 dark:border-gray-700 pt-6 space-y-4">
-            {isOriginalAvailable && originalPriceCents && (
+            {isOriginalAvailable && originalPrice && (
                 <div className="p-6 bg-gradient-to-br from-teal-50 via-emerald-50 to-teal-50 dark:from-teal-900/20 dark:via-emerald-900/20 dark:to-teal-900/20 rounded-xl border border-teal-100 dark:border-teal-800 shadow-sm">
                     <div className="flex items-center justify-between mb-4">
                         <div>
@@ -39,7 +39,7 @@ export default function ArtworkPricing({
                             <p className="text-sm text-gray-600 dark:text-gray-400">One of a kind piece</p>
                         </div>
                         <div className="text-3xl font-bold text-teal-700 dark:text-teal-400">
-                            {(originalPriceCents / 100).toLocaleString()} RWF
+                            {originalPrice.toLocaleString()} RWF
                         </div>
                     </div>
                     <AddToCartButton
@@ -47,7 +47,7 @@ export default function ArtworkPricing({
                         artworkId={artworkId}
                         title={title}
                         imageUrl={imageUrl}
-                        price={originalPriceCents}
+                        price={originalPrice}
                         label="Add Original to Cart"
                     />
                 </div>
@@ -65,7 +65,7 @@ export default function ArtworkPricing({
                                 <div>
                                     <div className="font-medium text-gray-900 dark:text-gray-100">{opt.name}</div>
                                     <div className="text-sm text-gray-600 dark:text-gray-400">
-                                        {(opt.priceCents / 100).toLocaleString()} RWF
+                                        {opt.price.toLocaleString()} RWF
                                     </div>
                                 </div>
                                 <AddToCartButton
@@ -73,7 +73,7 @@ export default function ArtworkPricing({
                                     printOptionId={opt.id}
                                     title={`${title} - ${opt.name}`}
                                     imageUrl={imageUrl}
-                                    price={opt.priceCents}
+                                    price={opt.price}
                                     label="Add to Cart"
                                     className="text-sm px-4 py-2"
                                 />

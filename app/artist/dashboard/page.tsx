@@ -43,7 +43,7 @@ export default async function ArtistDashboard() {
 
     const orderStats = await prisma.order.aggregate({
         where: orderWhere,
-        _sum: { totalCents: true },
+        _sum: { total: true },
         _count: true,
     });
 
@@ -74,7 +74,7 @@ export default async function ArtistDashboard() {
             title: true,
             slug: true,
             imageUrl: true,
-            originalPriceCents: true,
+            originalPrice: true,
         }
     });
 
@@ -84,10 +84,7 @@ export default async function ArtistDashboard() {
     });
 
     const formatPrice = (price: number) => {
-        return new Intl.NumberFormat("en-US", {
-            style: "currency",
-            currency: "USD",
-        }).format(price);
+        return `RWF ${price.toLocaleString()}`;
     };
 
     const formatDate = (date: Date) => {
@@ -137,7 +134,7 @@ export default async function ArtistDashboard() {
                         <TrendingUp className="h-8 w-8 text-green-600 dark:text-green-400 mb-3" />
                         <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Total Revenue</p>
                         <p className="text-3xl font-bold text-gray-900 dark:text-gray-100">
-                            {formatPrice((orderStats._sum.totalCents || 0) / 100)}
+                            {formatPrice(orderStats._sum.total || 0)}
                         </p>
                     </div>
 
@@ -303,7 +300,7 @@ export default async function ArtistDashboard() {
                                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-3">
                                         <p className="text-white font-medium truncate text-sm">{artwork.title}</p>
                                         <p className="text-white/80 text-xs mt-1">
-                                            {formatPrice((artwork.originalPriceCents || 0) / 100)}
+                                            {formatPrice(artwork.originalPrice || 0)}
                                         </p>
                                     </div>
                                 </Link>
@@ -343,7 +340,7 @@ export default async function ArtistDashboard() {
                                             <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">{order.user?.name || "Guest"}</td>
                                             <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">{order.items.length} items</td>
                                             <td className="px-6 py-4 text-sm font-semibold text-gray-900 dark:text-gray-100">
-                                                {formatPrice((order.totalCents || 0) / 100)}
+                                                {formatPrice(order.total || 0)}
                                             </td>
                                             <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">{formatDate(order.createdAt)}</td>
                                             <td className="px-6 py-4">

@@ -9,7 +9,7 @@ type OrderItem = {
   productType: "ORIGINAL" | "PRINT" | "COMMISSION";
   titleSnapshot: string;
   imageUrlSnapshot: string;
-  unitPriceCents: number;
+  unitPrice: number;
 };
 
 type Order = {
@@ -18,7 +18,7 @@ type Order = {
   customerName?: string;
   status: "PENDING" | "PAID" | "PENDING_DELIVERY" | "FULFILLED" | "CANCELED";
   currency: string;
-  totalCents: number;
+  total: number;
   createdAt: string;
   updatedAt: string;
   items: OrderItem[];
@@ -155,7 +155,7 @@ export default function OrdersAdminPage() {
                     </div>
                     <div className="text-right">
                       <p className="font-bold text-teal-600 dark:text-teal-400">
-                        {(order.totalCents / 100).toLocaleString(undefined, {
+                        {order.total.toLocaleString(undefined, {
                           style: "currency",
                           currency: order.currency,
                         })}
@@ -193,7 +193,7 @@ export default function OrdersAdminPage() {
                         {item.productType} × {item.quantity}
                       </p>
                       <p className="text-sm font-bold text-gray-900 dark:text-gray-100 mt-2">
-                        {(item.unitPriceCents * item.quantity / 100).toLocaleString(undefined, {
+                        {(item.unitPrice * item.quantity).toLocaleString(undefined, {
                           style: "currency",
                           currency: selectedOrder.currency,
                         })}
@@ -208,7 +208,7 @@ export default function OrdersAdminPage() {
                 <div className="flex justify-between">
                   <p className="text-gray-600 dark:text-gray-400">Subtotal</p>
                   <p className="font-semibold text-gray-900 dark:text-gray-100">
-                    {(selectedOrder.totalCents / 100).toLocaleString(undefined, {
+                    {selectedOrder.total.toLocaleString(undefined, {
                       style: "currency",
                       currency: selectedOrder.currency,
                     })}
@@ -217,7 +217,7 @@ export default function OrdersAdminPage() {
                 <div className="flex justify-between items-center pt-2 border-t border-gray-200 dark:border-gray-800">
                   <p className="font-bold text-gray-900 dark:text-gray-100">Total</p>
                   <p className="text-lg font-bold text-teal-600 dark:text-teal-400">
-                    {(selectedOrder.totalCents / 100).toLocaleString(undefined, {
+                    {selectedOrder.total.toLocaleString(undefined, {
                       style: "currency",
                       currency: selectedOrder.currency,
                     })}

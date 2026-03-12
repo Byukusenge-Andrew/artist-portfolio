@@ -25,12 +25,12 @@ type Artwork = {
   createdAt: string;
   tags: string[];
   isOriginalAvailable: boolean;
-  originalPriceCents?: number | null;
+  originalPrice?: number | null;
   printEnabled: boolean;
   printOptions: Array<{
     id: string;
     name: string;
-    priceCents: number;
+    price: number;
   }>;
   artist?: {
     id: string;
@@ -166,7 +166,7 @@ export default function ArtworkDetailClient({
             title={artwork.title}
             imageUrl={artwork.imageUrl}
             isOriginalAvailable={artwork.isOriginalAvailable}
-            originalPriceCents={artwork.originalPriceCents}
+            originalPrice={artwork.originalPrice}
             printEnabled={artwork.printEnabled}
             printOptions={artwork.printOptions}
           />

@@ -66,7 +66,7 @@ export default function CartItem({
                         </button>
                     </div>
                     <span className="text-sm font-bold text-teal-700 dark:text-teal-400">
-                        RWF {((price * quantity) / 100).toLocaleString()}
+                        RWF {(price * quantity).toLocaleString()}
                     </span>
                 </div>
             </div>

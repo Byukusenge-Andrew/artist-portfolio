@@ -18,7 +18,7 @@ const updateArtworkSchema = z.object({
   imagePublicId: z.string().min(1).optional(),
   imageUrl: z.string().url().optional(),
   isOriginalAvailable: z.boolean().optional(),
-  originalPriceCents: z.number().int().optional(),
+  originalPrice: z.number().int().optional(),
   printEnabled: z.boolean().optional(),
 });
 

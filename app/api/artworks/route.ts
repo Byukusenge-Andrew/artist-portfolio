@@ -13,11 +13,11 @@ const createArtworkSchema = z.object({
   height: z.number().optional(),
   tags: z.array(z.string()).default([]),
   isOriginalAvailable: z.boolean().default(true),
-  originalPriceCents: z.number().int().optional(),
+  originalPrice: z.number().int().optional(),
   printEnabled: z.boolean().default(false),
   printOptions: z
     .array(
-      z.object({ name: z.string().min(1), priceCents: z.number().int() })
+      z.object({ name: z.string().min(1), price: z.number().int() })
     )
     .default([]),
 });
@@ -64,13 +64,13 @@ export async function POST(req: Request) {
       height: data.height,
       tags: data.tags.map(sanitizeText),
       isOriginalAvailable: data.isOriginalAvailable,
-      originalPriceCents: data.originalPriceCents,
+      originalPrice: data.originalPrice,
       printEnabled: data.printEnabled,
       uploadedBy: user.userId, // Track who uploaded it
       printOptions: {
         create: data.printOptions.map((opt) => ({
           name: opt.name,
-          priceCents: opt.priceCents,
+          price: opt.price,
         })),
       },
     },

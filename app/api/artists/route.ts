@@ -30,7 +30,7 @@ export async function GET() {
             title: true,
             slug: true,
             imageUrl: true,
-            originalPriceCents: true,
+            originalPrice: true,
           }
         }
       },

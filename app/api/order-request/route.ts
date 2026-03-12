@@ -11,7 +11,7 @@ const orderRequestSchema = z.object({
             quantity: z.number().int().min(1),
             titleSnapshot: z.string(),
             imageUrlSnapshot: z.string(),
-            unitPriceCents: z.number().int().min(0),
+            unitPrice: z.number().int().min(0),
         })
     ).min(1),
     customerName: z.string().min(1),
@@ -27,8 +27,8 @@ export async function POST(req: Request) {
         const validated = orderRequestSchema.parse(body);
 
         // Calculate total
-        const totalCents = validated.items.reduce(
-            (sum, item) => sum + item.unitPriceCents * item.quantity,
+        const total = validated.items.reduce(
+            (sum, item) => sum + item.unitPrice * item.quantity,
             0
         );
 
@@ -39,7 +39,7 @@ export async function POST(req: Request) {
                 customerName: validated.customerName,
                 status: "PENDING",
                 currency: "RWF",
-                totalCents,
+                total,
                 items: {
                     createMany: {
                         data: validated.items.map((item) => ({
@@ -49,7 +49,7 @@ export async function POST(req: Request) {
                             quantity: item.quantity,
                             titleSnapshot: item.titleSnapshot,
                             imageUrlSnapshot: item.imageUrlSnapshot,
-                            unitPriceCents: item.unitPriceCents,
+                            unitPrice: item.unitPrice,
                         })),
                     },
                 },

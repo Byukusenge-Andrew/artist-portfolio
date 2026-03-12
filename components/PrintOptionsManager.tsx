@@ -6,7 +6,7 @@ import { AlertCircle, Trash2, Plus } from "lucide-react";
 type PrintOption = {
   id: string;
   name: string;
-  priceCents: number;
+  price: number;
 };
 
 export default function PrintOptionsManager({ artworkId }: { artworkId: string }) {
@@ -14,7 +14,7 @@ export default function PrintOptionsManager({ artworkId }: { artworkId: string }
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [showForm, setShowForm] = useState(false);
-  const [formData, setFormData] = useState({ name: "", priceCents: "" });
+  const [formData, setFormData] = useState({ name: "", price: "" });
 
   useEffect(() => {
     fetchOptions();
@@ -34,7 +34,7 @@ export default function PrintOptionsManager({ artworkId }: { artworkId: string }
   }
 
   async function handleAddOption() {
-    if (!formData.name || !formData.priceCents) {
+    if (!formData.name || !formData.price) {
       setError("All fields are required");
       return;
     }
@@ -45,7 +45,7 @@ export default function PrintOptionsManager({ artworkId }: { artworkId: string }
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: formData.name,
-          priceCents: parseInt(formData.priceCents),
+          price: parseInt(formData.price),
         }),
       });
 
@@ -55,7 +55,7 @@ export default function PrintOptionsManager({ artworkId }: { artworkId: string }
       }
 
       await fetchOptions();
-      setFormData({ name: "", priceCents: "" });
+      setFormData({ name: "", price: "" });
       setShowForm(false);
       setError("");
     } catch (err) {
@@ -105,7 +105,7 @@ export default function PrintOptionsManager({ artworkId }: { artworkId: string }
               <div>
                 <p className="font-medium text-gray-900">{option.name}</p>
                 <p className="text-sm text-gray-600">
-                  ${(option.priceCents / 100).toFixed(2)}
+                  {option.price.toLocaleString()} RWF
                 </p>
               </div>
               <button
@@ -131,14 +131,12 @@ export default function PrintOptionsManager({ artworkId }: { artworkId: string }
           />
           <input
             type="number"
-            placeholder="Price in dollars (e.g., 25.99)"
-            value={formData.priceCents}
+            placeholder="Price in RWF (e.g., 5000)"
+            value={formData.price}
             onChange={(e) => {
-              const dollars = parseFloat(e.target.value) || 0;
-              setFormData({ ...formData, priceCents: String(dollars * 100) });
+              setFormData({ ...formData, price: e.target.value });
             }}
             className="w-full px-3 py-2 rounded border border-gray-300 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-100 text-sm"
-            step="0.01"
           />
           <div className="flex gap-2">
             <button
@@ -150,7 +148,7 @@ export default function PrintOptionsManager({ artworkId }: { artworkId: string }
             <button
               onClick={() => {
                 setShowForm(false);
-                setFormData({ name: "", priceCents: "" });
+                setFormData({ name: "", price: "" });
               }}
               className="flex-1 px-3 py-2 bg-gray-300 text-gray-700 rounded font-medium hover:bg-gray-400 text-sm transition-all"
             >

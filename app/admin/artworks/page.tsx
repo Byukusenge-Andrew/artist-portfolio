@@ -27,7 +27,7 @@ export default async function ManageArtworksPage() {
             slug: true,
             title: true,
             imageUrl: true,
-            originalPriceCents: true,
+            originalPrice: true,
             isOriginalAvailable: true,
             createdAt: true,
             uploadedBy: true,
@@ -148,7 +148,7 @@ export default async function ManageArtworksPage() {
                                             </td>
                                             <td className="px-6 py-4">
                                                 <div className="font-semibold text-gray-900 dark:text-gray-100">
-                                                    {artwork.originalPriceCents ? `${(artwork.originalPriceCents / 100).toLocaleString()} RWF` : "N/A"}
+                                                    {artwork.originalPrice ? `${artwork.originalPrice.toLocaleString()} RWF` : "N/A"}
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4">

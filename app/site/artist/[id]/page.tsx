@@ -162,7 +162,7 @@ export default async function ArtistProfilePage({ params }: Props) {
                                 slug={artwork.slug}
                                 title={artwork.title}
                                 imageUrl={artwork.imageUrl}
-                                price={artwork.originalPriceCents}
+                                price={artwork.originalPrice}
                                 artistName={artist.name || undefined}
                             />
                         ))}

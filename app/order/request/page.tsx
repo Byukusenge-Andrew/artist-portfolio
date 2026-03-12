@@ -39,7 +39,7 @@ export default function OrderRequestPage() {
                         quantity: item.quantity,
                         titleSnapshot: item.title,
                         imageUrlSnapshot: item.imageUrl,
-                        unitPriceCents: item.price,
+                        unitPrice: item.price,
                     })),
                 }),
             });
@@ -82,7 +82,7 @@ export default function OrderRequestPage() {
         <div className="max-w-6xl mx-auto px-4 py-12">
             <div className="mb-8">
                 <h1 className="text-4xl font-bold text-gray-900 mb-2">Request Order</h1>
-                <p className="text-gray-600">Fill out your details and we'll contact you to arrange payment and delivery.</p>
+                <p className="text-gray-600">Fill out your details and we&apos;ll contact you to arrange payment and delivery.</p>
             </div>
 
             <div className="grid lg:grid-cols-2 gap-8">
@@ -115,7 +115,7 @@ export default function OrderRequestPage() {
                                         <div className="flex items-center justify-between mt-2">
                                             <span className="text-xs text-gray-600">Qty: {item.quantity}</span>
                                             <span className="text-sm font-bold text-teal-700">
-                                                RWF {((item.price * item.quantity) / 100).toLocaleString()}
+                                                RWF {(item.price * item.quantity).toLocaleString()}
                                             </span>
                                         </div>
                                     </div>
@@ -126,7 +126,7 @@ export default function OrderRequestPage() {
                         <div className="border-t border-gray-200 pt-4">
                             <div className="flex items-center justify-between text-lg font-bold">
                                 <span className="text-gray-900">Total</span>
-                                <span className="text-2xl text-teal-700">RWF {(totalPrice / 100).toLocaleString()}</span>
+                                <span className="text-2xl text-teal-700">RWF {totalPrice.toLocaleString()}</span>
                             </div>
                         </div>
                     </div>

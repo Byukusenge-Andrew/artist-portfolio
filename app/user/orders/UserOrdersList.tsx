@@ -3,12 +3,13 @@ import { useState } from "react";
 import { Package, CheckCircle2, Truck, Clock, ShoppingBag, ChevronDown, ChevronUp } from "lucide-react";
 import ConfirmReceiptButton from "./ConfirmReceiptButton";
 import Image from "next/image";
+import Link from "next/link";
 
 type OrderItem = {
   id: string;
   titleSnapshot: string;
   imageUrlSnapshot: string;
-  unitPriceCents: number;
+  unitPrice: number;
   quantity: number;
   productType: string;
 };
@@ -16,7 +17,7 @@ type OrderItem = {
 type Order = {
   id: string;
   status: string;
-  totalCents: number;
+  total: number;
   currency: string;
   createdAt: string;
   email: string;
@@ -41,8 +42,11 @@ function getStatusInfo(status: string) {
   }
 }
 
-function formatPrice(cents: number, currency = "USD") {
-  return new Intl.NumberFormat("en-US", { style: "currency", currency }).format(cents / 100);
+function formatPrice(amount: number, currency = "RWF") {
+  if (currency === "RWF") {
+    return `RWF ${amount.toLocaleString()}`;
+  }
+  return new Intl.NumberFormat("en-US", { style: "currency", currency }).format(amount);
 }
 
 function formatDate(dateStr: string) {
@@ -62,9 +66,9 @@ export default function UserOrdersList({ orders }: { orders: Order[] }) {
         <ShoppingBag className="h-16 w-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
         <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">No Orders Yet</h2>
         <p className="text-gray-600 dark:text-gray-400 mb-6">Start exploring and collecting art today</p>
-        <a href="/site/galleries" className="inline-block bg-teal-600 text-white px-6 py-2 rounded-lg hover:bg-teal-700 transition-colors">
+        <Link href="/site/galleries" className="inline-block bg-teal-600 text-white px-6 py-2 rounded-lg hover:bg-teal-700 transition-colors">
           Shop Now
-        </a>
+        </Link>
       </div>
     );
   }
@@ -107,7 +111,7 @@ export default function UserOrdersList({ orders }: { orders: Order[] }) {
               <div className="flex items-center gap-3 flex-shrink-0">
                 <div className="text-right">
                   <p className="text-lg font-bold text-gray-900 dark:text-gray-100">
-                    {formatPrice(order.totalCents || 0, order.currency || "USD")}
+                    {formatPrice(order.total || 0, order.currency || "RWF")}
                   </p>
                 </div>
                 <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap ${statusInfo.color}`}>
@@ -138,7 +142,7 @@ export default function UserOrdersList({ orders }: { orders: Order[] }) {
                         <p className="text-xs text-gray-500 dark:text-gray-400">{item.productType} × {item.quantity}</p>
                       </div>
                       <p className="font-semibold text-sm text-gray-900 dark:text-gray-100 flex-shrink-0">
-                        {formatPrice(item.unitPriceCents * item.quantity, order.currency)}
+                        {formatPrice(item.unitPrice * item.quantity, order.currency)}
                       </p>
                     </div>
                   ))}

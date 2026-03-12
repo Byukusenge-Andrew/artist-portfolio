@@ -94,12 +94,12 @@ export default async function ArtworkDetailPage({
         ? artwork.tags.filter((t): t is string => typeof t === "string")
         : [],
       isOriginalAvailable: artwork.isOriginalAvailable,
-      originalPriceCents: artwork.originalPriceCents,
+      originalPrice: artwork.originalPrice,
       printEnabled: artwork.printEnabled,
       printOptions: artwork.printOptions.map((opt) => ({
         id: opt.id,
         name: opt.name,
-        priceCents: opt.priceCents,
+        price: opt.price,
       })),
       artist: artwork.uploader ? {
         id: artwork.uploader.id,
