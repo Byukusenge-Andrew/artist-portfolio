@@ -41,10 +41,21 @@ export default async function ArtistDashboard() {
         }
     };
 
-    const orderStats = await prisma.order.aggregate({
-        where: orderWhere,
-        _sum: { total: true },
-        _count: true,
+    // Fetch total items sold by this artist to calculate revenue
+    const artistSoldItems = await prisma.orderItem.findMany({
+        where: {
+            artwork: { uploadedBy: user.userId },
+            order: { status: { in: ["PAID", "FULFILLED"] } },
+        },
+        select: { unitPrice: true, quantity: true },
+    });
+
+    const totalRevenue = artistSoldItems.reduce((acc, item) => acc + (item.unitPrice * item.quantity), 0);
+    const totalConfirmedOrdersCount = await prisma.order.count({
+        where: {
+            status: { in: ["PAID", "FULFILLED"] },
+            items: { some: { artwork: { uploadedBy: user.userId } } },
+        },
     });
 
     const artworksCount = await prisma.artwork.count({
@@ -134,14 +145,14 @@ export default async function ArtistDashboard() {
                         <TrendingUp className="h-8 w-8 text-green-600 dark:text-green-400 mb-3" />
                         <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Total Revenue</p>
                         <p className="text-3xl font-bold text-gray-900 dark:text-gray-100">
-                            {formatPrice(orderStats._sum.total || 0)}
+                            {formatPrice(totalRevenue)}
                         </p>
                     </div>
 
                     <div className="bg-white dark:bg-[#1a1a24] rounded-lg border border-gray-200 dark:border-gray-700 p-6 transition-colors">
                         <Package className="h-8 w-8 text-emerald-600 dark:text-emerald-400 mb-3" />
-                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Total Orders</p>
-                        <p className="text-3xl font-bold text-gray-900 dark:text-gray-100">{orderStats._count}</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Confirmed Orders</p>
+                        <p className="text-3xl font-bold text-gray-900 dark:text-gray-100">{totalConfirmedOrdersCount}</p>
                     </div>
 
                     <div className="bg-white dark:bg-[#1a1a24] rounded-lg border border-gray-200 dark:border-gray-700 p-6 transition-colors">

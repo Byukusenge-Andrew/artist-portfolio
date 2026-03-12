@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import { ArrowLeft, Users, Package, TrendingUp } from "lucide-react";
 import { prisma } from "@/lib/prisma";
+import AdminDashboardStats from "./AdminDashboardStats";
 
 import { parseUserSession } from "@/lib/auth";
 
@@ -29,39 +30,26 @@ export default async function AdminDashboard() {
   let recentOrders: any[] = [];
 
   try {
-    // Filter logic based on role
-    const isArtist = user.role === "ARTIST";
-    const artworkWhere = isArtist ? { uploadedBy: user.userId } : {};
-
-    // For orders, artists see orders containing their artworks
-    const orderWhere = isArtist ? {
-      items: {
-        some: {
-          artwork: { uploadedBy: user.userId }
-        }
-      }
-    } : {};
-
     const users = await (prisma as any).user.count();
+    
+    // Only count successful orders for revenue
+    const orderStats = await prisma.order.aggregate({
+      where: { status: { in: ["PAID", "FULFILLED"] } },
+      _sum: { total: true },
+      _count: true,
+    });
+
+    // Recent orders can still show everything, or just take 5 latest
     const orders = await (prisma as any).order.findMany({
-      where: orderWhere,
       take: 5,
       orderBy: { createdAt: "desc" },
       include: { items: true, user: true },
     });
 
-    const orderStats = await prisma.order.aggregate({
-      where: orderWhere,
-      _sum: { total: true },
-      _count: true,
-    });
-
-    const artworks = await prisma.artwork.count({
-      where: artworkWhere
-    });
+    const artworks = await prisma.artwork.count();
 
     Object.assign(stats, {
-      totalUsers: isArtist ? 0 : users, // Hide user count for artists
+      totalUsers: users,
       totalOrders: orderStats._count || 0,
       totalRevenue: orderStats._sum?.total || 0,
       totalArtworks: artworks,
@@ -70,6 +58,60 @@ export default async function AdminDashboard() {
     recentOrders = orders;
   } catch (error) {
     console.error("Failed to fetch dashboard stats:", error);
+  }
+
+  // Calculate last 30 days of data for charts
+  const chartDataArray: any[] = [];
+  try {
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+    const [recentUsersRaw, recentOrdersRaw, recentArtworksRaw] = await Promise.all([
+      prisma.user.findMany({ where: { createdAt: { gte: thirtyDaysAgo } }, select: { createdAt: true } }),
+      prisma.order.findMany({ where: { status: { in: ["PAID", "FULFILLED"] }, createdAt: { gte: thirtyDaysAgo } }, select: { createdAt: true, total: true } }),
+      prisma.artwork.findMany({ where: { createdAt: { gte: thirtyDaysAgo } }, select: { createdAt: true } })
+    ]);
+
+    const getDateString = (date: Date) => date.toISOString().split("T")[0];
+    const grouped = new Map<string, any>();
+    
+    for (let i = 29; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      const str = getDateString(d);
+      grouped.set(str, { dateRaw: str, users: 0, orders: 0, revenue: 0, artworks: 0 });
+    }
+    
+    // Type guards since user findMany returns untyped results here
+    const typedUsersRaw = recentUsersRaw as unknown as { createdAt: Date }[];
+    const typedOrdersRaw = recentOrdersRaw as unknown as { createdAt: Date, total: number }[];
+    const typedArtworksRaw = recentArtworksRaw as unknown as { createdAt: Date }[];
+
+    typedUsersRaw.forEach((u) => {
+      const d = getDateString(u.createdAt);
+      if (grouped.has(d)) grouped.get(d).users++;
+    });
+    typedOrdersRaw.forEach((o) => {
+      const d = getDateString(o.createdAt);
+      if (grouped.has(d)) {
+        grouped.get(d).orders++;
+        grouped.get(d).revenue += o.total;
+      }
+    });
+    typedArtworksRaw.forEach((a) => {
+      const d = getDateString(a.createdAt);
+      if (grouped.has(d)) grouped.get(d).artworks++;
+    });
+    
+    Array.from(grouped.values()).forEach((item) => {
+      const d = new Date(item.dateRaw);
+      chartDataArray.push({
+        ...item,
+        date: d.toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+      });
+    });
+  } catch (error) {
+    console.error("Failed to compile chart data", error);
   }
 
   const formatPrice = (price: number) => {
@@ -99,32 +141,8 @@ export default async function AdminDashboard() {
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-          <div className="bg-white dark:bg-[#1a1a24] rounded-lg border border-gray-200 dark:border-gray-700 p-6 transition-colors">
-            <Users className="h-8 w-8 text-blue-600 dark:text-blue-400 mb-3" />
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Total Users</p>
-            <p className="text-3xl font-bold text-gray-900 dark:text-gray-100">{stats.totalUsers}</p>
-          </div>
-
-          <div className="bg-white dark:bg-[#1a1a24] rounded-lg border border-gray-200 dark:border-gray-700 p-6 transition-colors">
-            <Package className="h-8 w-8 text-emerald-600 dark:text-emerald-400 mb-3" />
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Total Orders</p>
-            <p className="text-3xl font-bold text-gray-900 dark:text-gray-100">{stats.totalOrders}</p>
-          </div>
-
-          <div className="bg-white dark:bg-[#1a1a24] rounded-lg border border-gray-200 dark:border-gray-700 p-6 transition-colors">
-            <TrendingUp className="h-8 w-8 text-green-600 dark:text-green-400 mb-3" />
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Total Revenue</p>
-            <p className="text-3xl font-bold text-gray-900 dark:text-gray-100">{stats.totalRevenue}</p>
-          </div>
-
-          <div className="bg-white dark:bg-[#1a1a24] rounded-lg border border-gray-200 dark:border-gray-700 p-6 transition-colors">
-            <Package className="h-8 w-8 text-purple-600 dark:text-purple-400 mb-3" />
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Total Artworks</p>
-            <p className="text-3xl font-bold text-gray-900 dark:text-gray-100">{stats.totalArtworks}</p>
-          </div>
-        </div>
+        {/* Stats Grid with Interactive Charts */}
+        <AdminDashboardStats stats={stats} chartData={chartDataArray} />
 
         {/* Management Links */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">

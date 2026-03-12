@@ -210,113 +210,6 @@ export default async function Home() {
         </div>
       )}
 
-      {/* Highest Rated Artists */}
-      {topArtists.length > 0 && (
-        <section className="my-12 animate-fade-in-up">
-          <div className="flex items-end justify-between mb-6">
-            <div>
-              <h2 className="text-3xl font-bold tracking-tight dark:text-gray-100 flex items-center gap-3">
-                <span className="p-2 bg-gradient-to-br from-amber-400 to-orange-500 rounded-lg">
-                  <Star className="size-5 text-white fill-white" />
-                </span>
-                Highest Rated Artists
-              </h2>
-              <p className="text-gray-600 dark:text-gray-400 mt-1">Ranked by confirmed orders &amp; community appreciation</p>
-            </div>
-            <Link
-              href="/site/commissions"
-              className="inline-flex items-center gap-2 text-teal-700 dark:text-teal-400 hover:text-teal-800 dark:hover:text-teal-300 font-medium group transition-colors"
-            >
-              <span>Commission an Artist</span>
-              <span className="group-hover:translate-x-1 transition-transform">→</span>
-            </Link>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {topArtists.map((artist, idx) => {
-              const score = artist.orderCount + artist._count.profileLikes;
-              const medals = ["🥇", "🥈", "🥉"];
-              return (
-                <div
-                  key={artist.id}
-                  className="group relative bg-white dark:bg-[#1a1a24] rounded-2xl border border-gray-200 dark:border-gray-700 p-5 hover:border-teal-400 dark:hover:border-teal-600 hover:shadow-lg transition-all duration-300 overflow-hidden"
-                >
-                  {/* Rank badge */}
-                  {idx < 3 && (
-                    <div className="absolute top-3 right-3 text-xl" title={`Ranked #${idx + 1}`}>
-                      {medals[idx]}
-                    </div>
-                  )}
-
-                  {/* Background glow for top 3 */}
-                  {idx === 0 && (
-                    <div className="absolute inset-0 bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/10 dark:to-orange-900/10 pointer-events-none" />
-                  )}
-
-                  <div className="relative flex items-center gap-4 mb-4">
-                    {/* Avatar */}
-                    <div className="relative w-14 h-14 rounded-full overflow-hidden bg-gradient-to-br from-teal-400 to-emerald-500 flex-shrink-0 border-2 border-white dark:border-gray-800 shadow-md">
-                      {artist.avatarUrl ? (
-                        <Image src={artist.avatarUrl} alt={artist.name || "Artist"} fill className="object-cover" />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center">
-                          <Palette className="w-6 h-6 text-white" />
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-bold text-gray-900 dark:text-gray-100 truncate">
-                        {artist.name || "Anonymous Artist"}
-                      </h3>
-                      {artist.bio && (
-                        <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-1 mt-0.5">
-                          {artist.bio}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Stats */}
-                  <div className="relative flex items-center gap-4 text-sm mb-4">
-                    <div className="flex items-center gap-1.5 text-gray-600 dark:text-gray-400">
-                      <ShoppingBag className="w-4 h-4 text-teal-600 dark:text-teal-400" />
-                      <span className="font-semibold text-gray-900 dark:text-gray-100">{artist.orderCount}</span>
-                      <span>orders</span>
-                    </div>
-                    <div className="flex items-center gap-1.5 text-gray-600 dark:text-gray-400">
-                      <Heart className="w-4 h-4 text-pink-500" />
-                      <span className="font-semibold text-gray-900 dark:text-gray-100">{artist._count.profileLikes}</span>
-                      <span>likes</span>
-                    </div>
-                    <div className="flex items-center gap-1.5 text-gray-600 dark:text-gray-400">
-                      <Palette className="w-4 h-4 text-purple-500" />
-                      <span className="font-semibold text-gray-900 dark:text-gray-100">{artist._count.uploadedArtworks}</span>
-                      <span>works</span>
-                    </div>
-                  </div>
-
-                  {/* Score pill */}
-                  <div className="relative flex items-center justify-between">
-                    <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-gradient-to-r from-amber-100 to-orange-100 dark:from-amber-900/30 dark:to-orange-900/30 rounded-full">
-                      <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
-                      <span className="text-xs font-bold text-amber-700 dark:text-amber-400">{score} pts</span>
-                    </div>
-                    <Link
-                      href={`/site/commissions?artistId=${artist.id}`}
-                      className="text-xs font-semibold text-teal-700 dark:text-teal-400 hover:underline"
-                    >
-                      Commission →
-                    </Link>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        
-        </section>
-      )}
-
       {/* Latest Artworks */}
       <section className="my-12 animate-fade-in-up">
         <div className="flex items-end justify-between mb-6">
@@ -371,6 +264,100 @@ export default async function Home() {
                 commentsCount={a._count.comments}
               />
             ))}
+          </div>
+        </section>
+      )}
+
+      {/* Highest Rated Artists – below trending */}
+      {topArtists.length > 0 && (
+        <section className="my-12 animate-fade-in-up">
+          <div className="flex items-end justify-between mb-6">
+            <div>
+              <h2 className="text-3xl font-bold tracking-tight dark:text-gray-100 flex items-center gap-3">
+                <span className="p-2 bg-gradient-to-br from-amber-400 to-orange-500 rounded-lg">
+                  <Star className="size-5 text-white fill-white" />
+                </span>
+                Highest Rated Artists
+              </h2>
+              <p className="text-gray-600 dark:text-gray-400 mt-1">Ranked by confirmed orders &amp; community appreciation</p>
+            </div>
+            <Link
+              href="/site/commissions"
+              className="inline-flex items-center gap-2 text-teal-700 dark:text-teal-400 hover:text-teal-800 dark:hover:text-teal-300 font-medium group transition-colors"
+            >
+              <span>Commission an Artist</span>
+              <span className="group-hover:translate-x-1 transition-transform">→</span>
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {topArtists.map((artist, idx) => {
+              const score = artist.orderCount + artist._count.profileLikes;
+              const medals = ["🥇", "🥈", "🥉"];
+              return (
+                <div
+                  key={artist.id}
+                  className="group relative bg-white dark:bg-[#1a1a24] rounded-2xl border border-gray-200 dark:border-gray-700 p-5 hover:border-teal-400 dark:hover:border-teal-600 hover:shadow-lg transition-all duration-300 overflow-hidden"
+                >
+                  {idx < 3 && (
+                    <div className="absolute top-3 right-3 text-xl" title={`Ranked #${idx + 1}`}>
+                      {medals[idx]}
+                    </div>
+                  )}
+                  {idx === 0 && (
+                    <div className="absolute inset-0 bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/10 dark:to-orange-900/10 pointer-events-none" />
+                  )}
+                  <div className="relative flex items-center gap-4 mb-4">
+                    <div className="relative w-14 h-14 rounded-full overflow-hidden bg-gradient-to-br from-teal-400 to-emerald-500 flex-shrink-0 border-2 border-white dark:border-gray-800 shadow-md">
+                      {artist.avatarUrl ? (
+                        <Image src={artist.avatarUrl} alt={artist.name || "Artist"} fill className="object-cover" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <Palette className="w-6 h-6 text-white" />
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-bold text-gray-900 dark:text-gray-100 truncate">
+                        {artist.name || "Anonymous Artist"}
+                      </h3>
+                      {artist.bio && (
+                        <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-1 mt-0.5">{artist.bio}</p>
+                      )}
+                    </div>
+                  </div>
+                  <div className="relative flex items-center gap-4 text-sm mb-4">
+                    <div className="flex items-center gap-1.5 text-gray-600 dark:text-gray-400">
+                      <ShoppingBag className="w-4 h-4 text-teal-600 dark:text-teal-400" />
+                      <span className="font-semibold text-gray-900 dark:text-gray-100">{artist.orderCount}</span>
+                      <span>orders</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 text-gray-600 dark:text-gray-400">
+                      <Heart className="w-4 h-4 text-pink-500" />
+                      <span className="font-semibold text-gray-900 dark:text-gray-100">{artist._count.profileLikes}</span>
+                      <span>likes</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 text-gray-600 dark:text-gray-400">
+                      <Palette className="w-4 h-4 text-purple-500" />
+                      <span className="font-semibold text-gray-900 dark:text-gray-100">{artist._count.uploadedArtworks}</span>
+                      <span>works</span>
+                    </div>
+                  </div>
+                  <div className="relative flex items-center justify-between">
+                    <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-gradient-to-r from-amber-100 to-orange-100 dark:from-amber-900/30 dark:to-orange-900/30 rounded-full">
+                      <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
+                      <span className="text-xs font-bold text-amber-700 dark:text-amber-400">{score} pts</span>
+                    </div>
+                    <Link
+                      href={`/site/commissions?artistId=${artist.id}`}
+                      className="text-xs font-semibold text-teal-700 dark:text-teal-400 hover:underline"
+                    >
+                      Commission →
+                    </Link>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </section>
       )}
