@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Pencil, Trash2, Eye, Plus, Palette } from "lucide-react";
 import { redirect } from "next/navigation";
+import DeleteArtworkButton from "./DeleteArtworkButton";
 
 export default async function ManageArtworksPage() {
     const cookieStore = await cookies();
@@ -33,7 +34,6 @@ export default async function ManageArtworksPage() {
             uploadedBy: true,
         },
     });
-
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-50 to-teal-50/30 dark:from-[#0f0f12] dark:to-[#1a1a24] transition-colors">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12">
@@ -180,12 +180,7 @@ export default async function ManageArtworksPage() {
                                                     >
                                                         <Pencil className="size-4" />
                                                     </Link>
-                                                    <button
-                                                        className="p-2 text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors"
-                                                        title="Delete"
-                                                    >
-                                                        <Trash2 className="size-4" />
-                                                    </button>
+                                                    <DeleteArtworkButton id={artwork.id} />
                                                 </div>
                                             </td>
                                         </tr>

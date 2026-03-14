@@ -80,4 +80,28 @@ export async function POST(req: Request) {
   return NextResponse.json(created, { status: 201 });
 }
 
+export async function DELETE(req: Request) {
+  const user = await getCurrentUser(req);
 
+  // Only artists and admins can delete artworks
+  if (!user || (user.role !== "ARTIST" && user.role !== "ADMIN")) {
+    return NextResponse.json(
+      { error: "Artist or Admin role required to delete artworks" },
+      { status: 403 }
+    );
+  }
+
+  const { id } = await req.json();
+  
+  const artwork = await prisma.artwork.findUnique({ where: { id } });
+  if (!artwork) {
+      return NextResponse.json({ error: "Artwork not found" }, { status: 404 });
+  }
+
+  if (user.role === "ARTIST" && artwork.uploadedBy !== user.userId) {
+      return NextResponse.json({ error: "You can only delete your own artworks" }, { status: 403 });
+  }
+
+  const deleted = await prisma.artwork.delete({ where: { id } });
+  return NextResponse.json(deleted);
+}
