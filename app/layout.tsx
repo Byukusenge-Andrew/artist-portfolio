@@ -8,7 +8,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { CartProvider } from "@/contexts/CartContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { Toaster } from "sonner";
-
+import { Analytics } from "@vercel/analytics/next"
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -84,6 +84,7 @@ export default function RootLayout({
             </FavoritesProvider>
           </AuthProvider>
           <Toaster richColors position="top-right" />
+          <Analytics />
         </ThemeProvider>
       </body>
     </html>

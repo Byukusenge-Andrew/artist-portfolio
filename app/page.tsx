@@ -3,28 +3,13 @@ import { prisma } from "@/lib/prisma";
 import { ArtworkCard } from "@/components/ArtworkCard";
 import Stories from "@/components/Stories";
 import FeedCard from "@/components/FeedCard";
-import { Sparkles, TrendingUp, Palette, Users, Star, ShoppingBag, Heart } from "lucide-react";
+import { Star, ShoppingBag, Heart, Users, Sparkles, TrendingUp, Palette } from "lucide-react";
 import Image from "next/image";
+import { Analytics } from "@vercel/analytics/next"
+import { getTopArtists } from "@/lib/queries/artists";
 
 export default async function Home() {
-  type ArtworkWithStats = {
-    id: string;
-    title: string;
-    slug: string;
-    imageUrl: string;
-    uploader: {
-      id: string;
-      name: string | null;
-      avatarUrl: string | null;
-      bio: string | null;
-    } | null;
-    _count: {
-      likes: number;
-      comments: number;
-    };
-  };
-
-  const latest = (await prisma.artwork.findMany({
+  const latest = await prisma.artwork.findMany({
     orderBy: { createdAt: "desc" },
     take: 12,
     include: {
@@ -42,19 +27,19 @@ export default async function Home() {
           comments: true,
         },
       },
-    } as any,
-  })) as unknown as ArtworkWithStats[];
+    },
+  });
 
   // Trending: rank by likes + comments (true engagement, not recency)
-  const allWithEngagement = (await prisma.artwork.findMany({
+  const allWithEngagement = await prisma.artwork.findMany({
     take: 50,
     include: {
       uploader: {
         select: { id: true, name: true, avatarUrl: true, bio: true },
       },
       _count: { select: { likes: true, comments: true } },
-    } as any,
-  })) as unknown as ArtworkWithStats[];
+    },
+  });
 
   const trending = [...allWithEngagement]
     .sort((a, b) => (b._count.likes + b._count.comments) - (a._count.likes + a._count.comments))
@@ -73,43 +58,7 @@ export default async function Home() {
     artists = [];
   }
 
-  // Highest-rated artists: ranked by PAID order count + profile likes
-  type TopArtist = {
-    id: string;
-    name: string | null;
-    avatarUrl: string | null;
-    bio: string | null;
-    _count: { profileLikes: number; uploadedArtworks: number };
-    orderCount: number;
-  };
-
-  const artistUsers = await prisma.user.findMany({
-    where: { role: "ARTIST", isActive: true },
-    select: {
-      id: true,
-      name: true,
-      avatarUrl: true,
-      bio: true,
-      _count: { select: { profileLikes: true, uploadedArtworks: true } },
-    },
-  });
-
-  // For each artist, count confirmed orders (PAID or FULFILLED) that include their artworks
-  const topArtistsRaw = await Promise.all(
-    artistUsers.map(async (artist) => {
-      const orderCount = await prisma.order.count({
-        where: {
-          status: { in: ["PAID", "FULFILLED"] },
-          items: { some: { artwork: { uploadedBy: artist.id } } },
-        },
-      });
-      return { ...artist, orderCount };
-    })
-  );
-
-  const topArtists: TopArtist[] = topArtistsRaw
-    .sort((a, b) => (b.orderCount + b._count.profileLikes) - (a.orderCount + a._count.profileLikes))
-    .slice(0, 6);
+  const topArtists = await getTopArtists(6);
 
   return (
     <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6">
@@ -228,7 +177,7 @@ export default async function Home() {
 
         {latest.length > 0 ? (
           <div className="gallery-grid">
-            {latest.slice(0, 6).map((a: { id: string; slug: string; imageUrl: string; title: string }) => (
+            {latest.slice(0, 6).map((a) => (
               <ArtworkCard key={a.id} id={a.id} slug={a.slug} title={a.title} imageUrl={a.imageUrl} />
             ))}
           </div>
