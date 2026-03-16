@@ -248,13 +248,13 @@ export default async function Home() {
                   key={artist.id}
                   className="group relative bg-white dark:bg-[#1a1a24] rounded-2xl border border-gray-200 dark:border-gray-700 p-5 hover:border-teal-400 dark:hover:border-teal-600 hover:shadow-lg transition-all duration-300 overflow-hidden"
                 >
+                  {idx === 0 && (
+                    <div className="absolute inset-0 bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/10 dark:to-orange-900/10 pointer-events-none" />
+                  )}
                   {idx < 3 && (
                     <div className="absolute top-3 right-3 text-xl" title={`Ranked #${idx + 1}`}>
                       {medals[idx]}
                     </div>
-                  )}
-                  {idx === 0 && (
-                    <div className="absolute inset-0 bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/10 dark:to-orange-900/10 pointer-events-none" />
                   )}
                   <div className="relative flex items-center gap-4 mb-4">
                     <div className="relative w-14 h-14 rounded-full overflow-hidden bg-gradient-to-br from-teal-400 to-emerald-500 flex-shrink-0 border-2 border-white dark:border-gray-800 shadow-md">
