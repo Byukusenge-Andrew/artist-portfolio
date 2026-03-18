@@ -170,6 +170,7 @@ model User {
   resetToken       String?
   resetTokenExpiry DateTime?
   orders           Order[]   @relation("UserOrders")
+  sessions         Session[] @relation("UserSessions")
   uploadedArtworks Artwork[] @relation("UserArtworks")
   commissions      CommissionRequest[] @relation("ArtistCommissions")
   commissionMessages CommissionMessage[] @relation("UserCommissionMessages")
@@ -246,4 +247,16 @@ model Like {
 
   @@unique([userId, artworkId])
   @@unique([userId, artistId])
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation("UserSessions", fields: [userId], references: [id], onDelete: Cascade)
+  userAgent String?
+  ipAddress String?
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
 }

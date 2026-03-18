@@ -74,12 +74,23 @@ export async function POST(req: Request) {
       );
     }
 
-    // Create JWT session token
+    // Create session record in database
+    const sessionRecord = await prisma.session.create({
+      data: {
+        userId: user.id,
+        userAgent: req.headers.get("user-agent"),
+        ipAddress: req.headers.get("x-forwarded-for") || "unknown",
+        expiresAt: new Date(Date.now() + (rememberMe ? 30 : 7) * 24 * 60 * 60 * 1000),
+      },
+    });
+
+    // Create JWT session token with session ID (jti)
     const sessionToken = await signToken({
       userId: user.id,
       email: user.email,
       role: user.role,
       name: user.name || undefined,
+      jti: sessionRecord.id,
     });
 
     // Get redirect URL from query params or determine by role

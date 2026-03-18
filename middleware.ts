@@ -1,21 +1,35 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verifyToken } from "./lib/jwt";
+import { prisma } from "./lib/prisma";
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const userSession = request.cookies.get("user_session")?.value;
 
   // Decode user session if available (JWT verification)
-  let user: { role?: string; userId?: string } | null = null;
+  let user: { role?: string; userId?: string; sessionId?: string } | null = null;
   if (userSession) {
     const payload = await verifyToken(userSession);
-    if (payload && payload.type === "access") {
-      user = {
-        role: payload.role,
-        userId: payload.userId,
-      };
+    if (payload && payload.type === "access" && payload.jti) {
+      // Check if session exists and is not expired in DB
+      try {
+        const dbSession = await prisma.session.findUnique({
+          where: { id: payload.jti }
+        });
+
+        if (dbSession && new Date() < dbSession.expiresAt) {
+          user = {
+            role: payload.role,
+            userId: payload.userId,
+            sessionId: payload.jti,
+          };
+        }
+      } catch (error) {
+        console.error("Database error during session verification:", error);
+        // Fallback or deny? Let's deny for security if DB is strictly required for auth
+      }
     }
-    // Invalid/expired JWT — session is null (no legacy fallback for security)
+    // Invalid/expired JWT or revoked session — session is null
   }
 
   const isAuthenticated = !!user;

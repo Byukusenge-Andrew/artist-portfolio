@@ -10,12 +10,13 @@ export interface JWTPayload extends JoseJWTPayload {
     role: "USER" | "ADMIN" | "ARTIST";
     name?: string;
     type: "access" | "refresh";
+    jti?: string; // Standard JWT claim for session ID
 }
 
 /**
  * Sign a JWT token (Edge compatible)
  */
-export async function signToken(payload: Omit<JWTPayload, "type">, type: "access" | "refresh" = "access"): Promise<string> {
+export async function signToken(payload: Omit<JWTPayload, "type" | "jti"> & { jti?: string }, type: "access" | "refresh" = "access"): Promise<string> {
     const secret = new TextEncoder().encode(env.JWT_SECRET);
     const alg = 'HS256';
 
@@ -24,13 +25,18 @@ export async function signToken(payload: Omit<JWTPayload, "type">, type: "access
     // Expiration time from env or default
     const expiresIn = type === "access" ? env.JWT_EXPIRES_IN : env.JWT_REFRESH_EXPIRES_IN;
 
-    return new SignJWT(fullPayload)
+    const tokenBuilder = new SignJWT(fullPayload)
         .setProtectedHeader({ alg })
         .setIssuedAt()
         .setIssuer("artelier")
         .setAudience("artelier-users")
-        .setExpirationTime(expiresIn)
-        .sign(secret);
+        .setExpirationTime(expiresIn);
+
+    if (payload.jti) {
+        tokenBuilder.setJti(payload.jti);
+    }
+
+    return tokenBuilder.sign(secret);
 }
 
 /**

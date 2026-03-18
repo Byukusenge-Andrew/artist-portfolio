@@ -1,6 +1,7 @@
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
 import { signToken, verifyToken, JWTPayload } from "./jwt";
+import { prisma } from "./prisma";
 
 // Re-export password utilities for backward compatibility
 // Note: Client components should import directly from "./password-utils" to avoid server dependencies
@@ -57,27 +58,28 @@ export async function parseUserSession(sessionToken: string | undefined): Promis
 
   try {
     // Try JWT first (new format)
-    const payload = await verifyToken(sessionToken);
-    if (payload && payload.type === "access") {
-      return {
-        userId: payload.userId,
-        email: payload.email,
-        role: payload.role,
-        name: payload.name,
-      };
-    }
-  } catch {
-    // Ignore JWT errors, try legacy
-  }
+    const payload = await verifyToken(sessionToken) as JWTPayload & UserSession;
+    if (payload && payload.type === "access" && payload.jti) {
+      // Check if session exists and is not expired in DB
+      const dbSession = await prisma.session.findUnique({
+        where: { id: payload.jti }
+      });
 
-  try {
-    // Fall back to legacy base64 format for backward compatibility
-    // TODO: Remove this after all users have re-authenticated
-    const decoded = JSON.parse(Buffer.from(sessionToken, "base64").toString());
-    return decoded;
-  } catch {
+      if (dbSession && new Date() < dbSession.expiresAt) {
+        return {
+          userId: payload.userId,
+          email: payload.email,
+          role: payload.role,
+          name: payload.name,
+        };
+      }
+    }
+  } catch(error) {
+    console.error("Error parsing user session:", error);
     return null;
   }
+
+  return null;
 }
 
 /**
