@@ -45,11 +45,30 @@ function LoginForm() {
     }
   };
 
+  const verified = searchParams.get("verified") === "1";
+  const tokenError = searchParams.get("error");
+
   return (
     <AuthLayout
       title="Welcome Back"
       subtitle="Sign in to your account"
     >
+      {verified && (
+        <div className="mb-6 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 p-4 flex gap-3">
+          <svg className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+          <p className="text-sm text-green-700 dark:text-green-400">Email verified! You can now sign in.</p>
+        </div>
+      )}
+
+      {tokenError && (
+        <div className="mb-6 rounded-lg bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 p-4 flex gap-3">
+          <AlertCircle className="h-5 w-5 text-yellow-600 flex-shrink-0 mt-0.5" />
+          <p className="text-sm text-yellow-700 dark:text-yellow-400">
+            {tokenError === "invalid_token" ? "Verification link is invalid or has expired." : "Email verification failed. Please try again."}
+          </p>
+        </div>
+      )}
+
       {error && (
         <div className="mb-6 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 p-4 flex gap-3">
           <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
@@ -69,6 +88,7 @@ function LoginForm() {
             placeholder="you@example.com"
             className="w-full px-4 py-3 sm:py-3.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-[#1a1a24] dark:text-gray-200 dark:placeholder:text-gray-500 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-100 dark:focus:ring-teal-900 transition-all text-base"
             required
+            autoComplete="email"
           />
         </div>
 
@@ -84,6 +104,7 @@ function LoginForm() {
               placeholder="••••••••"
               className="w-full px-4 py-3 sm:py-3.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-[#1a1a24] dark:text-gray-200 dark:placeholder:text-gray-500 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-100 dark:focus:ring-teal-900 transition-all pr-12 text-base"
               required
+              autoComplete="current-password"
             />
             <button
               type="button"

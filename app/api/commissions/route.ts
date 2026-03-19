@@ -1,14 +1,14 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
+import { getCurrentUser } from "@/lib/authorization";
+import { sendCommissionRequestEmail } from "@/lib/email";
 
 const commissionSchema = z.object({
   name: z.string().min(2),
   email: z.string().email(),
   details: z.string().min(10),
 });
-
-import { getCurrentUser } from "@/lib/authorization";
 
 export async function GET(req: Request) {
   try {
@@ -20,7 +20,6 @@ export async function GET(req: Request) {
 
     let whereClause = {};
 
-    // Regular users can only see commissions with their email
     if (user.role === "ADMIN") {
       whereClause = { artistId: null };
     } else if (user.role === "ARTIST") {
@@ -59,15 +58,33 @@ export async function POST(req: Request) {
       );
     }
 
+    const { name, email, details, artistId } = validated.data;
+
     const commission = await prisma.commissionRequest.create({
       data: {
-        name: validated.data.name,
-        email: validated.data.email,
-        details: validated.data.details,
+        name,
+        email,
+        details,
         status: "NEW",
-        artistId: validated.data.artistId || null,
+        artistId: artistId || null,
       },
     });
+
+    // If the commission was directed at a specific artist, notify them by email
+    if (artistId) {
+      const artist = await prisma.user.findUnique({
+        where: { id: artistId },
+        select: { email: true, name: true },
+      });
+
+      if (artist) {
+        sendCommissionRequestEmail(
+          artist.email,
+          artist.name || "Artist",
+          { name, email, details, id: commission.id }
+        ).catch((err) => console.error("Failed to send commission email to artist:", err));
+      }
+    }
 
     return NextResponse.json(commission, { status: 201 });
   } catch (error) {

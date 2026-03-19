@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { generateResetToken } from "@/lib/auth";
+import { sendPasswordResetEmail } from "@/lib/email";
 import { z } from "zod";
 
 const forgotPasswordSchema = z.object({
@@ -47,21 +48,15 @@ export async function POST(req: Request) {
             },
         });
 
-        // In production, send email with reset link
-        // For now, return token in response (for testing)
-        const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/auth/reset-password/${resetToken}`;
-
-        console.log("Password reset link:", resetUrl);
-
-        // TODO: Send email with reset link
-        // await sendPasswordResetEmail(user.email, resetUrl);
+        // Send password reset email (non-blocking)
+        sendPasswordResetEmail(
+            user.email,
+            user.name || "there",
+            resetToken
+        ).catch((err) => console.error("Failed to send reset email:", err));
 
         return NextResponse.json(
-            {
-                message: "If an account exists with this email, a password reset link has been sent",
-                // Remove this in production:
-                resetUrl: process.env.NODE_ENV === "development" ? resetUrl : undefined,
-            },
+            { message: "If an account exists with this email, a password reset link has been sent" },
             { status: 200 }
         );
     } catch (error) {

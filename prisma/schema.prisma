@@ -169,6 +169,8 @@ model User {
   wishlist         String?   @db.LongText
   resetToken       String?
   resetTokenExpiry DateTime?
+  isEmailVerified  Boolean   @default(false)
+  emailVerifyToken String?   @unique
   orders           Order[]   @relation("UserOrders")
   sessions         Session[] @relation("UserSessions")
   uploadedArtworks Artwork[] @relation("UserArtworks")

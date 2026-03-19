@@ -18,21 +18,22 @@ export default function AuthLayout({
     showBackHome = true,
 }: AuthLayoutProps) {
     return (
-        <div className="min-h-screen w-full flex bg-white dark:bg-[#0f0f12] transition-colors">
+        <div className="min-h-screen w-full flex bg-white dark:bg-[#0f0f12] transition-colors" suppressHydrationWarning={true}>
             {/* Left Side - Art/Image */}
             <div className="hidden lg:flex w-1/2 relative bg-gray-900 overflow-hidden">
-                <div className="absolute inset-0 z-0">
+                <div className="absolute inset-0 z-0" suppressHydrationWarning={true}>
                     <Image
                         src="/auth_background_art.png"
                         alt="Artistic background"
                         fill
+                        sizes="(max-width: 1024px) 100vw, 50vw"
                         className="object-cover opacity-90"
                         priority
                     />
-                    <div className="absolute inset-0 bg-gradient-to-br from-teal-900/40 to-gray-900/60 mix-blend-multiply" />
+                    <div className="absolute inset-0 bg-gradient-to-br from-teal-900/40 to-gray-900/60 mix-blend-multiply" suppressHydrationWarning={true} />
                 </div>
 
-                <div className="relative z-10 w-full flex flex-col justify-between p-12 text-white">
+                <div className="relative z-10 w-full flex flex-col justify-between p-12 text-white" suppressHydrationWarning={true}>
                     <div>
                         <Link href="/" className="text-2xl font-serif tracking-wider font-bold">
                             ARTELIER

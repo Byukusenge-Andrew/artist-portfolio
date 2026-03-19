@@ -3,7 +3,9 @@ import { prisma } from "@/lib/prisma";
 import { hashPassword, validatePassword } from "@/lib/auth";
 import { signToken } from "@/lib/jwt";
 import { checkRateLimit } from "@/lib/rate-limit";
+import { sendVerificationEmail } from "@/lib/email";
 import { z } from "zod";
+import crypto from "crypto";
 
 const registerSchema = z.object({
   email: z.string().email("Invalid email"),
@@ -14,24 +16,18 @@ const registerSchema = z.object({
 
 export async function POST(req: Request) {
   try {
-    // Rate limiting - 3 registrations per hour
     const rateLimitResult = await checkRateLimit(req, "register");
     if (!rateLimitResult.allowed) {
       return NextResponse.json(
         { error: "Too many registration attempts. Please try again later." },
-        {
-          status: 429,
-          headers: rateLimitResult.headers,
-        }
+        { status: 429, headers: rateLimitResult.headers }
       );
     }
 
     const body = await req.json();
 
-    // Validate schema
     const validation = registerSchema.safeParse(body);
     if (!validation.success) {
-      console.error("Registration validation failed:", validation.error.flatten());
       return NextResponse.json(
         { error: validation.error.flatten().fieldErrors },
         { status: 400 }
@@ -40,15 +36,10 @@ export async function POST(req: Request) {
 
     const { email, password, confirmPassword, name } = validation.data;
 
-    // Check passwords match
     if (password !== confirmPassword) {
-      return NextResponse.json(
-        { error: "Passwords don't match" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Passwords don't match" }, { status: 400 });
     }
 
-    // Validate password strength
     const passwordValidation = validatePassword(password);
     if (!passwordValidation.valid) {
       return NextResponse.json(
@@ -57,41 +48,30 @@ export async function POST(req: Request) {
       );
     }
 
-    // Check if user exists
-    const existingUser = await prisma.user.findUnique({
-      where: { email },
-    });
-
+    const existingUser = await prisma.user.findUnique({ where: { email } });
     if (existingUser) {
-      return NextResponse.json(
-        { error: "Email already registered" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Email already registered" }, { status: 400 });
     }
 
-    // Hash password (now async with bcrypt)
     const hashedPassword = await hashPassword(password);
 
-    // Determine role and approval status
     const requestedRole = body.role as "USER" | "ARTIST" | "ADMIN" | undefined;
-    let role: "USER" | "ARTIST" | "ADMIN" = "USER"; // Default to USER (buyer)
-    let isApproved = true; // Users and artists are auto-approved
+    let role: "USER" | "ARTIST" | "ADMIN" = "USER";
+    let isApproved = true;
 
     if (requestedRole === "ARTIST") {
-      role = "ARTIST"; // Artists can self-register
+      role = "ARTIST";
     } else if (requestedRole === "ADMIN") {
       role = "ADMIN";
-      // Check if this is the first admin (auto-approve first admin)
       const existingAdminCount = await prisma.user.count({
-        where: {
-          role: "ADMIN",
-          isApproved: true,
-        },
+        where: { role: "ADMIN", isApproved: true },
       });
-      isApproved = existingAdminCount === 0; // First admin is auto-approved
+      isApproved = existingAdminCount === 0;
     }
 
-    // Create user
+    // Generate email verification token
+    const emailVerifyToken = crypto.randomBytes(32).toString("hex");
+
     const user = await prisma.user.create({
       data: {
         email,
@@ -99,21 +79,23 @@ export async function POST(req: Request) {
         name,
         role,
         isApproved,
+        isEmailVerified: false,
+        emailVerifyToken,
       },
     });
 
-    // If admin needs approval, don't create session
+    // Send verification email (non-blocking)
+    sendVerificationEmail(email, name, emailVerifyToken).catch((err) =>
+      console.error("Failed to send verification email:", err)
+    );
+
     if (role === "ADMIN" && !isApproved) {
       return NextResponse.json(
-        {
-          message: "Admin account created. Waiting for approval from an existing admin.",
-          requiresApproval: true,
-        },
+        { message: "Admin account created. Waiting for approval.", requiresApproval: true },
         { status: 201 }
       );
     }
 
-    // Create JWT session token
     const sessionToken = await signToken({
       userId: user.id,
       email: user.email,
@@ -121,44 +103,34 @@ export async function POST(req: Request) {
       name: user.name || undefined,
     });
 
-    // Determine redirect URL based on role
     const url = new URL(req.url);
     const redirectParam = url.searchParams.get("redirect");
-
-    let defaultRedirect = "/user/dashboard"; // Buyer default
-    if (role === "ARTIST") {
-      defaultRedirect = "/artist/dashboard";
-    } else if (role === "ADMIN") {
-      defaultRedirect = "/admin/dashboard";
-    }
+    let defaultRedirect = "/user/dashboard";
+    if (role === "ARTIST") defaultRedirect = "/artist/dashboard";
+    else if (role === "ADMIN") defaultRedirect = "/admin/dashboard";
 
     const redirectUrl = redirectParam || defaultRedirect;
 
     const res = NextResponse.json(
       {
-        message: "Account created successfully",
+        message: "Account created! Please check your email to verify your account.",
         redirectUrl,
+        requiresVerification: true,
       },
-      {
-        status: 201,
-        headers: rateLimitResult.headers,
-      }
+      { status: 201, headers: rateLimitResult.headers }
     );
 
     res.cookies.set("user_session", sessionToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
-      maxAge: 60 * 60 * 24 * 7, // 7 days
+      maxAge: 60 * 60 * 24 * 7,
       path: "/",
     });
 
     return res;
   } catch (error) {
     console.error("Registration error:", error);
-    return NextResponse.json(
-      { error: "Registration failed" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Registration failed" }, { status: 500 });
   }
 }

@@ -1,35 +1,24 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verifyToken } from "./lib/jwt";
-import { prisma } from "./lib/prisma";
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const userSession = request.cookies.get("user_session")?.value;
 
-  // Decode user session if available (JWT verification)
+  // Decode user session if available (JWT verification only — no DB in Edge Runtime)
   let user: { role?: string; userId?: string; sessionId?: string } | null = null;
   if (userSession) {
     const payload = await verifyToken(userSession);
     if (payload && payload.type === "access" && payload.jti) {
-      // Check if session exists and is not expired in DB
-      try {
-        const dbSession = await prisma.session.findUnique({
-          where: { id: payload.jti }
-        });
-
-        if (dbSession && new Date() < dbSession.expiresAt) {
-          user = {
-            role: payload.role,
-            userId: payload.userId,
-            sessionId: payload.jti,
-          };
-        }
-      } catch (error) {
-        console.error("Database error during session verification:", error);
-        // Fallback or deny? Let's deny for security if DB is strictly required for auth
-      }
+      // JWT is cryptographically valid — accept it in middleware.
+      // Session revocation is enforced by the API routes which DO have DB access.
+      user = {
+        role: payload.role,
+        userId: payload.userId,
+        sessionId: payload.jti,
+      };
     }
-    // Invalid/expired JWT or revoked session — session is null
+    // Invalid/expired JWT — session is null
   }
 
   const isAuthenticated = !!user;
@@ -111,7 +100,7 @@ function addSecurityHeaders(response: NextResponse): NextResponse {
   // Content Security Policy
   response.headers.set(
     "Content-Security-Policy",
-    "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://js.stripe.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' https://api.stripe.com https://res.cloudinary.com; frame-src https://js.stripe.com;"
+    "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://js.stripe.com https://va.vercel-scripts.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' https://api.stripe.com https://res.cloudinary.com https://va.vercel-scripts.com; frame-src https://js.stripe.com;"
   );
 
   // HTTP Strict Transport Security
