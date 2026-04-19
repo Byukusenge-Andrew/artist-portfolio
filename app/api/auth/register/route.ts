@@ -14,6 +14,31 @@ const registerSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
 });
 
+/**
+ * @swagger
+ * /api/auth/register:
+ *   post:
+ *     summary: Register a new user
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [email, password, name]
+ *             properties:
+ *               email: { type: string, format: email }
+ *               password: { type: string, minLength: 8 }
+ *               name: { type: string }
+ *               role: { type: string, enum: [USER, ARTIST] }
+ *     responses:
+ *       201:
+ *         description: User created successfully
+ *       400:
+ *         description: Validation error
+ */
+
 export async function POST(req: Request) {
   try {
     const rateLimitResult = await checkRateLimit(req, "register");
@@ -83,6 +108,19 @@ export async function POST(req: Request) {
         emailVerifyToken,
       },
     });
+
+    /**
+     * @swagger
+     * components:
+     *   schemas:
+     *     User:
+     *       type: object
+     *       properties:
+     *         id: { type: string }
+     *         email: { type: string }
+     *         name: { type: string }
+     *         role: { type: string }
+     */
 
     // Send verification email (non-blocking)
     sendVerificationEmail(email, name, emailVerifyToken).catch((err) =>

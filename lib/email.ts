@@ -13,7 +13,9 @@ function createTransporter() {
   });
 }
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 
+  (process.env.NEXT_PUBLIC_VERCEL_URL ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}` : "http://localhost:3000");
+
 const fromAddress = process.env.GMAIL_USER || "noreply@artelier.com";
 const fromName = "Artelier";
 
@@ -218,5 +220,83 @@ export async function sendCommissionRequestEmail(
       <p style="font-size:13px;color:#6b7280;">You can reply directly to this email or contact the client at ${commission.email}.</p>
     `),
     replyTo: commission.email,
+  });
+}
+
+/**
+ * Notify a client about a commission status update.
+ */
+export async function sendCommissionStatusUpdateEmail(
+  to: string,
+  clientName: string,
+  newStatus: string
+) {
+  const transporter = createTransporter();
+
+  // Make status human readable
+  const readableStatus: Record<string, string> = {
+    NEW: "New",
+    IN_REVIEW: "In Review",
+    INVOICE_SENT: "Invoice Sent",
+    PAID: "Paid",
+    REJECTED: "Declined"
+  };
+
+  await transporter.sendMail({
+    from: `"${fromName}" <${fromAddress}>`,
+    to,
+    subject: `Update on your commission request`,
+    html: htmlWrapper(`
+      <h2>Commission Request Update</h2>
+      <p>Hi ${clientName},</p>
+      <p>The status of your commission request has been updated to: <strong>${readableStatus[newStatus] || newStatus}</strong>.</p>
+      <hr class="divider" />
+      <p style="font-size:13px;color:#6b7280;">If you have any questions, feel free to reply directly to this email.</p>
+    `),
+  });
+}
+
+/**
+ * Notify a buyer about an order status update (e.g., shipped).
+ */
+export async function sendOrderStatusUpdateEmail(
+  to: string,
+  clientName: string,
+  orderId: string,
+  newStatus: string
+) {
+  const transporter = createTransporter();
+
+  // Make status human readable
+  const readableStatus: Record<string, string> = {
+    PENDING: "Pending",
+    PAID: "Paid & Processing",
+    PENDING_DELIVERY: "Shipped / Ready for Delivery",
+    FULFILLED: "Fulfilled",
+    CANCELED: "Canceled"
+  };
+
+  let extraMessage = "";
+  if (newStatus === "PENDING_DELIVERY") {
+    extraMessage = "<p>Great news! Your order is on its way. The artist has marked it as shipped or ready for delivery.</p>";
+  } else if (newStatus === "FULFILLED") {
+    extraMessage = "<p>Your order has been marked as fulfilled. We hope you love your new artwork!</p>";
+  } else {
+    extraMessage = "<p>Your order status has been updated.</p>";
+  }
+
+  await transporter.sendMail({
+    from: `"${fromName}" <${fromAddress}>`,
+    to,
+    subject: `Update on your order #${orderId.slice(-8).toUpperCase()}`,
+    html: htmlWrapper(`
+      <h2>Order Status Update</h2>
+      <p>Hi ${clientName},</p>
+      ${extraMessage}
+      <p>The status of your order #${orderId.slice(-8).toUpperCase()} is now: <strong>${readableStatus[newStatus] || newStatus}</strong>.</p>
+      <a href="${siteUrl}/user/orders" class="btn">View Order History</a>
+      <hr class="divider" />
+      <p style="font-size:13px;color:#6b7280;">If you have any questions, feel free to reply directly to this email.</p>
+    `),
   });
 }

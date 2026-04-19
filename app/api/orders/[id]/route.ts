@@ -3,6 +3,8 @@ import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 
 import { getCurrentUser } from "@/lib/authorization";
+import { sendOrderStatusUpdateEmail } from "@/lib/email";
+
 
 export async function GET(
   req: Request,
@@ -116,7 +118,17 @@ export async function PATCH(
         include: { items: true },
       });
 
+      if (updated.status !== order.status) {
+        sendOrderStatusUpdateEmail(
+          updated.email,
+          updated.customerName || "Customer",
+          updated.id,
+          updated.status
+        ).catch((err) => console.error("Failed to send order status email:", err));
+      }
+
       return NextResponse.json(updated);
+
     }
 
     // ── USER: can confirm receipt once artist has marked as PENDING_DELIVERY ──
@@ -147,7 +159,17 @@ export async function PATCH(
         include: { items: true },
       });
 
+      if (updated.status !== order.status) {
+        sendOrderStatusUpdateEmail(
+          updated.email,
+          updated.customerName || "Customer",
+          updated.id,
+          updated.status
+        ).catch((err) => console.error("Failed to send order status email:", err));
+      }
+
       return NextResponse.json(updated);
+
     }
 
     // ── ADMIN: can set any status ──
@@ -163,7 +185,17 @@ export async function PATCH(
         include: { items: true },
       });
 
+      if (updated.status !== order.status) {
+        sendOrderStatusUpdateEmail(
+          updated.email,
+          updated.customerName || "Customer",
+          updated.id,
+          updated.status
+        ).catch((err) => console.error("Failed to send order status email:", err));
+      }
+
       return NextResponse.json(updated);
+
     }
 
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });

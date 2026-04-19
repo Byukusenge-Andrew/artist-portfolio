@@ -50,10 +50,20 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(loginUrl);
     }
 
+
     // Strict check for admin-only pages (like user management) could go here
     // But for now, we rely on page-level checks since we share some admin routes with artists
 
     return addSecurityHeaders(NextResponse.next());
+  }
+
+  if (pathname.startsWith("/docs")||pathname.startsWith("/api/docs")) {
+   if(!isAuthenticated || !isAdmin){
+    const loginUrl = new URL("/auth/login", request.url);
+    loginUrl.searchParams.set("redirect", pathname);
+    return NextResponse.redirect(loginUrl);
+   }
+   return addSecurityHeaders(NextResponse.next());
   }
 
   // Artist routes - require artist role

@@ -10,6 +10,22 @@ const artistSchema = z.object({
   bio: z.string().optional(),
 });
 
+/**
+ * @swagger
+ * /api/artists:
+ *   get:
+ *     summary: Get all artists
+ *     tags: [Artists]
+ *     responses:
+ *       200:
+ *         description: List of artists
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items: { $ref: '#/components/schemas/User' }
+ */
+
 export async function GET() {
   try {
     const artists = await prisma.user.findMany({

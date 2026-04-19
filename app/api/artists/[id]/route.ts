@@ -10,6 +10,39 @@ const updateSchema = z.object({
   isActive: z.boolean().optional(),
 });
 
+/**
+ * @swagger
+ * /api/artists/{id}:
+ *   get:
+ *     summary: Get single artist
+ *     tags: [Artists]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Artist found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id: { type: string }
+ *                 name: { type: string }
+ *                 email: { type: string }
+ *                 bio: { type: string }
+ *                 avatarUrl: { type: string }
+ *                 isActive: { type: boolean }
+ *                 isApproved: { type: boolean }
+ *                 createdAt: { type: string, format: date-time }
+ *                 uploadedArtworks: { type: array, items: { $ref: '#/components/schemas/Artwork' } }
+ *       404:
+ *         description: Artist not found
+ */
+
 // GET /api/artists/[id] - Get single artist
 export async function GET(
   req: Request,

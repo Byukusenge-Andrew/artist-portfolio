@@ -3,6 +3,19 @@ import { cookies } from "next/headers";
 import { verifyToken } from "@/lib/jwt";
 import { prisma } from "@/lib/prisma";
 
+/**
+ * @swagger
+ * /api/auth/logout:
+ *   post:
+ *     summary: Logout user
+ *     tags: [Auth]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: User logged out successfully
+ */
+
 export async function POST(req: Request) {
   const cookieStore = await cookies();
   const sessionToken = cookieStore.get("user_session")?.value;

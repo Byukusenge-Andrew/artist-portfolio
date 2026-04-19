@@ -11,6 +11,44 @@ const loginSchema = z.object({
   rememberMe: z.boolean().optional(),
 });
 
+/**
+ * @swagger
+ * /api/auth/login:
+ *   post:
+ *     summary: Login user
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [email, password]
+ *             properties:
+ *               email: { type: string, format: email }
+ *               password: { type: string }
+ *               rememberMe: { type: boolean }
+ *     responses:
+ *       200:
+ *         description: Login successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message: { type: string }
+ *                 user: { $ref: '#/components/schemas/User' }
+ *                 redirectUrl: { type: string }
+ *       400:
+ *         description: Validation error
+ *       401:
+ *         description: Invalid credentials
+ *       403:
+ *         description: Account inactive or pending approval
+ *       429:
+ *         description: Too many attempts
+ */
+
 export async function POST(req: Request) {
   try {
     // Rate limiting - 5 attempts per 15 minutes

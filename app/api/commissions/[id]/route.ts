@@ -49,6 +49,8 @@ export async function GET(
   }
 }
 
+import { sendCommissionStatusUpdateEmail } from "@/lib/email";
+
 export async function PATCH(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -56,21 +58,42 @@ export async function PATCH(
   const { id } = await params;
   const user = await getCurrentUser(req as any);
 
-  // Only admins can update commission status
-  if (!user || user.role !== "ADMIN") {
+  if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   try {
+    const commission = await prisma.commissionRequest.findUnique({
+      where: { id },
+    });
+
+    if (!commission) {
+      return NextResponse.json({ error: "Commission not found" }, { status: 404 });
+    }
+
+    // Admins can update any commission; Artists can only update their own
+    if (user.role !== "ADMIN" && (user.role !== "ARTIST" || commission.artistId !== user.userId)) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
     const body = await req.json();
     const validated = updateSchema.parse(body);
 
-    const commission = await prisma.commissionRequest.update({
+    const updatedCommission = await prisma.commissionRequest.update({
       where: { id },
       data: { status: validated.status },
     });
 
-    return NextResponse.json(commission);
+    // Send email notification to client if status actually changed
+    if (commission.status !== validated.status) {
+      sendCommissionStatusUpdateEmail(
+        updatedCommission.email,
+        updatedCommission.name,
+        updatedCommission.status
+      ).catch((err) => console.error("Failed to send commission status update email:", err));
+    }
+
+    return NextResponse.json(updatedCommission);
   } catch (error) {
     console.error("Failed to update commission:", error);
     if (error instanceof z.ZodError) {

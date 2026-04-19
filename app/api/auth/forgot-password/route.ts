@@ -8,6 +8,28 @@ const forgotPasswordSchema = z.object({
     email: z.string().email("Invalid email"),
 });
 
+/**
+ * @swagger
+ * /api/auth/forgot-password:
+ *   post:
+ *     summary: Request password reset
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [email]
+ *             properties:
+ *               email: { type: string, format: email }
+ *     responses:
+ *       200:
+ *         description: Password reset link sent successfully
+ *       400:
+ *         description: Validation error
+ */
+
 export async function POST(req: Request) {
     try {
         const body = await req.json();

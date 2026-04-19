@@ -22,6 +22,21 @@ const createArtworkSchema = z.object({
     .default([]),
 });
 
+/**
+ * @swagger
+ * /api/artworks:
+ *   get:
+ *     summary: Get all artworks
+ *     tags: [Artworks]
+ *     responses:
+ *       200:
+ *         description: List of artworks
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items: { $ref: '#/components/schemas/Artwork' }
+ */
 export async function GET() {
   const artworks = await prisma.artwork.findMany({
     include: { printOptions: true, galleries: { include: { gallery: true } } },
