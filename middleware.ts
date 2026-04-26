@@ -140,6 +140,8 @@ export const config = {
     "/user/:path*",
     "/auth/:path*",
     "/order/:path*",
+    "/docs/:path*",
+    "/api/docs/:path*",
   ],
 };
 

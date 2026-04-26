@@ -7,7 +7,7 @@
     "dev:http": "next dev -p 3001",
     "build": "prisma generate && next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "next lint .",
     "migrate": "prisma migrate dev",
     "generate": "prisma generate",
     "generate:certs": "node scripts/generate-certs.js",

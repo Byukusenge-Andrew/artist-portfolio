@@ -5,7 +5,9 @@ import 'swagger-ui-react/swagger-ui.css';
 
 export default function ApiDocs() {
   return (
-    <div className="min-h-screen bg-white">
+    //suppress hydation
+    
+    <div className="min-h-screen bg-white" suppressHydrationWarning>
       <SwaggerUI url="/api/docs/swagger.json" />
     </div>
   );
