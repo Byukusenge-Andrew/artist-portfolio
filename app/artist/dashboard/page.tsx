@@ -218,7 +218,7 @@ export default async function ArtistDashboard() {
                 </div>
 
                 {/* Direct Commissions */}
-                <div className="bg-white dark:bg-[#1a1a24] rounded-lg border border-gray-200 dark:border-gray-700 mb-12 transition-colors">
+                <div id="commissions" className="bg-white dark:bg-[#1a1a24] rounded-lg border border-gray-200 dark:border-gray-700 mb-12 transition-colors scroll-mt-20">
                     <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
                         <div className="flex items-center gap-2">
                             <MessageSquare className="h-5 w-5 text-purple-600 dark:text-purple-400" />

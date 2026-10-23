@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { cookies } from "next/headers";
-import { Images, Plus, LogOut, Shield, User, Heart, Bell, Menu } from "lucide-react";
+import { Images, Plus, LogOut, Shield, User, Heart, Bell, Menu, Palette } from "lucide-react";
+
 import SearchBox from "./SearchBox";
 import FavoritesButton from "./FavoritesButton";
 import CartButton from "./CartButton";
@@ -8,6 +9,8 @@ import Image from "next/image";
 import { parseUserSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import ThemeToggle from "./ThemeToggle";
+
+import ArtistHeader from "./ArtistHeader";
 
 export default async function Header() {
   let user: Awaited<ReturnType<typeof parseUserSession>> = null;
@@ -22,6 +25,35 @@ export default async function Header() {
   const isAdmin = user?.role === "ADMIN";
   const isArtist = user?.role === "ARTIST";
   const isAuthenticated = !!user;
+
+  // Personalized Artist Navigation Experience
+  if (isArtist && user) {
+    let artistData: { avatarUrl?: string | null; name?: string | null; bio?: string | null } | null = null;
+    let pendingCommissionsCount = 0;
+    try {
+      const [artistRecord, count] = await Promise.all([
+        prisma.user.findUnique({
+          where: { id: user.userId },
+          select: { avatarUrl: true, name: true, bio: true },
+        }),
+        prisma.commissionRequest.count({
+          where: { artistId: user.userId, status: "NEW" },
+        }),
+      ]);
+      artistData = artistRecord;
+      pendingCommissionsCount = count;
+    } catch (err) {
+      console.error("Failed to load artist header data:", err);
+    }
+
+    return (
+      <ArtistHeader
+        user={{ ...user, role: "ARTIST" }}
+        artistData={artistData}
+        pendingCommissionsCount={pendingCommissionsCount}
+      />
+    );
+  }
 
   // Get pending admin count if user is admin
   let pendingAdminCount = 0;
@@ -39,6 +71,7 @@ export default async function Header() {
   }
 
   return (
+
     <header className="sticky top-0 z-50 border-b border-teal-100/50 dark:border-gray-700/50 bg-white/80 dark:bg-[#1a1a24]/80 backdrop-blur-xl supports-[backdrop-filter]:bg-white/70 dark:supports-[backdrop-filter]:bg-[#1a1a24]/70 shadow-sm dark:shadow-gray-900/20 transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 h-14 sm:h-16 flex items-center gap-3 sm:gap-4 lg:gap-6 justify-between">
         {/* Logo */}
@@ -57,12 +90,21 @@ export default async function Header() {
         <nav className="flex items-center gap-1 sm:gap-2 text-sm">
           {/* Public Links - Hidden on small mobile */}
           <Link
+            href="/artworks"
+            className="hidden sm:inline-flex group items-center gap-2 rounded-lg px-2 lg:px-3 py-2 text-gray-700 dark:text-gray-300 hover:text-teal-800 dark:hover:text-teal-400 hover:bg-gradient-to-br hover:from-teal-50 hover:to-emerald-50 dark:hover:from-teal-900/30 dark:hover:to-emerald-900/30 transition-all duration-300"
+          >
+            <Palette className="size-4 group-hover:scale-110 transition-transform" />
+            <span className="hidden lg:inline font-medium">Artworks</span>
+          </Link>
+
+          <Link
             href="/site/galleries"
             className="hidden sm:inline-flex group items-center gap-2 rounded-lg px-2 lg:px-3 py-2 text-gray-700 dark:text-gray-300 hover:text-teal-800 dark:hover:text-teal-400 hover:bg-gradient-to-br hover:from-teal-50 hover:to-emerald-50 dark:hover:from-teal-900/30 dark:hover:to-emerald-900/30 transition-all duration-300"
           >
             <Images className="size-4 group-hover:scale-110 transition-transform" />
             <span className="hidden lg:inline font-medium">Galleries</span>
           </Link>
+
 
           <Link
             href="/site/commissions"

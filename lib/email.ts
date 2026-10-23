@@ -300,3 +300,57 @@ export async function sendOrderStatusUpdateEmail(
     `),
   });
 }
+
+/**
+ * Notify the gallery team of a new contact form message.
+ */
+export async function sendContactInquiryEmail(inquiry: {
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+}) {
+  const transporter = createTransporter();
+  const recipient = process.env.CONTACT_EMAIL || process.env.GMAIL_USER || fromAddress;
+
+  await transporter.sendMail({
+    from: `"${fromName} Contact" <${fromAddress}>`,
+    to: recipient,
+    replyTo: inquiry.email,
+    subject: `📩 [Contact] ${inquiry.subject} - from ${inquiry.name}`,
+    html: htmlWrapper(`
+      <h2>New Contact Form Inquiry</h2>
+      <p><strong>From:</strong> ${inquiry.name} (<a href="mailto:${inquiry.email}" style="color:#0d9488;">${inquiry.email}</a>)</p>
+      <p><strong>Subject:</strong> ${inquiry.subject}</p>
+      <hr class="divider" />
+      <p><strong>Message:</strong></p>
+      <blockquote style="margin:12px 0;padding:12px 16px;background:#f9fafb;border-left:4px solid #0d9488;border-radius:4px;color:#374151;white-space:pre-wrap;">
+        ${inquiry.message.replace(/\n/g, "<br/>")}
+      </blockquote>
+      <p style="font-size:13px;color:#6b7280;">You can click Reply in your email client to respond directly to ${inquiry.email}.</p>
+    `),
+  });
+}
+
+/**
+ * Send an immediate confirmation auto-reply to the person who contacted Artelier.
+ */
+export async function sendContactAutoReplyEmail(to: string, name: string, subject: string) {
+  const transporter = createTransporter();
+
+  await transporter.sendMail({
+    from: `"${fromName}" <${fromAddress}>`,
+    to,
+    subject: `We received your message: ${subject}`,
+    html: htmlWrapper(`
+      <h2>Thank You for Contacting Artelier! ✨</h2>
+      <p>Hi ${name},</p>
+      <p>We've received your message regarding <strong>"${subject}"</strong>. Our team or the relevant artist will review your inquiry and get back to you within 24 to 48 hours.</p>
+      <hr class="divider" />
+      <p>In the meantime, feel free to explore our latest original pieces and artist galleries:</p>
+      <a href="${siteUrl}/site/galleries" class="btn">Explore Galleries</a>
+      <p style="font-size:13px;color:#6b7280;">This is an automated receipt confirmation from Artelier.</p>
+    `),
+  });
+}
+

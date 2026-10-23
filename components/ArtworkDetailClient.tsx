@@ -4,7 +4,7 @@
 import FavoriteButton from "@/components/FavoriteButton";
 import { ArtworkImage } from "@/components/ArtworkImage";
 import { ShareButton } from "@/components/ShareButton";
-import { Tag, Calendar, Palette } from "lucide-react";
+import { Tag, Calendar, Palette, ShieldCheck, Truck, Award, MessageCircleQuestion } from "lucide-react";
 import Link from "next/link";
 import ArtworkDeleteButton from "@/components/ArtworkDeleteButton";
 import { useRouter } from "next/navigation";
@@ -105,7 +105,7 @@ export default function ArtworkDetailClient({
             />
             <FavoriteButton artworkId={artwork.id} artworkTitle={artwork.title} />
             <ShareButton
-              url={`${process.env.NEXT_PUBLIC_BASE_URL || ""}/art/${artwork.slug}`}
+              url={typeof window !== "undefined" ? `${window.location.origin}/site/${artwork.slug}` : `${process.env.NEXT_PUBLIC_BASE_URL || ""}/site/${artwork.slug}`}
               title={artwork.title}
             />
           </div>
@@ -170,6 +170,43 @@ export default function ArtworkDetailClient({
             printEnabled={artwork.printEnabled}
             printOptions={artwork.printOptions}
           />
+
+          {/* Collector Assurance & Direct Inquiry */}
+          <div className="bg-gradient-to-br from-teal-50/50 via-white to-emerald-50/30 dark:from-[#181822] dark:via-[#16161e] dark:to-[#181822] rounded-2xl p-6 border border-teal-100/80 dark:border-gray-800 space-y-4 shadow-sm transition-colors">
+            <h3 className="text-sm font-bold uppercase tracking-wider text-teal-800 dark:text-teal-300 flex items-center gap-2">
+              <Award className="size-4 text-teal-600 dark:text-teal-400" />
+              Artelier Collector Guarantee
+            </h3>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-gray-600 dark:text-gray-300">
+              <div className="flex items-start gap-2.5">
+                <ShieldCheck className="size-4 text-emerald-600 dark:text-emerald-400 flex-shrink-0 mt-0.5" />
+                <span>
+                  <strong>100% Verified Authentic:</strong> Includes signed Certificate of Authenticity.
+                </span>
+              </div>
+              <div className="flex items-start gap-2.5">
+                <Truck className="size-4 text-teal-600 dark:text-teal-400 flex-shrink-0 mt-0.5" />
+                <span>
+                  <strong>Insured Global Shipping:</strong> Packed in custom archival, climate-safe casing.
+                </span>
+              </div>
+            </div>
+
+            <div className="pt-3 border-t border-teal-100/60 dark:border-gray-800/80 flex flex-wrap items-center justify-between gap-3">
+              <span className="text-xs text-gray-500 dark:text-gray-400">
+                Have questions about framing or dimensions?
+              </span>
+              <Link
+                href={`/contact?subject=${encodeURIComponent(`Inquiry regarding artwork: "${artwork.title}"`)}`}
+                className="inline-flex items-center gap-1.5 text-xs font-semibold text-teal-700 dark:text-teal-400 hover:text-teal-800 dark:hover:text-teal-300 hover:underline transition-all"
+              >
+                <MessageCircleQuestion className="size-3.5" />
+                Ask a Question About This Piece
+              </Link>
+            </div>
+          </div>
+
         </div>
       </div>
 

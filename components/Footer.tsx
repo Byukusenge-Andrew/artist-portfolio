@@ -63,14 +63,20 @@ export default async function Footer() {
           <div className="space-y-4 sm:col-span-1">
             <h3 className="font-semibold text-gray-900 dark:text-gray-100 text-sm uppercase tracking-wider">Explore</h3>
             <nav className="flex flex-col gap-2">
+              <Link href="/artworks" className="text-sm text-gray-600 dark:text-gray-400 hover:text-teal-700 dark:hover:text-teal-400 transition-colors inline-flex items-center gap-2 group">
+                <span className="group-hover:translate-x-1 transition-transform">→</span>
+                Explore Artworks
+              </Link>
               <Link href="/site/galleries" className="text-sm text-gray-600 dark:text-gray-400 hover:text-teal-700 dark:hover:text-teal-400 transition-colors inline-flex items-center gap-2 group">
                 <span className="group-hover:translate-x-1 transition-transform">→</span>
                 Galleries
               </Link>
-              <Link href="/site/artist" className="text-sm text-gray-600 dark:text-gray-400 hover:text-teal-700 dark:hover:text-teal-400 transition-colors inline-flex items-center gap-2 group">
+              <Link href="/site/artists" className="text-sm text-gray-600 dark:text-gray-400 hover:text-teal-700 dark:hover:text-teal-400 transition-colors inline-flex items-center gap-2 group">
                 <span className="group-hover:translate-x-1 transition-transform">→</span>
-                Artist Profile
+                Featured Artists
               </Link>
+
+
               <Link href="/site/commissions" className="text-sm text-gray-600 dark:text-gray-400 hover:text-teal-700 dark:hover:text-teal-400 transition-colors inline-flex items-center gap-2 group">
                 <span className="group-hover:translate-x-1 transition-transform">→</span>
                 Commissions

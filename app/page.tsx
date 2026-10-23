@@ -9,56 +9,59 @@ import { Analytics } from "@vercel/analytics/next"
 import { getTopArtists } from "@/lib/queries/artists";
 
 export default async function Home() {
-  const latest = await prisma.artwork.findMany({
-    orderBy: { createdAt: "desc" },
-    take: 12,
-    include: {
-      uploader: {
-        select: {
-          id: true,
-          name: true,
-          avatarUrl: true,
-          bio: true,
+  const [latest, allWithEngagement, artworkCount, artistCount, collectorCount, topArtists, rawArtists] = await Promise.all([
+    prisma.artwork.findMany({
+      where: { deletedAt: null },
+      orderBy: { createdAt: "desc" },
+      take: 12,
+      include: {
+        uploader: {
+          select: {
+            id: true,
+            name: true,
+            avatarUrl: true,
+            bio: true,
+          },
+        },
+        _count: {
+          select: {
+            likes: true,
+            comments: true,
+          },
         },
       },
-      _count: {
-        select: {
-          likes: true,
-          comments: true,
+    }),
+    prisma.artwork.findMany({
+      where: { deletedAt: null },
+      take: 50,
+      include: {
+        uploader: {
+          select: { id: true, name: true, avatarUrl: true, bio: true },
         },
+        _count: { select: { likes: true, comments: true } },
       },
-    },
-  });
+    }),
+    prisma.artwork.count({ where: { deletedAt: null } }),
+    prisma.user.count({ where: { role: "ARTIST" } }),
+    prisma.user.count({ where: { role: "USER" } }),
+    getTopArtists(6),
+    prisma.artist.findMany({
+      orderBy: { createdAt: "desc" },
+      take: 12,
+      select: { name: true, avatarUrl: true },
+    }).catch(() => [] as Array<{ name: string; avatarUrl: string | null }>),
+  ]);
+
+  const artists = rawArtists && rawArtists.length > 0 
+    ? rawArtists 
+    : topArtists.map((a) => ({ name: a.name || "Featured Artist", avatarUrl: a.avatarUrl }));
 
   // Trending: rank by likes + comments (true engagement, not recency)
-  const allWithEngagement = await prisma.artwork.findMany({
-    take: 50,
-    include: {
-      uploader: {
-        select: { id: true, name: true, avatarUrl: true, bio: true },
-      },
-      _count: { select: { likes: true, comments: true } },
-    },
-  });
-
   const trending = [...allWithEngagement]
     .sort((a, b) => (b._count.likes + b._count.comments) - (a._count.likes + a._count.comments))
     .filter((a) => a._count.likes + a._count.comments > 0)
     .slice(0, 3);
 
-  // Optional: artist list, if the model/migration is applied
-  let artists: Array<{ name: string; avatarUrl: string | null }> = [];
-  try {
-    artists = await prisma.artist.findMany({
-      orderBy: { createdAt: "desc" },
-      take: 12,
-      select: { name: true, avatarUrl: true },
-    });
-  } catch {
-    artists = [];
-  }
-
-  const topArtists = await getTopArtists(6);
 
   return (
     <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6">
@@ -110,18 +113,19 @@ export default async function Home() {
             {/* Stats */}
             <div className="grid grid-cols-3 gap-4 sm:gap-6 lg:gap-8 pt-4 sm:pt-6 border-t border-white/20">
               <div>
-                <div className="text-2xl sm:text-3xl font-bold">{(await prisma.artwork.count())}+</div>
+                <div className="text-2xl sm:text-3xl font-bold">{artworkCount}+</div>
                 <div className="text-xs sm:text-sm text-white/80">Artworks</div>
               </div>
               <div>
-                <div className="text-2xl sm:text-3xl font-bold">{(await prisma.user.count({ where: { role: "ARTIST" } }))}+</div>
+                <div className="text-2xl sm:text-3xl font-bold">{artistCount}+</div>
                 <div className="text-xs sm:text-sm text-white/80">Artists</div>
               </div>
               <div>
-                <div className="text-2xl sm:text-3xl font-bold">{(await prisma.user.count({ where: { role: "USER" } }))}+</div>
+                <div className="text-2xl sm:text-3xl font-bold">{collectorCount}+</div>
                 <div className="text-xs sm:text-sm text-white/80">Collectors</div>
               </div>
             </div>
+
           </div>
 
           <div className="relative h-48 sm:h-64 md:h-96 animate-scale-in">

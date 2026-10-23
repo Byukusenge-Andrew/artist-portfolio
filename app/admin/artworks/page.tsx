@@ -167,10 +167,11 @@ export default async function ManageArtworksPage() {
                                             <td className="px-6 py-4">
                                                 <div className="flex items-center justify-end gap-2">
                                                     <Link
-                                                        href={`/art/${artwork.slug}`}
+                                                        href={`/site/${artwork.slug}`}
                                                         className="p-2 text-gray-600 dark:text-gray-400 hover:text-teal-600 dark:hover:text-teal-400 hover:bg-teal-50 dark:hover:bg-teal-900/30 rounded-lg transition-colors"
                                                         title="View"
                                                     >
+
                                                         <Eye className="size-4" />
                                                     </Link>
                                                     <Link

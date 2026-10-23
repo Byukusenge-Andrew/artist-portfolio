@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
   Mail,
@@ -17,12 +18,23 @@ import {
 import { toast } from "sonner";
 
 export default function ContactClient() {
+  const searchParams = useSearchParams();
+  const querySubject = searchParams.get("subject") || "General Inquiry";
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
-    subject: "General Inquiry",
+    subject: querySubject,
     message: "",
   });
+
+  useEffect(() => {
+    const s = searchParams.get("subject");
+    if (s) {
+      setFormData((prev) => ({ ...prev, subject: s }));
+    }
+  }, [searchParams]);
+
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
@@ -30,13 +42,29 @@ export default function ContactClient() {
     e.preventDefault();
     setSubmitting(true);
 
-    // Simulate sending contact message
-    await new Promise((resolve) => setTimeout(resolve, 800));
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
 
-    toast.success("Thank you for reaching out! We will get back to you shortly.");
-    setSubmitted(true);
-    setSubmitting(false);
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.details?.[0] || data.error || "Failed to send message");
+      }
+
+      toast.success("Thank you for reaching out! We will get back to you shortly.");
+      setSubmitted(true);
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : "An error occurred while sending your message";
+      toast.error(errorMessage);
+    } finally {
+      setSubmitting(false);
+    }
   };
+
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-teal-50/40 via-white to-emerald-50/20 dark:from-[#0f0f12] dark:via-[#141418] dark:to-[#0f0f12] py-12 sm:py-16 px-4 sm:px-6 lg:px-8 transition-colors duration-300">
@@ -206,12 +234,16 @@ export default function ContactClient() {
                       onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
                       className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#141418] text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition-colors text-sm"
                     >
+                      {!["General Inquiry", "Order & Shipping Question", "Artist Application", "Commission Support", "Partnership / Collaboration"].includes(formData.subject) && (
+                        <option value={formData.subject}>{formData.subject}</option>
+                      )}
                       <option value="General Inquiry">General Inquiry</option>
                       <option value="Order & Shipping Question">Order & Shipping Question</option>
                       <option value="Artist Application">Artist Application</option>
                       <option value="Commission Support">Commission Support</option>
                       <option value="Partnership / Collaboration">Partnership / Collaboration</option>
                     </select>
+
                   </div>
 
                   <div>
