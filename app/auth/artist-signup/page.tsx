@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { AlertCircle, Palette } from "lucide-react";
 import AuthLayout from "@/components/auth/AuthLayout";
 import PasswordStrengthIndicator from "@/components/PasswordStrengthIndicator";
+import { toast } from "sonner";
 
 export default function ArtistSignupPage() {
     const [formData, setFormData] = useState({
@@ -38,10 +39,13 @@ export default function ArtistSignupPage() {
                 throw new Error(data.error || "Registration failed");
             }
 
+            toast.success("Welcome to Artelier! Artist account created.");
             router.refresh();
             router.push(data.redirectUrl || "/artist/dashboard");
         } catch (err) {
-            setError(err instanceof Error ? err.message : "Registration failed");
+            const msg = err instanceof Error ? err.message : "Registration failed";
+            setError(msg);
+            toast.error(msg);
         } finally {
             setLoading(false);
         }

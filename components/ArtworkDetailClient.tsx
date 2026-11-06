@@ -67,7 +67,7 @@ export default function ArtworkDetailClient({
   const router = useRouter();
 
   const handleDelete = () => {
-    router.push("/galleries");
+    router.push("/site/galleries");
     router.refresh();
   };
 
@@ -84,7 +84,7 @@ export default function ArtworkDetailClient({
               <Palette className="size-4" />
               Edit
             </Link>
-            {isAdmin && (
+            {(isAdmin || isOwner) && (
               <ArtworkDeleteButton
                 artworkId={artwork.id}
                 artworkTitle={artwork.title}

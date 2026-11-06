@@ -1,7 +1,9 @@
 "use client";
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
-import { AlertCircle, Mail, Calendar, CheckCircle, XCircle, Eye } from "lucide-react";
+import { AlertCircle, Mail, Calendar, CheckCircle, XCircle, Eye, Trash2 } from "lucide-react";
+import { toast } from "sonner";
 
 type Commission = {
   id: string;
@@ -26,9 +28,13 @@ export default function CommissionsAdminPage() {
   const [error, setError] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [filterStatus, setFilterStatus] = useState<Commission["status"] | "ALL">("ALL");
+  const [commissionToDelete, setCommissionToDelete] = useState<Commission | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
+    setMounted(true);
     fetchCommissions();
   }, []);
 
@@ -52,22 +58,31 @@ export default function CommissionsAdminPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status }),
       });
-      if (!res.ok) throw new Error("Failed to update");
+      if (!res.ok) throw new Error("Failed to update status");
+      toast.success(`Commission status updated to ${statusConfig[status].label}`);
       await fetchCommissions();
       setSelectedId(null);
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Failed to update");
+      toast.error(err instanceof Error ? err.message : "Failed to update");
     }
   }
 
-  async function deleteCommission(id: string) {
-    if (!confirm("Are you sure?")) return;
+  async function confirmDeleteCommission() {
+    if (!commissionToDelete) return;
+    setIsDeleting(true);
     try {
-      const res = await fetch(`/api/commissions/${id}`, { method: "DELETE" });
+      const res = await fetch(`/api/commissions/${commissionToDelete.id}`, { method: "DELETE" });
       if (!res.ok) throw new Error("Failed to delete");
+      toast.success("Commission request deleted successfully");
       await fetchCommissions();
+      if (selectedId === commissionToDelete.id) {
+        setSelectedId(null);
+      }
+      setCommissionToDelete(null);
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Failed to delete");
+      toast.error(err instanceof Error ? err.message : "Failed to delete");
+    } finally {
+      setIsDeleting(false);
     }
   }
 
@@ -202,14 +217,63 @@ export default function CommissionsAdminPage() {
               </div>
 
               <button
-                onClick={() => deleteCommission(selectedCommission.id)}
-                className="w-full px-4 py-2 bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-400 border border-transparent dark:border-red-900/50 rounded-lg font-semibold hover:bg-red-200 dark:hover:bg-red-900/40 transition-all"
+                onClick={() => setCommissionToDelete(selectedCommission)}
+                className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-900/40 rounded-xl font-semibold hover:bg-red-100 dark:hover:bg-red-900/50 transition-all text-xs"
               >
-                Delete Request
+                <Trash2 className="size-4" />
+                <span>Delete Request</span>
               </button>
             </div>
           )}
         </div>
+      )}
+
+      {/* Delete Commission Confirmation Modal */}
+      {commissionToDelete && mounted && typeof document !== "undefined" && createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+          <div
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
+            onClick={() => !isDeleting && setCommissionToDelete(null)}
+          />
+          <div className="relative w-full max-w-md rounded-2xl bg-white dark:bg-[#1a1a24] border border-gray-200 dark:border-gray-800 p-6 shadow-2xl z-10 animate-scale-in">
+            <div className="flex items-center gap-3 text-red-600 dark:text-red-400 mb-4">
+              <div className="p-2.5 rounded-xl bg-red-100 dark:bg-red-950/50">
+                <AlertCircle className="size-6" />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">
+                  Delete Commission Request?
+                </h3>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  Permanent deletion
+                </p>
+              </div>
+            </div>
+            <p className="text-sm text-gray-600 dark:text-gray-300 mb-6 leading-relaxed">
+              Are you sure you want to delete the commission request from <strong className="text-gray-900 dark:text-gray-100">{commissionToDelete.name}</strong> ({commissionToDelete.email})?
+            </p>
+            <div className="flex items-center justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setCommissionToDelete(null)}
+                disabled={isDeleting}
+                className="px-4 py-2 rounded-xl text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={confirmDeleteCommission}
+                disabled={isDeleting}
+                className="inline-flex items-center gap-2 px-5 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white text-sm font-semibold shadow-sm transition-all disabled:opacity-50"
+              >
+                <Trash2 className="size-4" />
+                <span>{isDeleting ? "Deleting..." : "Delete Permanently"}</span>
+              </button>
+            </div>
+          </div>
+        </div>,
+        document.body
       )}
     </div>
   );

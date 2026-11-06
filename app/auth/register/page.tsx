@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { AlertCircle, CheckCircle, Eye, EyeOff } from "lucide-react";
 import PasswordStrengthIndicator from "@/components/PasswordStrengthIndicator";
 import AuthLayout from "@/components/auth/AuthLayout";
+import { toast } from "sonner";
 
 function RegisterForm() {
   const [formData, setFormData] = useState({
@@ -47,9 +48,12 @@ function RegisterForm() {
 
       const data = await res.json();
       setSuccess(true);
-      setTimeout(() => router.push(data.redirectUrl || "/user/dashboard"), 2000);
+      toast.success("Account created successfully!");
+      setTimeout(() => router.push(data.redirectUrl || "/user/dashboard"), 1500);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Registration failed");
+      const msg = err instanceof Error ? err.message : "Registration failed";
+      setError(msg);
+      toast.error(msg);
     } finally {
       setLoading(false);
     }

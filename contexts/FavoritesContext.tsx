@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { usePathname } from "next/navigation";
+import { toast } from "sonner";
 
 type FavoritesContextType = {
   favorites: string[];
@@ -94,6 +95,7 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
 
   const addFavorite = async (artworkId: string) => {
     if (!isAuthenticated) {
+      toast.info("Please sign in to save artworks to your favorites");
       // Redirect to login
       window.location.href = "/auth/login?redirect=" + encodeURIComponent(window.location.pathname);
       return;
@@ -121,10 +123,12 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
       // Mark as unseen so badge shows until user visits favorites page
       setHasUnseenFavorites(true);
       localStorage.setItem("favoritesLastSeenCount", String((data.favorites.length - 1) || 0));
+      toast.success("Added to favorites");
     } catch (error) {
       console.error("Error adding favorite:", error);
       // Revert optimistic update
       setFavorites((prev) => prev.filter((id) => id !== artworkId));
+      toast.error("Could not add to favorites");
     }
   };
 
@@ -147,10 +151,12 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
 
       const data = await res.json();
       setFavorites(data.favorites);
+      toast.info("Removed from favorites");
     } catch (error) {
       console.error("Error removing favorite:", error);
       // Revert optimistic update
       setFavorites((prev) => [...prev, artworkId]);
+      toast.error("Could not remove from favorites");
     }
   };
 

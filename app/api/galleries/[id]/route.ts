@@ -113,3 +113,40 @@ export async function PATCH(
     );
   }
 }
+
+export async function DELETE(
+  req: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { id } = await params;
+  const user = await getCurrentUser(req as any);
+
+  if (!user || user.role !== "ADMIN") {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  try {
+    const gallery = await prisma.gallery.findUnique({
+      where: { id },
+      select: { id: true, slug: true },
+    });
+
+    if (!gallery) {
+      return NextResponse.json({ error: "Gallery not found" }, { status: 404 });
+    }
+
+    await prisma.gallery.delete({
+      where: { id },
+    });
+
+    revalidatePath("/galleries");
+    revalidatePath("/site/galleries");
+    revalidatePath(`/site/galleries/${gallery.slug}`);
+    revalidatePath("/");
+
+    return NextResponse.json({ message: "Gallery deleted" }, { status: 200 });
+  } catch (error) {
+    console.error("Delete gallery error:", error);
+    return NextResponse.json({ error: "Failed to delete" }, { status: 500 });
+  }
+}

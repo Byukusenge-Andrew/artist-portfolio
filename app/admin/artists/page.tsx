@@ -1,7 +1,9 @@
 "use client";
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { AlertCircle, CheckCircle, Edit2, Trash2, Plus, User as UserIcon, ShieldAlert } from "lucide-react";
 import Image from "next/image";
+import { toast } from "sonner";
 
 type Artist = {
   id: string;
@@ -27,6 +29,13 @@ export default function ArtistsAdminPage() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({ name: "", email: "", bio: "", isActive: true });
+  const [artistToDelete, setArtistToDelete] = useState<Artist | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     fetchArtists();
@@ -58,6 +67,7 @@ export default function ArtistsAdminPage() {
           const data = await res.json();
           throw new Error(data.error || "Failed to update");
         }
+        toast.success(`Artist "${formData.name}" updated successfully!`);
       } else {
         const res = await fetch("/api/artists", {
           method: "POST",
@@ -68,28 +78,45 @@ export default function ArtistsAdminPage() {
           const data = await res.json();
           throw new Error(data.error || "Failed to create");
         }
+        toast.success(`Artist "${formData.name}" created successfully!`);
       }
       await fetchArtists();
       setIsEditing(false);
       setSelectedId(null);
       setFormData({ name: "", email: "", bio: "", isActive: true });
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to save");
+      const msg = err instanceof Error ? err.message : "Failed to save";
+      setError(msg);
+      toast.error(msg);
     }
   }
 
-  async function handleDelete(id: string) {
-    if (!confirm("Are you sure you want to delete this artist? This will permanently delete their account.")) return;
+  function handleDelete(id: string) {
+    const target = artists.find((a) => a.id === id);
+    if (target) {
+      setArtistToDelete(target);
+    }
+  }
+
+  async function confirmDeleteArtist() {
+    if (!artistToDelete) return;
+    setIsDeleting(true);
     try {
-      const res = await fetch(`/api/artists/${id}`, { method: "DELETE" });
-      if (!res.ok) throw new Error("Failed to delete");
+      const res = await fetch(`/api/artists/${artistToDelete.id}`, { method: "DELETE" });
+      if (!res.ok) throw new Error("Failed to delete artist");
+      toast.success(`Artist "${artistToDelete.name}" deleted successfully.`);
       await fetchArtists();
-      if (selectedId === id) {
+      if (selectedId === artistToDelete.id) {
         setSelectedId(null);
         setIsEditing(false);
       }
+      setArtistToDelete(null);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to delete");
+      const msg = err instanceof Error ? err.message : "Failed to delete";
+      setError(msg);
+      toast.error(msg);
+    } finally {
+      setIsDeleting(false);
     }
   }
 
@@ -421,6 +448,54 @@ export default function ArtistsAdminPage() {
             </div>
           )}
         </div>
+      )}
+
+      {/* Delete Artist Confirmation Modal */}
+      {artistToDelete && mounted && typeof document !== "undefined" && createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+          <div
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
+            onClick={() => !isDeleting && setArtistToDelete(null)}
+          />
+          <div className="relative w-full max-w-md rounded-2xl bg-white dark:bg-[#1a1a24] border border-gray-200 dark:border-gray-800 p-6 shadow-2xl z-10 animate-scale-in">
+            <div className="flex items-center gap-3 text-red-600 dark:text-red-400 mb-4">
+              <div className="p-2.5 rounded-xl bg-red-100 dark:bg-red-950/50">
+                <AlertCircle className="size-6" />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">
+                  Delete Artist Account?
+                </h3>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  Permanent removal
+                </p>
+              </div>
+            </div>
+            <p className="text-sm text-gray-600 dark:text-gray-300 mb-6 leading-relaxed">
+              Are you sure you want to delete <strong className="text-gray-900 dark:text-gray-100">&ldquo;{artistToDelete.name}&rdquo;</strong>? This will permanently delete their account and associated artist profile.
+            </p>
+            <div className="flex items-center justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setArtistToDelete(null)}
+                disabled={isDeleting}
+                className="px-4 py-2 rounded-xl text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={confirmDeleteArtist}
+                disabled={isDeleting}
+                className="inline-flex items-center gap-2 px-5 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white text-sm font-semibold shadow-sm transition-all disabled:opacity-50"
+              >
+                <Trash2 className="size-4" />
+                <span>{isDeleting ? "Deleting..." : "Delete Artist"}</span>
+              </button>
+            </div>
+          </div>
+        </div>,
+        document.body
       )}
     </div>
   );

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { toast } from "sonner";
 
 export interface CartItem {
     productType: "ORIGINAL" | "PRINT" | "COMMISSION";
@@ -51,10 +52,15 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
     const addItem = (item: CartItem) => {
         setItems((prev) => [...prev, item]);
+        toast.success(`Added "${item.title}" to cart`);
     };
 
     const removeItem = (index: number) => {
+        const item = items[index];
         setItems((prev) => prev.filter((_, i) => i !== index));
+        if (item) {
+            toast.info(`Removed "${item.title}" from cart`);
+        }
     };
 
     const updateQuantity = (index: number, quantity: number) => {
@@ -66,6 +72,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
     const clearCart = () => {
         setItems([]);
+        toast.info("Cart cleared");
     };
 
     const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);

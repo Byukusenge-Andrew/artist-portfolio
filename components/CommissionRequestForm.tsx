@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { AlertCircle, CheckCircle, Users, ShieldCheck, ChevronDown } from "lucide-react";
 import Image from "next/image";
+import { toast } from "sonner";
 
 const commissionSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -62,10 +63,13 @@ export default function CommissionRequestForm({ artistId: initialArtistId, artis
       }
 
       setSubmitted(true);
+      toast.success("Commission request submitted successfully!");
       reset();
       setTimeout(() => setSubmitted(false), 5000);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred");
+      const msg = err instanceof Error ? err.message : "An error occurred";
+      setError(msg);
+      toast.error(msg);
     } finally {
       setIsLoading(false);
     }

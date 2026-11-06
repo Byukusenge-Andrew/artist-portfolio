@@ -1,6 +1,7 @@
 "use client";
 import { useRef, useState } from "react";
 import { supabaseConfigured } from "@/lib/supabaseClient";
+import { toast } from "sonner";
 
 type Props = {
   onUploaded: (args: { publicId: string; url: string; width?: number; height?: number }) => void;
@@ -80,16 +81,14 @@ export function SupabaseUpload({ onUploaded, label = "Upload image", bucket = "a
       } catch (localError) {
         console.error("Local upload error:", localError);
         setUploadStatus("Upload failed");
-        alert("Upload failed. Please try again or contact support.");
+        toast.error("Upload failed. Please check your network or try a smaller image.");
       }
     } finally {
       setLoading(false);
-      // Reset the input value to allow re-uploading the same file
       if (inputRef.current) {
         inputRef.current.value = "";
       }
-      // Clear status after 3 seconds
-      setTimeout(() => setUploadStatus(""), 3000);
+      setTimeout(() => setUploadStatus(""), 4000);
     }
   };
 
@@ -100,14 +99,14 @@ export function SupabaseUpload({ onUploaded, label = "Upload image", bucket = "a
         <button
           type="button"
           disabled={loading}
-          className="px-3 py-2 rounded border disabled:opacity-50 disabled:cursor-not-allowed"
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-teal-200 dark:border-teal-800 bg-teal-50/60 dark:bg-teal-950/40 text-teal-800 dark:text-teal-300 font-semibold text-xs hover:bg-teal-100 dark:hover:bg-teal-900/40 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
           onClick={() => inputRef.current?.click()}
         >
           {loading ? "Uploading..." : label}
         </button>
       </div>
       {uploadStatus && (
-        <p className={`text-xs ${uploadStatus.includes("failed") ? "text-red-600" : uploadStatus.includes("locally") ? "text-amber-600" : "text-green-600"}`}>
+        <p className={`text-xs ${uploadStatus.includes("failed") ? "text-red-600 dark:text-red-400" : uploadStatus.includes("locally") ? "text-amber-600 dark:text-amber-400" : "text-emerald-600 dark:text-emerald-400"}`}>
           {uploadStatus}
         </p>
       )}

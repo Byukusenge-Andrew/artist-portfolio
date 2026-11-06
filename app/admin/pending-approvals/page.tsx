@@ -1,7 +1,9 @@
 "use client";
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import Link from "next/link";
-import { ArrowLeft, CheckCircle, XCircle, Clock, AlertCircle } from "lucide-react";
+import { ArrowLeft, CheckCircle, XCircle, Clock, AlertCircle, Trash2 } from "lucide-react";
+import { toast } from "sonner";
 
 type PendingAdmin = {
     id: string;
@@ -15,8 +17,11 @@ export default function PendingApprovalsPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [processingId, setProcessingId] = useState<string | null>(null);
+    const [adminToReject, setAdminToReject] = useState<PendingAdmin | null>(null);
+    const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
+        setMounted(true);
         fetchPendingAdmins();
     }, []);
 
@@ -29,7 +34,9 @@ export default function PendingApprovalsPage() {
             const data = await res.json();
             setPendingAdmins(data.pendingAdmins || []);
         } catch (err) {
-            setError(err instanceof Error ? err.message : "Failed to load");
+            const msg = err instanceof Error ? err.message : "Failed to load";
+            setError(msg);
+            toast.error(msg);
         } finally {
             setLoading(false);
         }
@@ -49,20 +56,18 @@ export default function PendingApprovalsPage() {
                 throw new Error(data.error || "Failed to approve");
             }
 
-            // Remove from list
+            toast.success("Administrator account approved successfully!");
             setPendingAdmins((prev) => prev.filter((admin) => admin.id !== adminId));
         } catch (err) {
-            alert(err instanceof Error ? err.message : "Failed to approve admin");
+            toast.error(err instanceof Error ? err.message : "Failed to approve admin");
         } finally {
             setProcessingId(null);
         }
     };
 
-    const handleReject = async (adminId: string) => {
-        if (!confirm("Are you sure you want to reject this admin account? This will delete the account.")) {
-            return;
-        }
-
+    const confirmReject = async () => {
+        if (!adminToReject) return;
+        const adminId = adminToReject.id;
         setProcessingId(adminId);
         try {
             const res = await fetch(`/api/admin/approve-admin?adminId=${adminId}`, {
@@ -74,10 +79,11 @@ export default function PendingApprovalsPage() {
                 throw new Error(data.error || "Failed to reject");
             }
 
-            // Remove from list
+            toast.success(`Admin request for "${adminToReject.name}" rejected and removed.`);
             setPendingAdmins((prev) => prev.filter((admin) => admin.id !== adminId));
+            setAdminToReject(null);
         } catch (err) {
-            alert(err instanceof Error ? err.message : "Failed to reject admin");
+            toast.error(err instanceof Error ? err.message : "Failed to reject admin");
         } finally {
             setProcessingId(null);
         }
@@ -168,7 +174,7 @@ export default function PendingApprovalsPage() {
                                         {processingId === admin.id ? "Approving..." : "Approve"}
                                     </button>
                                     <button
-                                        onClick={() => handleReject(admin.id)}
+                                        onClick={() => setAdminToReject(admin)}
                                         disabled={processingId === admin.id}
                                         className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-red-600 to-rose-600 text-white rounded-lg hover:from-red-700 hover:to-rose-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
@@ -180,6 +186,54 @@ export default function PendingApprovalsPage() {
                         </div>
                     ))}
                 </div>
+            )}
+
+            {/* Rejection Modal */}
+            {adminToReject && mounted && typeof document !== "undefined" && createPortal(
+                <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+                    <div
+                        className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
+                        onClick={() => !processingId && setAdminToReject(null)}
+                    />
+                    <div className="relative w-full max-w-md rounded-2xl bg-white dark:bg-[#1a1a24] border border-gray-200 dark:border-gray-800 p-6 shadow-2xl z-10 animate-scale-in">
+                        <div className="flex items-center gap-3 text-red-600 dark:text-red-400 mb-4">
+                            <div className="p-2.5 rounded-xl bg-red-100 dark:bg-red-950/50">
+                                <AlertCircle className="size-6" />
+                            </div>
+                            <div>
+                                <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">
+                                    Reject Admin Request?
+                                </h3>
+                                <p className="text-xs text-gray-500 dark:text-gray-400">
+                                    This will delete the pending account
+                                </p>
+                            </div>
+                        </div>
+                        <p className="text-sm text-gray-600 dark:text-gray-300 mb-6 leading-relaxed">
+                            Are you sure you want to reject the admin request from <strong className="text-gray-900 dark:text-gray-100">{adminToReject.name}</strong> ({adminToReject.email})?
+                        </p>
+                        <div className="flex items-center justify-end gap-3">
+                            <button
+                                type="button"
+                                onClick={() => setAdminToReject(null)}
+                                disabled={!!processingId}
+                                className="px-4 py-2 rounded-xl text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                type="button"
+                                onClick={confirmReject}
+                                disabled={!!processingId}
+                                className="inline-flex items-center gap-2 px-5 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white text-sm font-semibold shadow-sm transition-all disabled:opacity-50"
+                            >
+                                <Trash2 className="size-4" />
+                                <span>{processingId ? "Rejecting..." : "Reject & Delete"}</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>,
+                document.body
             )}
         </div>
     );

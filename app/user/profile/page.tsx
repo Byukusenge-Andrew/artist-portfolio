@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, User, Mail, Save, Loader2, LogOut } from "lucide-react";
 import { SupabaseUpload } from "@/components/SupabaseUpload";
+import { toast } from "sonner";
 
 export default function UserProfilePage() {
   const router = useRouter();
@@ -48,6 +49,7 @@ export default function UserProfilePage() {
       });
       if (res.ok) {
         setSuccess("Profile picture updated!");
+        toast.success("Profile picture updated!");
         setTimeout(() => setSuccess(""), 3000);
       }
     } catch { /* silent — user can still Save manually */ }
@@ -69,10 +71,13 @@ export default function UserProfilePage() {
         throw new Error(data.error || "Failed to update profile");
       }
       setSuccess("Profile updated successfully!");
+      toast.success("Profile updated successfully!");
       setTimeout(() => setSuccess(""), 3000);
       router.refresh();
     } catch (err: any) {
-      setError(err.message || "Failed to update profile");
+      const msg = err.message || "Failed to update profile";
+      setError(msg);
+      toast.error(msg);
     } finally {
       setSaving(false);
     }

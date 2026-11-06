@@ -6,6 +6,7 @@ import { User, Mail, Camera, Save, ArrowLeft, Loader2, Image as ImageIcon } from
 import Image from "next/image";
 import Link from "next/link";
 import { SupabaseUpload } from "@/components/SupabaseUpload";
+import { toast } from "sonner";
 
 export default function EditProfilePage() {
     const router = useRouter();
@@ -79,6 +80,7 @@ export default function EditProfilePage() {
             });
             if (res.ok) {
                 setSuccess("Profile picture updated!");
+                toast.success("Profile picture updated!");
                 setTimeout(() => setSuccess(""), 3000);
             }
         } catch {
@@ -109,13 +111,16 @@ export default function EditProfilePage() {
             }
 
             setSuccess("Profile updated successfully!");
+            toast.success("Profile updated successfully!");
             setTimeout(() => setSuccess(""), 3000);
 
             // Refresh to update header/session info if necessary
             router.refresh();
 
         } catch (err: any) {
-            setError(err.message || "Failed to update profile");
+            const msg = err.message || "Failed to update profile";
+            setError(msg);
+            toast.error(msg);
         } finally {
             setSaving(false);
         }

@@ -1,5 +1,6 @@
 "use client";
 import { useState, useRef } from "react";
+import { toast } from "sonner";
 
 type Props = {
   onUploaded: (args: {
@@ -54,9 +55,9 @@ export function LocalUpload({ onUploaded, label = "Upload from PC" }: Props) {
       setUploadStatus(`Failed: ${errorMessage}`);
       
       if (errorMessage.includes("aborted")) {
-        alert("Upload timed out. Please try again or use a smaller image.");
+        toast.error("Upload timed out. Please try again or use a smaller image.");
       } else {
-        alert(errorMessage);
+        toast.error(errorMessage || "Upload failed. Please try again.");
       }
     } finally {
       setLoading(false);

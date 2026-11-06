@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { AlertCircle, Eye, EyeOff } from "lucide-react";
 import AuthLayout from "@/components/auth/AuthLayout";
+import { toast } from "sonner";
 
 function LoginForm() {
   const [email, setEmail] = useState("");
@@ -36,10 +37,12 @@ function LoginForm() {
       }
 
       const data = await res.json();
-      // Hard navigation: forces server re-render so the Header picks up the new session cookie
+      toast.success("Welcome back! Redirecting...");
       window.location.href = data.redirectUrl || "/user/dashboard";
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Login failed");
+      const msg = err instanceof Error ? err.message : "Login failed";
+      setError(msg);
+      toast.error(msg);
     } finally {
       setLoading(false);
     }

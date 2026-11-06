@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { cookies } from "next/headers";
-import { Images, Plus, LogOut, Shield, User, Heart, Bell, Menu, Palette } from "lucide-react";
+import { Images, Plus, LogOut, Shield, User, Heart, Bell, Palette } from "lucide-react";
 
 import SearchBox from "./SearchBox";
 import FavoritesButton from "./FavoritesButton";
@@ -9,7 +9,7 @@ import Image from "next/image";
 import { parseUserSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import ThemeToggle from "./ThemeToggle";
-
+import HeaderMobileNav from "./HeaderMobileNav";
 import ArtistHeader from "./ArtistHeader";
 
 export default async function Header() {
@@ -117,6 +117,14 @@ export default async function Header() {
           <FavoritesButton />
           <CartButton />
           <ThemeToggle />
+
+          {/* Mobile Navigation Drawer Trigger */}
+          <HeaderMobileNav
+            user={user}
+            isAdmin={isAdmin}
+            isArtist={isArtist}
+            pendingAdminCount={pendingAdminCount}
+          />
 
           {/* Admin/Artist Section */}
           {(isAdmin || isArtist) && (
